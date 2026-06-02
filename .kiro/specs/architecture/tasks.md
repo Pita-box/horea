@@ -24,76 +24,76 @@ Foundation pokrývá:
 
 ## Tasks
 
-- [ ] 1. Inicializace Next.js + TypeScript projektu
+- [x] 1. Inicializace Next.js + TypeScript projektu
   - [x] 1.1 Vytvořit Next.js projekt s App Routerem a TypeScriptem
     - Spustit `pnpm create next-app .` s volbami: TypeScript, App Router, ESLint, src/ directory, Tailwind dle preference (default zapnutý), import alias `@/*`
     - Ověřit `pnpm dev` běží na `http://localhost:3000`
     - _Requirements: 5.4, 6.1, 18.4_
 
-  - [-] 1.2 Vytvořit `.gitignore` a inicializovat git repozitář
+  - [x] 1.2 Vytvořit `.gitignore` a inicializovat git repozitář
     - Ověřit, že `.gitignore` z `create-next-app` obsahuje `.env*.local`, `node_modules`, `.next`, `out`, `coverage`
     - `.gitignore` **NESMÍ** ignorovat `pnpm-lock.yaml` (lockfile se commituje); pokud `create-next-app` vygeneroval `package-lock.json`, odstranit ho
     - `git init`, první commit `chore: initial Next.js scaffold`
     - _Requirements: 10.7_
 
-  - [-] 1.3 Nastavit Node.js verzi přes `.nvmrc` a `engines` v `package.json`
+  - [x] 1.3 Nastavit Node.js verzi přes `.nvmrc` a `engines` v `package.json`
     - Vytvořit `.nvmrc` s LTS verzí (např. `20`)
     - Přidat `"engines": { "node": ">=20.0.0" }` do `package.json`
     - Přidat pole `"packageManager": "pnpm@9.x"` do `package.json` (pin verze pnpm)
     - Commituj `pnpm-lock.yaml`, NIKDY `package-lock.json`
     - _Requirements: 3.4, 5.4_
 
-- [ ] 2. Vývojový tooling — linting, formatting, testing
-  - [~] 2.1 Konfigurace ESLint (rozšíření výchozí Next.js konfigurace)
+- [x] 2. Vývojový tooling — linting, formatting, testing
+  - [x] 2.1 Konfigurace ESLint (rozšíření výchozí Next.js konfigurace)
     - Ověřit, že `eslint.config.mjs` (nebo `.eslintrc.json`) je vygenerovaný z `create-next-app`
     - Přidat pravidlo zakazující `console.log` (povolit `console.warn`, `console.error`)
     - Přidat `pnpm lint` script (pokud chybí)
     - _Requirements: 3.5, 20.1_
 
-  - [~] 2.2 Přidat Prettier a integrovat s ESLint
+  - [x] 2.2 Přidat Prettier a integrovat s ESLint
     - Nainstalovat `prettier`, `eslint-config-prettier`
     - Vytvořit `.prettierrc` (single quote, semicolons, trailing comma `all`, print width 100)
     - Přidat `.prettierignore` (`node_modules`, `.next`, `coverage`, `*.md` dle volby)
     - Přidat `pnpm format` script (`prettier --write .`) a `pnpm format:check`
     - _Requirements: 3.5_
 
-  - [~] 2.3 Nastavit Vitest pro unit testy
+  - [x] 2.3 Nastavit Vitest pro unit testy
     - Nainstalovat `vitest`, `@vitest/coverage-v8`, `@testing-library/react`, `jsdom`
     - Vytvořit `vitest.config.ts` s `environment: 'jsdom'` a path alias `@/*`
     - Přidat scripty `test`, `test:run`, `test:coverage`
     - Vytvořit smoke test `src/__tests__/smoke.test.ts` s `expect(1 + 1).toBe(2)` pro ověření setupu
     - _Requirements: 3.5_
 
-  - [~] 2.4 Nastavit fast-check pro property-based testing infrastrukturu
+  - [x] 2.4 Nastavit fast-check pro property-based testing infrastrukturu
     - Nainstalovat `fast-check` a `@fast-check/vitest`
     - Vytvořit `src/__tests__/pbt-smoke.test.ts` s minimálním property testem (např. `fc.assert(fc.property(fc.integer(), n => n + 0 === n))`) pro ověření, že fast-check funguje
     - **Žádné konkrétní property testy** — ty patří do feature specs (viz `design.md` *Testing Strategy*)
     - _Requirements: 3.5_
 
-  - [~] 2.5 Nastavit Playwright pro E2E testy
+  - [x] 2.5 Nastavit Playwright pro E2E testy
     - Spustit `pnpm exec playwright install` a `pnpm create playwright`
     - Konfigurovat `playwright.config.ts` s `baseURL: http://localhost:3000`, projekt pro Chromium (MVP), trace `on-first-retry`
     - Vytvořit `e2e/smoke.spec.ts` ověřující, že root URL vrací HTTP 200
     - Přidat `pnpm test:e2e` script (`playwright test`)
     - _Requirements: 3.5_
 
-- [ ] 3. Provisioning Supabase projektu
-  - [~] 3.1 Vytvořit Supabase projekt v EU regionu
+- [x] 3. Provisioning Supabase projektu
+  - [x] 3.1 Vytvořit Supabase projekt v EU regionu
     - Manuálně v Supabase dashboardu: nový projekt v regionu `eu-central-1` nebo `eu-west-1`
     - Uložit `Project URL`, `anon public key`, `service_role key`, `Database password`, `JWT secret`
     - **Citlivé klíče** patří pouze do `.env.local` a Vercel env, nikdy do gitu
     - _Requirements: 9.7, 10.7_
 
-  - [~] 3.2 Nainstalovat Supabase JS SDK a CLI
+  - [x] 3.2 Nainstalovat Supabase JS SDK a CLI
     - Nainstalovat `@supabase/supabase-js`, `@supabase/ssr`
     - Nainstalovat `supabase` CLI jako devDependency
     - Spustit `pnpm dlx supabase init` (vytvoří `supabase/` adresář pro migrace)
     - Spustit `pnpm dlx supabase link --project-ref <ref>` pro propojení s remote projektem
     - _Requirements: 5.6, 6.4_
 
-  - [~] 3.3 Konfigurace Supabase Auth — e-mail/heslo
+  - [x] 3.3 Konfigurace Supabase Auth — e-mail/heslo
     - V Supabase dashboardu: Authentication → Providers → povolit Email (zakázat magic link, OAuth pro MVP)
-    - Nastavit Site URL na `https://www.mojerezervace.cz` (a `http://localhost:3000` jako Additional Redirect URL pro dev)
+    - Nastavit Site URL na `https://www.horea.cz` (a `http://localhost:3000` jako Additional Redirect URL pro dev)
     - Nastavit Confirm email = ON (vyžadovat e-mail verifikaci)
     - Vlastní e-mailové šablony zatím **NEpřepisovat** — patří do `auth-onboarding` specu
     - _Requirements: 10.5, 10.8_
@@ -112,13 +112,13 @@ Foundation pokrývá:
     - **Service role key** smí mít pouze server-side scope, nikdy `NEXT_PUBLIC_*` prefix
     - _Requirements: 5.5, 10.7_
 
-  - [~] 4.3 Konfigurace custom domény mojerezervace.cz na Vercelu
-    - Ve Vercel projektu: Settings → Domains → přidat `mojerezervace.cz` a `www.mojerezervace.cz`
+  - [~] 4.3 Konfigurace custom domény Horea.cz na Vercelu
+    - Ve Vercel projektu: Settings → Domains → přidat `Horea.cz` a `www.horea.cz`
     - Vercel zobrazí DNS instrukce (A/CNAME) — zatím NEnastavovat na DNS, počkat na úkol 5.x (DNS přejde přes Cloudflare)
     - _Requirements: 11.2, 9.5_
 
 - [ ] 5. Provisioning Cloudflare — DNS, WAF, edge rate limit
-  - [~] 5.1 Přidat doménu mojerezervace.cz do Cloudflare a změnit nameservery u registrátora
+  - [~] 5.1 Přidat doménu Horea.cz do Cloudflare a změnit nameservery u registrátora
     - V Cloudflare dashboardu: Add site, vybrat Free plan
     - U registrátora domény změnit nameservery na hodnoty z Cloudflare
     - Počkat na propagaci a aktivaci v Cloudflare (zelený stav)
@@ -127,7 +127,7 @@ Foundation pokrývá:
   - [~] 5.2 Nastavit DNS záznamy směřující na Vercel
     - Přidat A / CNAME záznamy dle instrukcí z Vercelu (úkol 4.3)
     - Nastavit Proxy status na **proxied** (oranžový mrak), aby provoz šel přes Cloudflare
-    - Ověřit, že `https://www.mojerezervace.cz` vrací response z Vercelu
+    - Ověřit, že `https://www.horea.cz` vrací response z Vercelu
     - _Requirements: 10.1, 9.5_
 
   - [~] 5.3 Aktivovat základní Cloudflare WAF
@@ -148,19 +148,19 @@ Foundation pokrývá:
     - Edge Certificates: zapnout Always Use HTTPS, Automatic HTTPS Rewrites, HSTS (max-age 6 měsíců, includeSubDomains)
     - _Requirements: 10.1, 9.5_
 
-- [ ] 6. Základní layout, locale, error pages
-  - [~] 6.1 Konfigurace root layoutu pro českou lokalizaci
+- [x] 6. Základní layout, locale, error pages
+  - [x] 6.1 Konfigurace root layoutu pro českou lokalizaci
     - V `src/app/layout.tsx`: nastavit `<html lang="cs">`
     - Nastavit `metadata.title` a `metadata.description` v češtině (placeholder hodnoty pro MVP)
     - _Requirements: 18.1, 18.4_
 
-  - [~] 6.2 Konfigurace timezone helperu pro Europe/Prague
+  - [x] 6.2 Konfigurace timezone helperu pro Europe/Prague
     - Vytvořit `src/lib/datetime.ts` se dvěma utility funkcemi: `toPragueDisplay(utcDate)` a `fromPragueInput(localDate)`
     - V DB ukládáme UTC, v UI zobrazujeme Europe/Prague — viz `design.md` *Reservation Logic*
     - Použít nativní `Intl.DateTimeFormat` s `timeZone: 'Europe/Prague'`, žádná dependency navíc
     - _Requirements: 18.3_
 
-  - [~] 6.3 Scaffoldovat design tokens jako globální stylový baseline
+  - [x] 6.3 Scaffoldovat design tokens jako globální stylový baseline
     - V `src/app/globals.css` nastavit design tokens z `.kiro/steering/design-system.md`, sekce *Quick Start* (`.kiro/steering/design-system.md` je **source of truth** — tokeny kopírovat 1:1, neimprovizovat hodnoty)
     - **Pokud `create-next-app` v úkolu 1.1 nastavil Tailwind v4** → použít blok `@theme { ... }` z *Quick Start › Tailwind v4*. **Pokud Tailwind není** → použít blok `:root { ... }` z *Quick Start › CSS Custom Properties*
     - Barevné tokeny (`--color-*`): Canvas White, Cloud Mist, Slate Text, Rich Violet, Action Violet, Air Blue, Lush Green, Sunset Pink, Neon Pink, Aqua Blue, Electric Green, Soft Gray Fill
@@ -169,24 +169,24 @@ Foundation pokrývá:
     - Tímto vzniká vizuální **design baseline**, na kterém staví všechny feature UI; konkrétní feature komponenty zůstávají ve feature specs
     - _Requirements: 18.1_
 
-  - [~] 6.4 Implementovat root error boundary
+  - [x] 6.4 Implementovat root error boundary
     - Vytvořit `src/app/error.tsx` (client component) s českou hláškou „Něco se pokazilo. Zkuste to prosím znovu."
     - Zobrazit request ID (z hlavičky `x-request-id`, vytvořeno v úkolu 11.x), pokud je dostupné
     - **Žádný stack trace** uživateli — viz `design.md` *Error Handling*
     - _Requirements: 14.4, 20.2_
 
-  - [~] 6.5 Implementovat 404 stránku
+  - [x] 6.5 Implementovat 404 stránku
     - Vytvořit `src/app/not-found.tsx` s českou hláškou „Stránka nenalezena" a odkazem na hlavní stránku
     - _Requirements: 18.1_
 
-  - [~] 6.6 Nastavit web fonty přes `next/font`
+  - [x] 6.6 Nastavit web fonty přes `next/font`
     - V `src/app/layout.tsx` načíst fonty přes `next/font/google`: Plus Jakarta Sans (body/UI) a Montserrat jako **substituci za PolySans** (PolySans je proprietární, viz `.kiro/steering/design-system.md` — používáme dokumentovaný substitut Montserrat); Inter ponechán jako fallback v `--font-plus-jakarta-sans` stacku
     - Zahrnout subset `latin-ext` kvůli českým diakritickým znakům (ě, š, č, ř, ž, ů…)
     - Načítané váhy dle design-system.md: Plus Jakarta Sans 400/500/600/700, Montserrat 600/700
     - Přemapovat CSS proměnné fontů na tokeny: nastavit `variable: '--font-plus-jakarta-sans'` a `variable: '--font-polysans'` tak, aby odpovídaly tokenům z úkolu 6.3, a aplikovat třídy fontů na `<body>`
     - _Requirements: 18.1_
 
-  - [~] 6.7 Vytvořit minimální sadu sdílených UI primitiv
+  - [x] 6.7 Vytvořit minimální sadu sdílených UI primitiv
     - Vytvořit `src/components/ui/` se **třemi** primitivy, které využije každá feature, postavenými výhradně na tokenech z úkolu 6.3 (per `.kiro/steering/design-system.md`):
       - `Button` (varianty `primary` / `ghost` / `outline` — Action Violet filled, transparent + Cloud Mist border, transparent + Slate Text border; radius 12px `--radius-buttons`)
       - `Card` (Canvas White, radius 26px `--radius-cards`, bez stínu)
@@ -194,33 +194,33 @@ Foundation pokrývá:
       - **Pouze tyto tři primitivy** s dokumentovanými variantami/radii/barvami — feature-specifické komponenty (formuláře, kalendář, dashboard widgety) zůstávají ve feature specs (Simplicity First)
     - _Requirements: 18.1_
 
-- [ ] 7. Supabase schema baseline — DDL pro všechny entity
-  - [~] 7.1 Vytvořit migraci `0001_init_users.sql`
+- [x] 7. Supabase schema baseline — DDL pro všechny entity
+  - [x] 7.1 Vytvořit migraci `0001_init_users.sql`
     - Tabulka `users` (id UUID, email UNIQUE, password_hash, is_admin BOOL DEFAULT FALSE, dpa_version_accepted, dpa_accepted_at, created_at, updated_at)
     - Pozn.: pokud používáme Supabase Auth, `users` je rozšíření `auth.users` přes 1:1 FK na `auth.users.id` (nebo separátní `public.user_profiles` — zvolit jednu cestu a zdokumentovat v `README.md`)
     - **Pouze DDL, žádné triggery ani business logika**
     - _Requirements: 9.1, 9.2, 17.1_
 
-  - [~] 7.2 Vytvořit migraci `0002_init_businesses.sql`
+  - [x] 7.2 Vytvořit migraci `0002_init_businesses.sql`
     - Tabulka `businesses` (id, owner_user_id FK→users, slug UNIQUE, name, type ENUM, description, logo_url, is_published BOOL DEFAULT FALSE, auto_approve_reservations BOOL DEFAULT FALSE, allow_parallel_slots BOOL DEFAULT FALSE, last_backup_at, created_at, updated_at)
     - ENUM `business_type`: `kadernik`, `nehtove_studio`, `bistro`, `masazni_salon`, `spa`, `beauty`, `ostatni`
     - Index na `slug`
     - _Requirements: 11.1, 11.4, 15.2, 16.2, 21.1_
 
-  - [~] 7.3 Vytvořit migraci `0003_init_services_and_hours.sql`
+  - [x] 7.3 Vytvořit migraci `0003_init_services_and_hours.sql`
     - Tabulka `services` (id, business_id FK→businesses, name, duration_minutes INT, price_czk DECIMAL, description, created_at, updated_at)
     - Tabulka `opening_hours` (id, business_id FK→businesses, day_of_week INT 0-6, opens_at TIME, closes_at TIME)
     - Index na `business_id` v obou tabulkách
     - _Requirements: 1.1_
 
-  - [~] 7.4 Vytvořit migraci `0004_init_reservations_clients.sql`
+  - [x] 7.4 Vytvořit migraci `0004_init_reservations_clients.sql`
     - Tabulka `reservations` (id, business_id FK→businesses, service_id FK→services, client_name, client_phone, client_email, starts_at TIMESTAMPTZ, ends_at TIMESTAMPTZ, status ENUM, note, created_at, updated_at)
     - ENUM `reservation_status`: `pending`, `approved`, `rejected`, `cancelled`
     - Tabulka `clients` (id, business_id FK→businesses, name, phone, email, created_at, updated_at)
     - Index na `(business_id, starts_at)` v `reservations`
     - _Requirements: 1.1, 19.3, 19.4_
 
-  - [~] 7.5 Vytvořit migraci `0005_init_subscriptions_payments_coupons.sql`
+  - [x] 7.5 Vytvořit migraci `0005_init_subscriptions_payments_coupons.sql`
     - Tabulka `subscriptions` (id, business_id FK→businesses UNIQUE, plan ENUM, status ENUM, current_period_start, current_period_end, gopay_schedule_id, created_at, updated_at)
     - ENUM `subscription_plan`: `start`, `pokrocily`, `max`
     - ENUM `subscription_status`: `free`, `active`, `grace_period`, `expired`, `deleted_data`
@@ -228,7 +228,7 @@ Foundation pokrývá:
     - Tabulka `coupons` (id, code UNIQUE, type ENUM, discount_value, valid_until, max_uses, used_count, created_at)
     - _Requirements: 7.1, 12.6_
 
-  - [~] 7.6 Spustit migrace na Supabase remote a ověřit schéma
+  - [x] 7.6 Spustit migrace na Supabase remote a ověřit schéma
     - `pnpm dlx supabase db push` (nebo `supabase migration up`)
     - V Supabase dashboardu (Table Editor) ověřit, že všechny tabulky existují
     - _Requirements: 1.3_
@@ -278,7 +278,7 @@ Foundation pokrývá:
 
 - [ ] 10. Resend setup
   - [~] 10.1 Založit Resend účet a verifikovat doménu
-    - Manuálně: založit Resend účet, přidat doménu `mojerezervace.cz`
+    - Manuálně: založit Resend účet, přidat doménu `Horea.cz`
     - V Cloudflare DNS přidat SPF, DKIM, DMARC záznamy dle Resend instrukcí
     - Počkat na verifikaci a uložit `RESEND_API_KEY` do Vercel env (úkol 4.2 už refer na klíč; zde se hodnota doplní)
     - _Requirements: 13.1, 13.7_
@@ -291,7 +291,7 @@ Foundation pokrývá:
     - _Requirements: 13.1, 14.2_
 
 - [ ] 11. Logging baseline + request ID middleware
-  - [~] 11.1 Implementovat strukturovaný logger utility
+  - [x] 11.1 Implementovat strukturovaný logger utility
     - Vytvořit `src/lib/log.ts` — funkce `log.info(msg, ctx)`, `log.warn(msg, ctx)`, `log.error(msg, ctx)`
     - Výstup JSON na `stdout` (Vercel automaticky scrapuje), formát: `{ timestamp, level, msg, requestId?, userId?, ...ctx }`
     - Filtr citlivých klíčů (`password`, `token`, `authorization`, `cookie`) — nahradit hodnotu `[REDACTED]`
@@ -313,9 +313,9 @@ Foundation pokrývá:
 
 - [ ] 13. Google Cloud setup (service account, žádný integration kód)
   - [~] 13.1 Vytvořit Google Cloud projekt a service account
-    - Manuálně: GCP console → nový projekt `mojerezervace`
+    - Manuálně: GCP console → nový projekt `Horea`
     - Povolit API: Google Drive API, Google Sheets API
-    - Vytvořit service account `mojerezervace-backup@...`, vygenerovat JSON klíč
+    - Vytvořit service account `Horea-backup@...`, vygenerovat JSON klíč
     - Uložit obsah JSON jako jeden řádek (escapovaný) do env var `GOOGLE_SERVICE_ACCOUNT_JSON` ve Vercelu a `.env.local`
     - **Žádný integrace kód zde** — patří do `subscription-payments` / dedikovaného backup specu
     - _Requirements: 8.1, 8.4_
@@ -323,7 +323,7 @@ Foundation pokrývá:
 - [~] 14. Checkpoint — ověřit foundation lokálně i v preview
   - Ověřit `pnpm lint`, `pnpm format:check`, `pnpm test:run`, `pnpm test:e2e` projdou
   - Ověřit, že Vercel preview deploy se zelenou (úspěšný build)
-  - Ověřit, že `https://www.mojerezervace.cz` vrací výchozí Next.js stránku přes Cloudflare → Vercel
+  - Ověřit, že `https://www.horea.cz` vrací výchozí Next.js stránku přes Cloudflare → Vercel
   - Ověřit, že Supabase migrace jsou aplikované a anonymní SELECT z `businesses` respektuje RLS
   - Ensure all tests pass, ask the user if questions arise.
 

@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import type { NextConfig } from 'next';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Pin the workspace root to this project directory. The home directory (~)
 // contains a stray package.json + pnpm-lock.yaml, which makes Next.js infer

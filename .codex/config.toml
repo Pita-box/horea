@@ -1,0 +1,7 @@
+# Project-local Codex config. Applies when this repository's `.codex` layer is trusted.
+
+project_doc_max_bytes = 65536
+
+[agents]
+max_threads = 6
+max_depth = 1

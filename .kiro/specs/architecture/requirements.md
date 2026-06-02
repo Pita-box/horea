@@ -1,13 +1,13 @@
 # Requirements Document
 
-> Požadavky na architekturu platformy Mojerezervace
+> Požadavky na architekturu platformy Horea
 
 > Tento dokument odvozuje **architektonické a platformové požadavky** z dokumentu `design.md`.
 > Funkční požadavky jednotlivých feature jsou rozpracovány v samostatných spec dokumentech (viz `design.md`, sekce *Planned Spec Structure*).
 
 ## Introduction
 
-Mojerezervace je SaaS rezervační platforma pro malé české podniky (kadeřníci, nehtová studia, bistra, masážní salóny, spa, beauty). Cílem těchto požadavků je definovat **měřitelné a ověřitelné podmínky**, které musí platforma jako celek splňovat — nezávisle na konkrétní funkcionalitě. Konkrétní user stories pro jednotlivé funkce (registrace, rezervace, platby, atd.) jsou rozpracovány v samostatných spec dokumentech.
+Horea je SaaS rezervační platforma pro malé české podniky (kadeřníci, nehtová studia, bistra, masážní salóny, spa, beauty). Cílem těchto požadavků je definovat **měřitelné a ověřitelné podmínky**, které musí platforma jako celek splňovat — nezávisle na konkrétní funkcionalitě. Konkrétní user stories pro jednotlivé funkce (registrace, rezervace, platby, atd.) jsou rozpracovány v samostatných spec dokumentech.
 
 Požadavky jsou odvozeny z designových rozhodnutí v `design.md` a slouží jako:
 
@@ -159,7 +159,7 @@ Požadavky jsou odvozeny z designových rozhodnutí v `design.md` a slouží jak
 #### Acceptance Criteria
 
 1. THE platforma SHALL přidělit každému podniku unikátní `slug`.
-2. THE veřejná stránka podniku SHALL být dostupná na URL `https://www.mojerezervace.cz/{slug}`.
+2. THE veřejná stránka podniku SHALL být dostupná na URL `https://www.horea.cz/{slug}`.
 3. WHEN podnikatel registruje slug THEN platforma SHALL ověřit unikátnost a odmítnout již obsazené slugy (first-come, first-served).
 4. THE slug SHALL splňovat URL-bezpečné požadavky (malá písmena, číslice, pomlčky; bez diakritiky a mezer).
 5. WHERE slug koliduje se systémovými routami (např. `/admin`, `/login`, `/api`), THE platforma SHALL slug odmítnout.
@@ -190,7 +190,7 @@ Požadavky jsou odvozeny z designových rozhodnutí v `design.md` a slouží jak
 4. WHEN platba uspěje THEN platforma SHALL odeslat fakturu emailem.
 5. WHEN auto-charge selže THEN platforma SHALL odeslat email s QR kódem, fakturou a bankovními údaji pro manuální platbu.
 6. WHEN se blíží mazání dat (po 3 měsících expired) THEN platforma SHALL odeslat warning email.
-7. THE platforma SHALL mít nakonfigurovaný SPF, DKIM a DMARC pro doménu mojerezervace.cz, aby emaily nebyly označovány jako spam.
+7. THE platforma SHALL mít nakonfigurovaný SPF, DKIM a DMARC pro doménu Horea.cz, aby emaily nebyly označovány jako spam.
 8. IF odeslání emailu selže THEN platforma SHALL operaci zopakovat (retry) a v případě trvalého selhání zalogovat chybu.
 
 ### Requirement 14: Dostupnost a degradace

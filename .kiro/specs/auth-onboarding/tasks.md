@@ -134,7 +134,7 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
   - [ ] 5.1 Vytvořit českou e-mailovou šablonu pro ověření emailu
     - V `src/lib/email/templates/verify-email.ts`: funkce `renderVerifyEmail({ verifyUrl })` vracející `{ subject, html, text }`
     - Použít `wrapEmail()` z foundation (10.2) pro patičku
-    - Subject: `Ověřte svůj email — Mojerezervace`, body česky s tlačítkem/odkazem na `verifyUrl`
+    - Subject: `Ověřte svůj email — Horea`, body česky s tlačítkem/odkazem na `verifyUrl`
     - _Requirements: 1.7, 15.3_
 
   - [ ] 5.2 Nakonfigurovat Supabase Auth e-mailovou šablonu pro verifikaci
@@ -186,7 +186,7 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
   - [ ] 7.1 Vytvořit českou e-mailovou šablonu pro reset hesla
     - V `src/lib/email/templates/password-reset.ts`: funkce `renderPasswordResetEmail({ resetUrl })` vracející `{ subject, html, text }`
     - Použít `wrapEmail()` z foundation (10.2)
-    - Subject: `Obnovení hesla — Mojerezervace`
+    - Subject: `Obnovení hesla — Horea`
     - _Requirements: 5.1, 15.3_
 
   - [ ] 7.2 Nakonfigurovat Supabase Auth e-mailovou šablonu pro reset
@@ -305,7 +305,7 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
 
 - [ ] 13. Onboarding wizard — krok 2: slug
   - [ ] 13.1 Implementovat UI pro krok 2 v `src/app/onboarding/2/page.tsx`
-    - Pole pro slug + živý náhled URL `https://www.mojerezervace.cz/{slug}`
+    - Pole pro slug + živý náhled URL `https://www.horea.cz/{slug}`
     - Client Component s debounce 300 ms volajícím server action z 13.2
     - Předvyplnit z `draft.slug_data`
     - _Requirements: 8.1, 8.2, 14.1, 15.2_

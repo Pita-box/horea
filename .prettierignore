@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+build
+coverage
+pnpm-lock.yaml
+
+# Spec a steering dokumenty jsou ručně formátované — Prettier je nesmí přepisovat
+.kiro/
+*.md

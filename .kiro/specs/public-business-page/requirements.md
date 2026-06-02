@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Tato specifikace pokrývá **veřejnou stránku podniku** dostupnou na URL `https://www.mojerezervace.cz/{slug}` — tedy rozhraní, kterým koncoví zákazníci (klienti) bez registrace prohlížejí profil podniku a vytvářejí rezervace. Stránka je první (a často jediný) kontakt klienta s platformou; její dostupnost, rychlost a srozumitelnost přímo určují konverzi rezervací.
+Tato specifikace pokrývá **veřejnou stránku podniku** dostupnou na URL `https://www.horea.cz/{slug}` — tedy rozhraní, kterým koncoví zákazníci (klienti) bez registrace prohlížejí profil podniku a vytvářejí rezervace. Stránka je první (a často jediný) kontakt klienta s platformou; její dostupnost, rychlost a srozumitelnost přímo určují konverzi rezervací.
 
 Feature pokrývá:
 
@@ -31,7 +31,7 @@ Návaznost na feature specifikace: `services-and-availability` poskytuje sdílen
 
 ## Glossary
 
-- **Public_Page**: Veřejná stránka podniku dostupná na URL `https://www.mojerezervace.cz/{slug}`. Vykresluje se serverově s ISR (Incremental Static Regeneration) cache.
+- **Public_Page**: Veřejná stránka podniku dostupná na URL `https://www.horea.cz/{slug}`. Vykresluje se serverově s ISR (Incremental Static Regeneration) cache.
 - **Public_Page_Renderer**: Komponenta zodpovědná za načtení dat podniku, rozhodnutí o stavu stránky (publikováno / nepublikováno / 404) a vykreslení odpovídajícího HTML.
 - **Slug**: URL-bezpečný identifikátor podniku v cestě `/{slug}` (definováno v `auth-onboarding`).
 - **Reserved_Slug**: Systémem rezervovaný řetězec, který nesmí být použit jako slug podniku (viz `auth-onboarding`).
@@ -201,7 +201,7 @@ Návaznost na feature specifikace: `services-and-availability` poskytuje sdílen
 #### Acceptance Criteria
 
 1. THE Sitemap_Generator SHALL vystavit endpoint `/sitemap.xml` vracející validní XML sitemap podle protokolu sitemaps.org.
-2. THE Sitemap_Generator SHALL do sitemap zahrnout právě URL všech `Published_Business` ve tvaru `https://www.mojerezervace.cz/{slug}`.
+2. THE Sitemap_Generator SHALL do sitemap zahrnout právě URL všech `Published_Business` ve tvaru `https://www.horea.cz/{slug}`.
 3. THE Sitemap_Generator SHALL z sitemap vyloučit URL `Unpublished_Business` a vyloučit i jakékoli systémové cesty platformy (`/admin`, `/dashboard`, `/api`, `/login` atd.).
 4. THE Sitemap_Generator SHALL pro každý záznam vyplnit `<lastmod>` na hodnotu `business.updated_at` převedenou do formátu ISO 8601.
 

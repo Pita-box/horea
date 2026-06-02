@@ -6,7 +6,7 @@
 
 ## Overview
 
-Feature `public-business-page` pokrývá **veřejnou stránku podniku** dostupnou na URL `https://www.mojerezervace.cz/{slug}` — tedy první (a často jediný) kontakt klienta s platformou. Zahrnuje vykreslení profilu (logo, název, popis, kontakty, otevírací doba, služby), pětikrokový rezervační formulář, server-side vytvoření rezervace s plnou revalidací invariantů a odeslání dvou potvrzovacích e-mailů (klientovi a majiteli). Doplňkově řeší SEO (meta tagy, Open Graph, JSON-LD, sitemap.xml) a tři stavy stránky (publikováno / nepublikováno / 404).
+Feature `public-business-page` pokrývá **veřejnou stránku podniku** dostupnou na URL `https://www.horea.cz/{slug}` — tedy první (a často jediný) kontakt klienta s platformou. Zahrnuje vykreslení profilu (logo, název, popis, kontakty, otevírací doba, služby), pětikrokový rezervační formulář, server-side vytvoření rezervace s plnou revalidací invariantů a odeslání dvou potvrzovacích e-mailů (klientovi a majiteli). Doplňkově řeší SEO (meta tagy, Open Graph, JSON-LD, sitemap.xml) a tři stavy stránky (publikováno / nepublikováno / 404).
 
 **Co je sdíleno z jiných specifikací (a tato feature to neopakuje):**
 
@@ -229,7 +229,7 @@ Implementuje `app/sitemap.ts` (Next.js dynamic sitemap konvence).
 **Odpovědnosti:**
 
 - Načte přes anon klíč všechny `Published_Business` (`is_published = true AND subscription.status IN ('active', 'grace_period')`).
-- Pro každý záznam vyplní `loc = https://www.mojerezervace.cz/{slug}` a `lastmod = business.updated_at` v ISO 8601.
+- Pro každý záznam vyplní `loc = https://www.horea.cz/{slug}` a `lastmod = business.updated_at` v ISO 8601.
 - **Vyloučí** `Unpublished_Business` a všechny systémové cesty (`/admin`, `/dashboard`, `/api`, `/login` atd. — ty jsou implicitně vyloučeny tím, že se sitemap generuje **jen z `businesses` tabulky**, neobsahuje všechny aplikační routy).
 - Sitemap je revalidována Next.js cache stejným mechanismem jako `/[slug]` (ISR) — viz *ISR strategie* níže.
 
@@ -359,7 +359,7 @@ flowchart TD
 
 ### Canonical URL
 
-Aby se zabránilo duplicitnímu indexování při různém casingu URL, `SeoMetadata` vždy nastaví `<link rel="canonical">` na lowercase tvar (`https://www.mojerezervace.cz/{slug_norm}`). Open Graph `og:url` používá stejnou canonical hodnotu.
+Aby se zabránilo duplicitnímu indexování při různém casingu URL, `SeoMetadata` vždy nastaví `<link rel="canonical">` na lowercase tvar (`https://www.horea.cz/{slug_norm}`). Open Graph `og:url` používá stejnou canonical hodnotu.
 
 ---
 
@@ -383,7 +383,7 @@ Veřejná stránka `/[slug]` je generována s **Incremental Static Regeneration*
 
 ## E-mailové šablony
 
-Obě e-mailové šablony jsou v češtině, odesílané přes Resend ze sender domény platformy (např. `noreply@mojerezervace.cz`; konkrétní adresa je provozní detail mimo design). SPF/DKIM/DMARC pro tuto doménu zařizuje provozovatel platformy.
+Obě e-mailové šablony jsou v češtině, odesílané přes Resend ze sender domény platformy (např. `noreply@Horea.cz`; konkrétní adresa je provozní detail mimo design). SPF/DKIM/DMARC pro tuto doménu zařizuje provozovatel platformy.
 
 ### Reservation_Confirmation_Email (klientovi, R10)
 
@@ -396,7 +396,7 @@ Obě e-mailové šablony jsou v češtině, odesílané přes Resend ze sender d
 - Stav rezervace:
   - **Pokud `pending`:** „Rezervace čeká na schválení podnikem. O výsledku Vás budeme informovat e-mailem."
   - **Pokud `approved`:** „Rezervace je potvrzena. Těšíme se na Vás."
-- Patička: kontakt na podnik (telefon, e-mail — pokud jsou na profilu vyplněné), odkaz na veřejný profil podniku, generický disclaimer „E-mail byl odeslán automaticky platformou mojerezervace.cz na vyžádání podniku."
+- Patička: kontakt na podnik (telefon, e-mail — pokud jsou na profilu vyplněné), odkaz na veřejný profil podniku, generický disclaimer „E-mail byl odeslán automaticky platformou Horea.cz na vyžádání podniku."
 
 **Proměnné:** `client_name`, `business_name`, `service_name`, `service_duration_minutes`, `service_price_czk`, `reservation_date`, `reservation_time`, `status`, `business_phone?`, `business_email?`, `business_url`.
 
@@ -412,7 +412,7 @@ Obě e-mailové šablony jsou v češtině, odesílané přes Resend ze sender d
 - Kontaktní údaje klienta: jméno, telefon, e-mail.
 - Poznámka klienta (pokud je vyplněna).
 - Odkaz na dashboard rezervací (cesta v MVP řešená samostatným specem `reservation-management` — pro tuto šablonu je odkaz na `/dashboard/reservations`).
-- Patička: „E-mail byl odeslán automaticky platformou mojerezervace.cz."
+- Patička: „E-mail byl odeslán automaticky platformou Horea.cz."
 
 **Proměnné:** `business_name`, `service_name`, `service_duration_minutes`, `service_price_czk`, `reservation_date`, `reservation_time`, `status`, `client_name`, `client_phone`, `client_email`, `client_note?`, `dashboard_url`.
 
@@ -564,7 +564,7 @@ Logy obsahují pouze identifikátory entit (`business_id`, `service_id`, `reserv
 
 ### Property 7: Sitemap correctness
 
-*For any* dataset záznamů v `businesses` × `subscriptions`, výstup `SitemapBuilder` (`/sitemap.xml`) obsahuje URL `https://www.mojerezervace.cz/{slug}` **právě tehdy**, když odpovídající business je `Published_Business` (`is_published = true` AND `subscription.status IN ('active', 'grace_period')`).
+*For any* dataset záznamů v `businesses` × `subscriptions`, výstup `SitemapBuilder` (`/sitemap.xml`) obsahuje URL `https://www.horea.cz/{slug}` **právě tehdy**, když odpovídající business je `Published_Business` (`is_published = true` AND `subscription.status IN ('active', 'grace_period')`).
 
 Symetricky: pro každý business, který není `Published_Business`, jeho URL **není** v sitemap. Žádná systémová cesta (`/admin`, `/dashboard`, `/api`, `/login`, atd.) v sitemap **není** — sitemap se generuje výhradně z `businesses` tabulky a systémové cesty nemají žádný řádek tam.
 

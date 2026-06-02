@@ -1,6 +1,6 @@
 # Requirements Document
 
-> Požadavky na feature **admin-dashboard** — administrátorský SaaS dashboard provozovatele platformy Mojerezervace, dostupný na cestě `/admin`.
+> Požadavky na feature **admin-dashboard** — administrátorský SaaS dashboard provozovatele platformy Horea, dostupný na cestě `/admin`.
 >
 > Tento dokument navazuje na `architecture/requirements.md` a `architecture/design.md`. Soulad s architektonickými požadavky **R1** (multi-tenancy / RLS admin override), **R7** (stavový automat předplatného a lifecycle dat), **R9** (GDPR), **R12** (platby přes GoPay / ruční párování), **R17** (admin role a privilegovaný přístup), **R18** (čeština) a **R20** (observability / logování) je závazný.
 >
@@ -26,7 +26,7 @@ Návrh drží princip **Simplicity First** z `CLAUDE.md` — žádné spekulativ
 
 ## Glossary
 
-- **Platforma**: Softwarový systém Mojerezervace (Next.js aplikace na Vercelu) jako celek, pokud není uveden konkrétnější subsystém.
+- **Platforma**: Softwarový systém Horea (Next.js aplikace na Vercelu) jako celek, pokud není uveden konkrétnější subsystém.
 - **Administrator**: Jediný uživatel s `users.is_admin = true` — vlastník/provozovatel platformy. Aktér, nikoli subsystém.
 - **Admin_Dashboard**: Subsystém Platformy dostupný na cestách pod `/admin`, který poskytuje administrátorovi přehledy, správu a akce nad daty napříč podniky.
 - **Access_Guard**: Middleware Platformy chránící cesty pod `/admin`, který ověřuje autentizaci a roli `is_admin` před zobrazením jakéhokoli obsahu admin dashboardu.

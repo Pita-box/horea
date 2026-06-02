@@ -1,0 +1,65 @@
+# Horea Codex command policy.
+# These rules apply to commands Codex asks to run outside the sandbox.
+
+prefix_rule(
+    pattern = ["npm"],
+    decision = "forbidden",
+    justification = "Use `pnpm` for this project.",
+    match = ["npm install", "npm run lint"],
+)
+
+prefix_rule(
+    pattern = ["npx"],
+    decision = "forbidden",
+    justification = "Use `pnpm exec` or `pnpm dlx` for this project.",
+    match = ["npx playwright test"],
+)
+
+prefix_rule(
+    pattern = ["yarn"],
+    decision = "forbidden",
+    justification = "Use `pnpm` for this project.",
+    match = ["yarn install", "yarn test"],
+)
+
+prefix_rule(
+    pattern = ["bun"],
+    decision = "forbidden",
+    justification = "Use `pnpm` for this project.",
+    match = ["bun install", "bun test"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", ["install", "add", "remove", "dlx"]],
+    decision = "prompt",
+    justification = "Dependency and one-off package commands can change lockfiles or use the network.",
+    match = [
+        "pnpm install",
+        "pnpm add zod",
+        "pnpm remove zod",
+        "pnpm dlx supabase db push",
+    ],
+    not_match = ["pnpm lint", "pnpm test:run"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", ["lint", "test", "test:run", "test:coverage", "build", "format:check"]],
+    decision = "allow",
+    justification = "Project verification commands are expected during Codex work.",
+    match = [
+        "pnpm lint",
+        "pnpm test",
+        "pnpm test:run",
+        "pnpm test:coverage",
+        "pnpm build",
+        "pnpm format:check",
+    ],
+    not_match = ["pnpm install", "pnpm dev"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", "dev"],
+    decision = "prompt",
+    justification = "The dev server is long-running and should be started deliberately.",
+    match = ["pnpm dev"],
+)

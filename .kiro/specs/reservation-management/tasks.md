@@ -52,7 +52,7 @@ Konvence: české popisy, anglické názvy souborů, příkazů a identifikátor
 - [ ] 3. E-mailové šablony této feature
   - [ ] 3.1 Čtyři české šablony v `lib/email/templates`
     - `Reservation_Approved_Email`, `Reservation_Rejected_Email`, `Reservation_Cancelled_Email`, `Reservation_Modified_Email` v `src/lib/email/templates/`
-    - Proměnné dle designu, časy v Europe/Prague (24h), patička s odkazem na veřejný profil + disclaimer „E-mail byl odeslán automaticky platformou mojerezervace.cz"; u rejected/cancelled odlišený blok důvodu, pokud byl zadán; u modified hodnoty po úpravě; u cancelled původní datum a čas
+    - Proměnné dle designu, časy v Europe/Prague (24h), patička s odkazem na veřejný profil + disclaimer „E-mail byl odeslán automaticky platformou Horea.cz"; u rejected/cancelled odlišený blok důvodu, pokud byl zadán; u modified hodnoty po úpravě; u cancelled původní datum a čas
     - _Requirements: 18.1, 18.2, 18.3, 18.4, 18.5_
 
   - [ ]* 3.2 Snapshot testy čtyř šablon

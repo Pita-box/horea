@@ -458,7 +458,7 @@ Klíčové: anonymizace a smazání klienta jsou v **jedné transakci** (R16.2) 
 
 ## E-mailové šablony
 
-Čtyři šablony, všechny v češtině, odesílané přes `Email_Dispatcher` (Resend) **až po commitu** příslušné mutace, best-effort (R18). Všechny mají v patičce odkaz na veřejný profil podniku a disclaimer „E-mail byl odeslán automaticky platformou mojerezervace.cz" (R18.5).
+Čtyři šablony, všechny v češtině, odesílané přes `Email_Dispatcher` (Resend) **až po commitu** příslušné mutace, best-effort (R18). Všechny mají v patičce odkaz na veřejný profil podniku a disclaimer „E-mail byl odeslán automaticky platformou Horea.cz" (R18.5).
 
 ### Reservation_Approved_Email (R18.1)
 

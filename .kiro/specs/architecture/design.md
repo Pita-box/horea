@@ -1,6 +1,6 @@
-# Architektura platformy Mojerezervace
+# Architektura platformy Horea
 
-> **Master dokument** popisující vysokoúrovňovou architekturu SaaS rezervačního systému `www.mojerezervace.cz`. Detailní implementace jednotlivých částí jsou předmětem navazujících feature specifikací (viz sekce *Plánovaná struktura specifikací*).
+> **Master dokument** popisující vysokoúrovňovou architekturu SaaS rezervačního systému `www.horea.cz`. Detailní implementace jednotlivých částí jsou předmětem navazujících feature specifikací (viz sekce *Plánovaná struktura specifikací*).
 >
 > Tento dokument obsahuje pouze **high-level design** — žádný kód, pseudokód, SQL DDL ani signatury funkcí. Vše je popsáno prózou a Mermaid diagramy (komponentové, ER, sekvenční).
 
@@ -10,9 +10,9 @@
 
 ### Přehled
 
-**Mojerezervace** je rezervační SaaS pro malé české podniky ve službách — kadeřnictví, nehtová studia, masážní salóny, bistra, spa, beauty a další obdobné provozovny. Cílem je nabídnout majiteli podniku jednoduchou cestu, jak si během několika minut vytvořit veřejný profil s online rezervačním formulářem, a klientovi bezbariérovou cestu, jak si bez registrace zarezervovat termín.
+**Horea** je rezervační SaaS pro malé české podniky ve službách — kadeřnictví, nehtová studia, masážní salóny, bistra, spa, beauty a další obdobné provozovny. Cílem je nabídnout majiteli podniku jednoduchou cestu, jak si během několika minut vytvořit veřejný profil s online rezervačním formulářem, a klientovi bezbariérovou cestu, jak si bez registrace zarezervovat termín.
 
-Produkt je primárně **webová aplikace** dostupná na doméně `www.mojerezervace.cz`. Mobilní nativní aplikace (Android, iOS) jsou plánovány do budoucna a nejsou v rozsahu MVP — architektura je však navržena tak, aby je v budoucnu nezablokovala (REST/JSON API, autentizace přes tokeny, všechna doménová logika v API vrstvě).
+Produkt je primárně **webová aplikace** dostupná na doméně `www.horea.cz`. Mobilní nativní aplikace (Android, iOS) jsou plánovány do budoucna a nejsou v rozsahu MVP — architektura je však navržena tak, aby je v budoucnu nezablokovala (REST/JSON API, autentizace přes tokeny, všechna doménová logika v API vrstvě).
 
 **Cílový trh:** Česká republika, čeština jako jediný jazyk MVP. Vícejazyčnost je v roadmapě v2/v3.
 
@@ -593,7 +593,7 @@ Restore ze Sheets není automatizovaný proces. Pokud dojde k mimořádné situa
 ### Role v rámci GDPR
 
 - **Podnik (majitel)** — **správce** osobních údajů svých klientů (jméno, telefon, e-mail v rezervacích). Rozhoduje, proč a jak se data zpracovávají v rámci jeho podnikání.
-- **Mojerezervace (provozovatel platformy)** — **zpracovatel** osobních údajů klientů jménem podniku. Provozuje technickou infrastrukturu, ale o účelu zpracování nerozhoduje.
+- **Horea (provozovatel platformy)** — **zpracovatel** osobních údajů klientů jménem podniku. Provozuje technickou infrastrukturu, ale o účelu zpracování nerozhoduje.
 
 ### DPA (Data Processing Agreement)
 

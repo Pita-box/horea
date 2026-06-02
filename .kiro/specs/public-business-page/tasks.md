@@ -64,7 +64,7 @@ Každý úkol je atomický (cca 30–60 min), referencuje konkrétní acceptance
 
   - [ ] 4.3 `app/sitemap.ts` dynamic sitemap
     - Implementovat `SitemapBuilder` jako default export Next.js sitemap konvence
-    - Anon read všech `Published_Business`; pro každý záznam URL `https://www.mojerezervace.cz/{slug}` + `lastmod = business.updated_at` v ISO 8601
+    - Anon read všech `Published_Business`; pro každý záznam URL `https://www.horea.cz/{slug}` + `lastmod = business.updated_at` v ISO 8601
     - `export const revalidate = 3600`
     - _Requirements: 13.1, 13.2, 13.3, 13.4_
 

@@ -1,6 +1,6 @@
 # Technické konvence projektu
 
-> Závazné technické konvence pro projekt Mojerezervace. Platí pro veškerou práci s kódem, příkazy a nástroji — stejně jako CLAUDE.md a design-system.md.
+> Závazné technické konvence pro projekt Horea. Platí pro veškerou práci s kódem, příkazy a nástroji — stejně jako CLAUDE.md a design-system.md.
 
 ## Správce balíčků — pnpm (povinné)
 

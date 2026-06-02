@@ -1,6 +1,6 @@
 # Design Document — admin-dashboard
 
-> Návrh feature **admin-dashboard** — administrátorský SaaS dashboard provozovatele platformy Mojerezervace, dostupný na cestách pod `/admin`.
+> Návrh feature **admin-dashboard** — administrátorský SaaS dashboard provozovatele platformy Horea, dostupný na cestách pod `/admin`.
 >
 > Tento dokument navazuje na `architecture/design.md` (sekce *Security*, *Data Models*, *Error Handling*, RLS admin override, admin role) a na `subscription-payments/design.md` (efekt spárování platby, entita kupónu, stavový automat předplatného). Drží se principu **Simplicity First** z `CLAUDE.md` — žádné spekulativní vrstvy, žádné BI nástroje, minimum kódu na vyřešení problému.
 >

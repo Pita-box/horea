@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Tato spec popisuje **autentizační vrstvu a první onboarding** SaaS platformy Mojerezervace pro registrované uživatele typu *majitel podniku*. Výstupem úspěšného průchodu je **uživatelský účet ve stavu `free`** se založeným profilem podniku, alespoň jednou službou a otevírací dobou — tedy plně připravený k publikaci po zaplacení předplatného.
+Tato spec popisuje **autentizační vrstvu a první onboarding** SaaS platformy Horea pro registrované uživatele typu *majitel podniku*. Výstupem úspěšného průchodu je **uživatelský účet ve stavu `free`** se založeným profilem podniku, alespoň jednou službou a otevírací dobou — tedy plně připravený k publikaci po zaplacení předplatného.
 
 Spec **NEPOKRÝVÁ** klientskou stranu (rezervační formulář, viz `R19` v `architecture/requirements.md`), placení předplatného (`subscription-payments`), veřejnou stránku podniku (`public-business-page`), správu služeb a otevírací doby po onboardingu (`services-and-availability`), správu rezervací (`reservation-management`) ani admin dashboard (`admin-dashboard`).
 
@@ -21,7 +21,7 @@ Spec je v souladu s platformovými požadavky `R9` (GDPR / DPA), `R10` (bezpečn
 - **Session_Manager**: Komponenta spravující životní cyklus přihlašovací relace (přihlášení, remember-me, odhlášení).
 - **Free_User_Guard**: Komponenta omezující přístup k dashboardu uživatelům ve stavu `free` (po onboardingu, před zaplacením předplatného).
 - **DPA**: Data Processing Agreement — smlouva mezi platformou a podnikatelem (správcem dat) podle GDPR. Verzována řetězcem (např. `2025-01-15`).
-- **Slug**: URL-bezpečný identifikátor podniku použitý ve veřejné URL `https://www.mojerezervace.cz/{slug}` (viz `R11`).
+- **Slug**: URL-bezpečný identifikátor podniku použitý ve veřejné URL `https://www.horea.cz/{slug}` (viz `R11`).
 - **Free uživatel**: Stav předplatného `free` — registrovaný podnikatel bez platného placeného předplatného. Profil podniku existuje, ale `is_published = false`.
 - **Reserved_Slug**: Systémem rezervovaný řetězec, který nelze použít jako slug podniku (např. `admin`, `api`, `login`, `register`, `dashboard`, `app`, `www`, `mail`).
 - **Typ podniku**: Jedna z hodnot `kadernik`, `nehtove_studio`, `bistro`, `masazni_salon`, `spa`, `beauty`, `ostatni` (viz `R21`).
@@ -120,7 +120,7 @@ Spec je v souladu s platformovými požadavky `R9` (GDPR / DPA), `R10` (bezpečn
 
 #### Acceptance Criteria
 
-1. THE Onboarding_Wizard SHALL ve druhém kroku zobrazit pole pro slug s živým náhledem výsledné URL `https://www.mojerezervace.cz/{slug}`.
+1. THE Onboarding_Wizard SHALL ve druhém kroku zobrazit pole pro slug s živým náhledem výsledné URL `https://www.horea.cz/{slug}`.
 2. WHEN podnikatel mění hodnotu pole slugu, THE Slug_Validator SHALL ověřit formát, kolizi s `Reserved_Slug` množinou a obsazenost v reálném čase a zobrazit výsledek validace.
 3. IF slug obsahuje jiné znaky než malá písmena bez diakritiky, číslice nebo pomlčky, THEN THE Slug_Validator SHALL slug označit jako neplatný s českou chybovou hláškou specifikující povolenou znakovou sadu.
 4. IF slug má méně než 3 znaky nebo více než 50 znaků, THEN THE Slug_Validator SHALL slug označit jako neplatný s českou chybovou hláškou specifikující povolený rozsah délky.

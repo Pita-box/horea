@@ -1,6 +1,6 @@
 # Design Document — subscription-payments
 
-> Návrh feature **subscription-payments** — kompletní platební a předplatitelský životní cyklus podniku na platformě Mojerezervace.
+> Návrh feature **subscription-payments** — kompletní platební a předplatitelský životní cyklus podniku na platformě Horea.
 >
 > Tento dokument navazuje na `architecture/design.md` (sekce *Payments*, *Security*, *Error Handling*, *Data Models*) a na `subscription-payments/requirements.md`. Drží se principu **Simplicity First** z `CLAUDE.md` — žádné spekulativní vrstvy, minimum kódu na vyřešení problému, žádná konfigurabilita, která nebyla vyžádána.
 >

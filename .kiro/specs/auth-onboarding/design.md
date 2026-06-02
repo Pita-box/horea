@@ -538,7 +538,7 @@ sequenceDiagram
 
 ## Slug Normalization
 
-Slug je URL-bezpečný identifikátor v cestě `https://www.mojerezervace.cz/{slug}`. Normalizace má **dvě role**: ergonomie (uživatel může zadat „Salón Růženka" a dostat `salon-ruzenka`) a bezpečnost (předvídatelný kanonický tvar).
+Slug je URL-bezpečný identifikátor v cestě `https://www.horea.cz/{slug}`. Normalizace má **dvě role**: ergonomie (uživatel může zadat „Salón Růženka" a dostat `salon-ruzenka`) a bezpečnost (předvídatelný kanonický tvar).
 
 ### Algoritmus
 

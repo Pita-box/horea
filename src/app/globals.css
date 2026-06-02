@@ -1,26 +1,95 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Design tokens — vizuální baseline pro celou platformu.
+ * Source of truth: .kiro/steering/design-system.md (sekce Quick Start › Tailwind v4).
+ * Hodnoty kopírovány 1:1, neimprovizovat. Web fonty se napojí v úkolu 6.6 (next/font).
+ */
+@theme {
+  /* Colors */
+  --color-canvas-white: #ffffff;
+  --color-cloud-mist: #e0e0db;
+  --color-slate-text: #353241;
+  --color-rich-violet: #21164c;
+  --color-action-violet: #592eff;
+  --color-air-blue: #bcf2ff;
+  --color-lush-green: #dfff9d;
+  --color-sunset-pink: #ffaae6;
+  --color-neon-pink: #f843c2;
+  --color-aqua-blue: #2ed6ff;
+  --color-electric-green: #a2ea13;
+  --color-soft-gray-fill: #eeeeee;
+
+  /* Typography — Font Families */
+  --font-polysans:
+    'PolySans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-plus-jakarta-sans:
+    'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
+
+  /* Typography — Scale */
+  --text-caption: 14px;
+  --leading-caption: 1.1;
+  --text-body-sm: 16px;
+  --leading-body-sm: 1.1;
+  --text-body: 18px;
+  --leading-body: 1.1;
+  --text-body-lg: 20px;
+  --leading-body-lg: 1.1;
+  --text-heading-sm: 32px;
+  --leading-heading-sm: 1.1;
+
+  /* Typography — Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing (4px base) */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-60: 60px;
+  --spacing-100: 100px;
+
+  /* Border Radius */
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-2xl-2: 20px;
+  --radius-3xl: 26px;
+  --radius-3xl-2: 30px;
+  --radius-3xl-3: 40px;
+  --radius-full: 48px;
+  --radius-full-2: 64px;
+  --radius-full-3: 200px;
+  --radius-full-4: 800px;
+
+  /* Named Radii */
+  --radius-cards: 26px;
+  --radius-buttons: 12px;
+  --radius-badges: 200px;
+
+  /* Surfaces */
+  --surface-canvas-white: #ffffff;
+  --surface-soft-gray-fill: #eeeeee;
+  --surface-card-white: #ffffff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/*
+ * Base — minimální stylový baseline dle design-system.md "Do" guidance.
+ * Žádné komponentové styly (ty patří do úkolu 6.7).
+ */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-canvas-white);
+  color: var(--color-slate-text);
+  font-family: var(--font-plus-jakarta-sans);
+  letter-spacing: -0.02em;
 }

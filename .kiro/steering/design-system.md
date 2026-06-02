@@ -1,4 +1,4 @@
-# Mojerezervace — Style Reference
+# Horea — Style Reference
 > Digital Canvas with Violet Bloom. A pristine workspace where key actions pop with vibrant, focused energy.
 
 **Theme:** light

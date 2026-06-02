@@ -1,12 +1,12 @@
 # Requirements Document
 
-> Požadavky na feature **subscription-payments** — předplatné podniků platformě Mojerezervace.
+> Požadavky na feature **subscription-payments** — předplatné podniků platformě Horea.
 >
 > Tento dokument navazuje na `architecture/requirements.md` a `architecture/design.md`. Soulad s architektonickými požadavky **R3** (provozní jednoduchost), **R4** (náklady MVP), **R7** (stavový automat předplatného a lifecycle dat), **R9** (GDPR), **R10** (bezpečnost / HMAC webhooky), **R12** (platby přes GoPay), **R13** (email notifikace) a **R18** (čeština) je závazný.
 
 ## Introduction
 
-Tato feature pokrývá kompletní platební a předplatitelský životní cyklus podniku na platformě Mojerezervace: výběr tarifu a první platbu, založení opakované (recurring) platby přes GoPay, měsíční automatické strhávání, zpracování platebních webhooků, fallback na ruční platbu QR kódem a převodem, generování faktur, stavový automat předplatného (`free` → `active` → `grace_period` → `expired` → `deleted_data`) včetně přesných časových limitů a mazání dat, změny tarifu, aplikaci kupónů při checkoutu, zrušení automatické obnovy a denní cron úlohy, které celý cyklus pohánějí.
+Tato feature pokrývá kompletní platební a předplatitelský životní cyklus podniku na platformě Horea: výběr tarifu a první platbu, založení opakované (recurring) platby přes GoPay, měsíční automatické strhávání, zpracování platebních webhooků, fallback na ruční platbu QR kódem a převodem, generování faktur, stavový automat předplatného (`free` → `active` → `grace_period` → `expired` → `deleted_data`) včetně přesných časových limitů a mazání dat, změny tarifu, aplikaci kupónů při checkoutu, zrušení automatické obnovy a denní cron úlohy, které celý cyklus pohánějí.
 
 Architektura (`architecture/design.md`, sekce *Payments*) i požadavek **R7.8** explicitně odkládají **přesné časové limity a načasování varovných emailů** do tohoto specu. Tento dokument je tedy závazným zdrojem pravdy pro tyto hodnoty.
 
@@ -21,7 +21,7 @@ Architektura (`architecture/design.md`, sekce *Payments*) i požadavek **R7.8** 
 
 ## Glossary
 
-- **Platforma**: Softwarový systém Mojerezervace (Next.js aplikace na Vercelu) jako celek, pokud není uveden konkrétnější subsystém.
+- **Platforma**: Softwarový systém Horea (Next.js aplikace na Vercelu) jako celek, pokud není uveden konkrétnější subsystém.
 - **Checkout**: Subsystém Platformy, který zpracovává výběr tarifu, aplikaci kupónu a iniciaci první platby.
 - **Billing_Engine**: Subsystém Platformy odpovědný za zakládání recurring schedule v GoPay a iniciaci měsíčních strhávání.
 - **Webhook_Handler**: Endpoint Platformy `/api/webhooks/gopay`, který přijímá a zpracovává platební notifikace od GoPay.
