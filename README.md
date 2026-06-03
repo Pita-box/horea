@@ -1,40 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Horea
 
-## Getting Started
+Rezervační SaaS pro malé české podniky. Foundation workflow a feature specifikace žijí v `.kiro/specs/`; `.kiro` je zdroj pravdy pro Kiro i Codex práci.
 
-First, run the development server:
+## Prerekvizity
+
+- Node.js 20 LTS (`.nvmrc` je nastavené na `20`)
+- pnpm 8.15.0 (`corepack enable`)
+- Supabase CLI (`pnpm exec supabase --version` po instalaci dependencies)
+- GitHub účet a repozitář
+- Vercel CLI volitelně pro ruční preview deploye
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Potom doplň hodnoty v `.env.local`. Skutečné klíče nikdy nepatří do gitu.
 
-## Supabase schéma
+Povinné proměnné pro lokální foundation práci:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `RESEND_API_KEY`
+- `GOPAY_GOID`
+- `GOPAY_CLIENT_ID`
+- `GOPAY_CLIENT_SECRET`
+- `GOOGLE_OAUTH_CLIENT_ID`
+- `GOOGLE_OAUTH_CLIENT_SECRET`
+- `GOOGLE_OAUTH_REFRESH_TOKEN`
+- `GOOGLE_DRIVE_BACKUP_FOLDER_ID`
+- `LOG_LEVEL`
+
+Google backup používá osobní Google Drive přes OAuth refresh token. Backup složka musí být vytvořená přes stejný OAuth client, aby scope `drive.file` měl k cíli přístup. Service account se nepoužívá, protože osobní Google Drive nepodporuje Shared Drives a service account nelze spolehlivě přidat jako běžný účet.
+
+## Local Dev
+
+```bash
+pnpm dev
+```
+
+Aplikace běží na `http://localhost:3000`.
+
+## Databáze
+
+Supabase migrace jsou v `supabase/migrations/`.
+
+```bash
+pnpm exec supabase link --project-ref <project-ref>
+pnpm exec supabase db push
+```
 
 Uživatelé aplikace jsou uložené v `public.users` jako 1:1 profilové rozšíření `auth.users`. Sloupec `public.users.id` odkazuje na `auth.users.id`; hashe hesel záměrně nejsou v `public.users`, protože přihlašovací údaje spravuje Supabase Auth.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Testy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm test:run
+pnpm test:e2e
+```
 
-## Learn More
+E2E testy se spouští ručně; nejsou součástí MVP CI.
 
-To learn more about Next.js, take a look at the following resources:
+## CI A Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+GitHub Actions workflow je v `.github/workflows/ci.yml` a běží na `pull_request` a `push` do `main`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+CI spouští:
 
-## Deploy on Vercel
+- `pnpm exec tsc --noEmit`
+- `pnpm lint`
+- `pnpm test:run`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Pokud je projekt propojený s Vercelem, push do `main` spouští automatický Vercel build přes `pnpm build`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Foundation A Feature Specs
+
+Foundation úkoly jsou v `.kiro/specs/architecture/tasks.md`. Navazující oblasti mají vlastní složky v `.kiro/specs/`, vždy s vlastními `requirements.md`, `design.md` a `tasks.md`.
+
+Před prací na jakékoli oblasti si agent musí přečíst její `.config.kiro` a zdrojové dokumenty podle workflow typu.

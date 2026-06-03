@@ -198,7 +198,7 @@ Tato sekce popisuje hlavní komponenty platformy a jejich vzájemné integračn�
 | **Supabase Postgres + Auth + Storage** | Datová vrstva, autentizace, úložiště souborů | Vstup: dotazy z Next.js API (anon JWT pro klientské operace, server-side klíč pouze v server kontextu). Výstup: data, JWT tokeny, signed URLs pro Storage. |
 | **GoPay** | Platební brána | Vstup: požadavky z Next.js API (založení recurring platby, charge, QR generation). Výstup: webhook na Next.js endpoint `/api/webhooks/gopay` s podepsaným payloadem o stavu platby. |
 | **Resend** | Transakční e-maily | Vstup: HTTP API volání z Next.js (send email s šablonou). Výstup: doručené e-maily; v případě selhání error response, který Next.js loguje. |
-| **Google Drive + Sheets API** | Záloha + per-business export | Vstup: API volání z Next.js Cron (denní backup) a z dashboardu (on-demand export). Výstup: zápis do per-business Google Sheet a/nebo CSV souboru ve fallback Drive složce. |
+| **Google Drive + Sheets API** | Záloha + per-business export | Vstup: API volání z Next.js Cron (denní backup) a z dashboardu (on-demand export), autentizace přes OAuth refresh token osobního Google účtu provozovatele. Výstup: zápis do per-business Google Sheet a/nebo CSV souboru ve fallback Drive složce. |
 | **Vercel Cron** | Plánovač denních úloh | Trigger: cron expression. Volá: interní Next.js endpointy (`/api/cron/billing`, `/api/cron/backup`, `/api/cron/cleanup`). |
 
 ### Integrační body (high-level)
@@ -209,7 +209,7 @@ Tato sekce popisuje hlavní komponenty platformy a jejich vzájemné integračn�
   - **Outbound:** založení recurring schedule, manuální charge, generování QR.
   - **Inbound:** webhook na `/api/webhooks/gopay` (POST, podepsaný HMAC). Webhook handler je idempotentní — opakovaný webhook se stejným payment ID nevyvolá duplicitní stavovou změnu.
 - **Vercel ↔ Resend:** synchronní HTTP volání pro odeslání e-mailu. Selhání odeslání nesmí blokovat hlavní transakci (rezervace, platba) — e-mail je v případě potřeby zařazen do retry fronty (v MVP jednoduchý DB záznam `pending_emails` + retry v cronu).
-- **Vercel Cron → Vercel API → Google Drive/Sheets:** denní cron volá interní endpoint, ten sekvenčně zpracuje aktivní + grace podniky, pro každý zapíše inkrementální data do per-business Sheet. Při rate-limitu nebo chybě fallback na zápis CSV do dedikované Drive složky a pokračuje v dalším podniku.
+- **Vercel Cron → Vercel API → Google Drive/Sheets:** denní cron volá interní endpoint, ten sekvenčně zpracuje aktivní + grace podniky, pro každý zapíše inkrementální data do per-business Sheet v osobním Google Drive provozovatele. Autentizace běží přes OAuth refresh token; service account se nepoužívá, protože osobní Google Drive nemá Shared Drives. Při rate-limitu nebo chybě fallback na zápis CSV do dedikované Drive složky a pokračuje v dalším podniku.
 - **Vercel Cron → Vercel API (billing):** denní cron prochází podniky s blížícím se koncem cyklu, zakládá GoPay charge nebo posílá QR e-mail při selhání auto-charge.
 - **Vercel Cron → Vercel API (cleanup):** denní cron identifikuje podniky ve stavu `expired` po 3 měsících a iniciuje mazání tenant dat.
 
@@ -242,7 +242,7 @@ Tato sekce popisuje hlavní komponenty platformy a jejich vzájemné integračn�
 
 **ADR-3: GoPay místo Stripe.** Český trh očekává místní platební metody a QR platby (Banking Q, Spořitelna, ČSOB QR). GoPay je domácí, podporuje recurring, má české zákaznické rozhraní pro fakturaci. Stripe by byl jednodušší integraci, ale za cenu horší konverze u méně technicky zdatných zákazníků.
 
-**ADR-4: Google Sheets jako záloha — vědomé rozhodnutí navzdory rate-limitům.** Provozovatel chce mít data po ruce v Sheets pro ad-hoc reporty bez nutnosti psát admin UI. Riziko (Sheets API rate limit, spolehlivost) je řešeno na úrovni implementace (batch zápisy, fallback na CSV soubory v Drive). Detail v sekci *Zálohování a export*.
+**ADR-4: Google Sheets jako záloha — vědomé rozhodnutí navzdory rate-limitům.** Provozovatel chce mít data po ruce v Sheets pro ad-hoc reporty bez nutnosti psát admin UI. Backup používá OAuth refresh token osobního Google účtu provozovatele, ne service account, protože MVP běží na osobním Google Drive bez Shared Drives. Riziko (Sheets API rate limit, spolehlivost) je řešeno na úrovni implementace (batch zápisy, fallback na CSV soubory v Drive). Detail v sekci *Zálohování a export*.
 
 **ADR-5: Multi-tenancy přes RLS v jedné databázi.** Místo per-tenant schématu nebo per-tenant databáze je každý podnik odlišen sloupcem `business_id` ve všech relevantních tabulkách a izolován přes Postgres Row Level Security. Důvod: jednoduchost, snazší zálohy, snazší migrace, dostatečná izolace pro 200 podniků. Schema-per-tenant by znamenalo stovky schémat a komplikovanější deployment.
 
@@ -564,7 +564,9 @@ Po každé úspěšné platbě platforma vygeneruje fakturu (PDF nebo HTML→PDF
 
 ### Per-business Google Sheet
 
-Každý aktivní + grace podnik má **vlastní Google Sheet** v Drive provozovatele. Denní cron job (`/api/cron/backup`) prochází podniky a do příslušného Sheetu **inkrementálně připisuje** rezervace změněné od `business.last_backup_at`. Po úspěšném zápisu se `last_backup_at` aktualizuje.
+Každý aktivní + grace podnik má **vlastní Google Sheet** v osobním Drive provozovatele. Denní cron job (`/api/cron/backup`) prochází podniky a do příslušného Sheetu **inkrementálně připisuje** rezervace změněné od `business.last_backup_at`. Po úspěšném zápisu se `last_backup_at` aktualizuje.
+
+Přístup do Google Drive a Sheets běží přes OAuth client + refresh token provozovatele (`GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`). Backup složka musí být vytvořená přes tento OAuth client, aby scope `drive.file` měl k cílové složce přístup; ručně vytvořená Drive složka může z API vracet 404. Service account se pro MVP nepoužívá; osobní Google Drive nejde spolehlivě sdílet se service accountem a nemá Shared Drives.
 
 Sheet slouží primárně provozovateli platformy pro ad-hoc analýzy a jako **čitelná záloha** v případě výpadku Supabase. Podnikatelé do něj přístup **nemají** (je v Drive provozovatele) — pro ně slouží on-demand export.
 

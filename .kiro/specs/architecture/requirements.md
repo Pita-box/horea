@@ -115,7 +115,7 @@ Požadavky jsou odvozeny z designových rozhodnutí v `design.md` a slouží jak
 
 #### Acceptance Criteria
 
-1. THE platforma SHALL provádět **denní backup** rezervací každého aktivního i grace podniku do dedikovaného Google Sheetu na Drive provozovatele.
+1. THE platforma SHALL provádět **denní backup** rezervací každého aktivního i grace podniku do dedikovaného Google Sheetu na osobním Drive provozovatele přes OAuth refresh token.
 2. THE platforma SHALL vystavit každému podnikateli **on-demand export** (CSV) jeho rezervací z dashboardu — kdykoliv, bez ohledu na stav denního backup jobu.
 3. WHEN backup job narazí na Google API rate limit nebo chybu THEN platforma SHALL zapsat data do **CSV fallback souboru** v dedikované Drive složce, aby data nebyla ztracena.
 4. WHEN backup job zpracovává podniky, THE job SHALL respektovat Google Sheets API kvóty (throttle, batch writes).

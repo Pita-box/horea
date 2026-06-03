@@ -107,7 +107,7 @@ Foundation pokrývá:
     - _Requirements: 3.4_
 
   - [~] 4.2 Nastavit produkční environment variables ve Vercelu
-    - Přidat env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `GOPAY_GOID`, `GOPAY_CLIENT_ID`, `GOPAY_CLIENT_SECRET`, `GOOGLE_SERVICE_ACCOUNT_JSON`, `LOG_LEVEL`
+    - Přidat env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `GOPAY_GOID`, `GOPAY_CLIENT_ID`, `GOPAY_CLIENT_SECRET`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, `GOOGLE_DRIVE_BACKUP_FOLDER_ID`, `LOG_LEVEL`
     - Hodnoty pro produkci, preview i development scope dle vhodnosti (development scope smí používat sandbox/test účty)
     - **Service role key** smí mít pouze server-side scope, nikdy `NEXT_PUBLIC_*` prefix
     - _Requirements: 5.5, 10.7_
@@ -118,7 +118,7 @@ Foundation pokrývá:
     - _Requirements: 11.2, 9.5_
 
 - [ ] 5. Provisioning Cloudflare — DNS, WAF, edge rate limit
-  - [~] 5.1 Přidat doménu Horea.cz do Cloudflare a změnit nameservery u registrátora
+  - [x] 5.1 Přidat doménu Horea.cz do Cloudflare a změnit nameservery u registrátora
     - V Cloudflare dashboardu: Add site, vybrat Free plan
     - U registrátora domény změnit nameservery na hodnoty z Cloudflare
     - Počkat na propagaci a aktivaci v Cloudflare (zelený stav)
@@ -233,43 +233,43 @@ Foundation pokrývá:
     - V Supabase dashboardu (Table Editor) ověřit, že všechny tabulky existují
     - _Requirements: 1.3_
 
-- [ ] 8. RLS policies baseline
-  - [~] 8.1 Vytvořit migraci `0006_enable_rls.sql`
+- [x] 8. RLS policies baseline
+  - [x] 8.1 Vytvořit migraci `0006_enable_rls.sql`
     - `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` na všech tenant-scoped tabulkách: `businesses`, `services`, `opening_hours`, `reservations`, `clients`, `subscriptions`, `payments`
     - Tabulky `users` a `coupons` — RLS také ENABLE, policies dle úkolů níže
     - _Requirements: 1.3_
 
-  - [~] 8.2 Vytvořit migraci `0007_rls_tenant_policies.sql`
+  - [x] 8.2 Vytvořit migraci `0007_rls_tenant_policies.sql`
     - Helper funkce `auth.user_business_id()` vracející `business_id` z aktuální session JWT (přes `auth.uid()` → `businesses.owner_user_id`)
     - Helper funkce `auth.is_admin()` vracející BOOL z `users.is_admin` aktuální session
     - Pro každou tenant-scoped tabulku: policy `tenant_isolation` SELECT/INSERT/UPDATE/DELETE povolující operace, kde `business_id = auth.user_business_id() OR auth.is_admin()`
     - _Requirements: 1.1, 1.6, 17.2_
 
-  - [~] 8.3 Vytvořit migraci `0008_rls_public_read.sql`
+  - [x] 8.3 Vytvořit migraci `0008_rls_public_read.sql`
     - Policy `public_read_published` na `businesses` — SELECT povoleno pro `anon` role, kde `is_published = true`
     - Policy `public_read_published_services` na `services` — SELECT povoleno pro `anon`, kde EXISTS (SELECT 1 FROM businesses WHERE id = services.business_id AND is_published = true)
     - Stejně pro `opening_hours`
     - **Žádné policy pro INSERT rezervace anonymem zde** — rezervace se vkládají server-side přes service role v API endpointu (`design.md` *Multi-tenancy přes RLS*)
     - _Requirements: 1.2, 11.6_
 
-  - [~] 8.4 Vytvořit migraci `0009_rls_admin_override.sql`
+  - [x] 8.4 Vytvořit migraci `0009_rls_admin_override.sql`
     - Policy `admin_full_access` na `users`, `coupons` — všechny operace povolené, pokud `auth.is_admin() = true`
     - _Requirements: 17.2, 17.4_
 
-  - [~] 8.5 Spustit RLS migrace a manuálně ověřit izolaci
+  - [x] 8.5 Spustit RLS migrace a manuálně ověřit izolaci
     - `pnpm dlx supabase db push`
     - Ze Supabase SQL editoru manuálně otestovat: jako anonymní role SELECT z `businesses` vrací jen `is_published=true`
     - _Requirements: 1.1, 1.2_
 
-- [ ] 9. Auth wiring — Supabase klienti a middleware
-  - [~] 9.1 Vytvořit Supabase klienty pro server, browser a middleware
+- [x] 9. Auth wiring — Supabase klienti a middleware
+  - [x] 9.1 Vytvořit Supabase klienty pro server, browser a middleware
     - `src/lib/supabase/server.ts` — `createServerClient` z `@supabase/ssr` pro Server Components / Route Handlers (čte cookies přes `next/headers`)
     - `src/lib/supabase/client.ts` — `createBrowserClient` pro Client Components
     - `src/lib/supabase/middleware.ts` — helper pro Edge middleware (refresh session)
     - **Service role klient** — `src/lib/supabase/admin.ts` — používán pouze v cron jobech / admin operacích, NIKDY v klientském kódu
     - _Requirements: 1.4, 5.6, 6.4, 10.7_
 
-  - [~] 9.2 Implementovat Next.js middleware pro chráněné cesty
+  - [x] 9.2 Implementovat Next.js middleware pro chráněné cesty
     - Vytvořit `src/middleware.ts` matchující `/dashboard/:path*` a `/admin/:path*`
     - V matched cestě: refresh session přes `supabase.auth.getUser()`
     - Pokud neautentizovaný: redirect na `/login` (samotná `/login` stránka patří do `auth-onboarding`)
@@ -283,14 +283,14 @@ Foundation pokrývá:
     - Počkat na verifikaci a uložit `RESEND_API_KEY` do Vercel env (úkol 4.2 už refer na klíč; zde se hodnota doplní)
     - _Requirements: 13.1, 13.7_
 
-  - [~] 10.2 Vytvořit Resend SDK wrapper a base e-mailovou šablonu
+  - [x] 10.2 Vytvořit Resend SDK wrapper a base e-mailovou šablonu
     - Nainstalovat `resend`, `react-email` (volitelně pro JSX šablony — pro MVP stačí prostý HTML/text)
     - `src/lib/email/client.ts` — singleton `Resend` instance s API klíčem z env
     - `src/lib/email/templates/base.ts` — funkce `wrapEmail({subject, body})` vracející HTML s českou paticí (název platformy, kontakt na podporu, GDPR link placeholder)
     - **Žádné konkrétní e-mailové šablony** — patří do feature specs (rezervace, fakturace…)
     - _Requirements: 13.1, 14.2_
 
-- [ ] 11. Logging baseline + request ID middleware
+- [x] 11. Logging baseline + request ID middleware
   - [x] 11.1 Implementovat strukturovaný logger utility
     - Vytvořit `src/lib/log.ts` — funkce `log.info(msg, ctx)`, `log.warn(msg, ctx)`, `log.error(msg, ctx)`
     - Výstup JSON na `stdout` (Vercel automaticky scrapuje), formát: `{ timestamp, level, msg, requestId?, userId?, ...ctx }`
@@ -298,7 +298,7 @@ Foundation pokrývá:
     - Žádná externí dependency (žádný pino/winston) — viz `CLAUDE.md` *Simplicity First*
     - _Requirements: 20.1, 20.2_
 
-  - [~] 11.2 Rozšířit middleware o generování request ID
+  - [x] 11.2 Rozšířit middleware o generování request ID
     - V `src/middleware.ts` (z úkolu 9.2): vygenerovat `crypto.randomUUID()` na každý request, propsat do request hlavičky `x-request-id` a do response hlavičky stejně
     - Logger v server contextu čte `x-request-id` z `next/headers` a přibalí do každého logu
     - _Requirements: 20.2_
@@ -311,12 +311,15 @@ Foundation pokrývá:
     - **Žádný integrace kód zde** — patří do `subscription-payments` specu
     - _Requirements: 12.1_
 
-- [ ] 13. Google Cloud setup (service account, žádný integration kód)
-  - [~] 13.1 Vytvořit Google Cloud projekt a service account
+- [x] 13. Google Cloud setup (OAuth credentials pro osobní Google Drive, žádný integration kód)
+  - [x] 13.1 Vytvořit Google Cloud OAuth client a refresh token
     - Manuálně: GCP console → nový projekt `Horea`
     - Povolit API: Google Drive API, Google Sheets API
-    - Vytvořit service account `Horea-backup@...`, vygenerovat JSON klíč
-    - Uložit obsah JSON jako jeden řádek (escapovaný) do env var `GOOGLE_SERVICE_ACCOUNT_JSON` ve Vercelu a `.env.local`
+    - Nastavit OAuth consent screen pro externí aplikaci `Horea Backups`; scopes: `https://www.googleapis.com/auth/drive.file` a `https://www.googleapis.com/auth/spreadsheets`
+    - Vytvořit OAuth client typu `Web application` a dočasně povolit redirect URI `https://developers.google.com/oauthplayground`
+    - Přes OAuth Playground vygenerovat refresh token pro osobní Google účet provozovatele
+    - Přes OAuth klienta vytvořit v osobním Google Drive složku `Horea Backups` a uložit její ID, aby `drive.file` scope měl k backup složce přístup
+    - Uložit `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, `GOOGLE_DRIVE_BACKUP_FOLDER_ID` do Vercel env a `.env.local`
     - **Žádný integrace kód zde** — patří do `subscription-payments` / dedikovaného backup specu
     - _Requirements: 8.1, 8.4_
 
@@ -327,24 +330,24 @@ Foundation pokrývá:
   - Ověřit, že Supabase migrace jsou aplikované a anonymní SELECT z `businesses` respektuje RLS
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 15. CI baseline — GitHub Actions
-  - [~] 15.1 Vytvořit workflow `.github/workflows/ci.yml`
+- [x] 15. CI baseline — GitHub Actions
+  - [x] 15.1 Vytvořit workflow `.github/workflows/ci.yml`
     - Trigger: `pull_request` a `push` do `main`
     - Joby: `setup` (checkout, `pnpm/action-setup` + `actions/setup-node` Node 20 s `cache: 'pnpm'`, instalace přes `pnpm install --frozen-lockfile`), `typecheck` (`tsc --noEmit`), `lint` (`pnpm lint`), `test` (`pnpm test:run`)
     - **Žádné E2E v CI** v MVP (pomalé, vyžaduje další setup) — manuální spouštění
     - _Requirements: 3.4_
 
-  - [ ]* 15.2 Přidat coverage upload jako artefakt (nepovinné)
+  - [x]* 15.2 Přidat coverage upload jako artefakt (nepovinné)
     - V `test` jobu spustit `pnpm test:coverage`, uložit `coverage/` jako artifact
     - _Requirements: 3.4_
 
-- [ ] 16. Dokumentace — README a .env.example
-  - [~] 16.1 Vytvořit `.env.example` s placeholder hodnotami všech env vars
+- [x] 16. Dokumentace — README a .env.example
+  - [x] 16.1 Vytvořit `.env.example` s placeholder hodnotami všech env vars
     - Vyjmenovat všechny env vars z úkolu 4.2, popsat účel jedním řádkem
     - **Žádné reálné hodnoty** — `.env.example` jde do gitu, `.env.local` ne
     - _Requirements: 5.5, 10.7_
 
-  - [~] 16.2 Vytvořit `README.md` s instrukcemi pro setup
+  - [x] 16.2 Vytvořit `README.md` s instrukcemi pro setup
     - Sekce: Prerekvizity (Node 20, pnpm — např. přes `corepack enable`, Supabase CLI, GitHub, Vercel CLI volitelně), Setup (clone, `pnpm install`, `cp .env.example .env.local` + doplnit hodnoty), Local dev (`pnpm dev`), Database migrace (`pnpm dlx supabase db push`), Testy (`pnpm test:run`, `pnpm test:e2e`), CI a deploy (push do main → Vercel automatic), Foundation vs feature specs (odkaz na `.kiro/specs/`)
     - _Requirements: 3.4_
 

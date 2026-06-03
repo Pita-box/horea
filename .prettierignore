@@ -3,6 +3,8 @@ node_modules
 out
 build
 coverage
+.vscode
+supabase/.temp
 pnpm-lock.yaml
 
 # Spec a steering dokumenty jsou ručně formátované — Prettier je nesmí přepisovat
