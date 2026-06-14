@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Opakované platby | Horea.cz</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#1c1a28",
+                      "tertiary-fixed": "#ffd8eb",
+                      "primary": "#4100dc",
+                      "surface-variant": "#e6dff3",
+                      "canvas-white": "#ffffff",
+                      "primary-container": "#592eff",
+                      "lush-green": "#dfff9d",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#e6dff3",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed": "#3c002c",
+                      "primary-fixed-dim": "#c8bfff",
+                      "surface-dim": "#ddd7eb",
+                      "input-border": "#d8ddef",
+                      "error-container": "#ffdad6",
+                      "aqua-blue": "#2ed6ff",
+                      "secondary-fixed-dim": "#cabeff",
+                      "on-background": "#1c1a28",
+                      "inverse-on-surface": "#f4eeff",
+                      "background": "#fdf8ff",
+                      "on-tertiary-fixed-variant": "#880068",
+                      "surface-container": "#f1ebff",
+                      "electric-green": "#a2ea13",
+                      "on-primary-container": "#dbd4ff",
+                      "outline-variant": "#c9c4da",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#ece5f9",
+                      "on-tertiary": "#ffffff",
+                      "cloud-mist": "#f0f3fe",
+                      "tertiary-container": "#b20089",
+                      "secondary-container": "#cabeff",
+                      "soft-gray": "#eeeeee",
+                      "secondary-fixed": "#e6deff",
+                      "on-secondary-fixed": "#1d1148",
+                      "on-secondary-container": "#554b82",
+                      "tertiary": "#880068",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-surface": "#312e3d",
+                      "on-tertiary-container": "#ffcae5",
+                      "inverse-primary": "#c8bfff",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed-variant": "#4100db",
+                      "on-primary-fixed": "#190064",
+                      "on-error-container": "#93000a",
+                      "primary-fixed": "#e5deff",
+                      "outline": "#787589",
+                      "secondary": "#61568f",
+                      "surface-bright": "#fdf8ff",
+                      "on-secondary-fixed-variant": "#493f76",
+                      "tertiary-fixed-dim": "#ffaedc",
+                      "surface-container-low": "#f7f1ff",
+                      "surface-tint": "#592eff",
+                      "sunset-pink": "#ffaae6",
+                      "air-blue": "#bcf2ff",
+                      "surface": "#fdf8ff",
+                      "on-surface-variant": "#474557"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gap-section": "30px",
+                      "stack-24": "24px",
+                      "stack-100": "100px",
+                      "stack-16": "16px",
+                      "base": "4px",
+                      "stack-48": "48px",
+                      "padding-input-v": "12px",
+                      "padding-input-h": "10px",
+                      "stack-4": "4px",
+                      "gap-element": "5px",
+                      "stack-8": "8px",
+                      "padding-card": "40px"
+              },
+              "fontFamily": {
+                      "display-sm": [
+                              "Montserrat"
+                      ],
+                      "display-lg": [
+                              "Montserrat"
+                      ],
+                      "body-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ],
+                      "display-md": [
+                              "Montserrat"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "caption": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "display-sm": [
+                              "38px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "68px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-md": [
+                              "58px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "caption": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #fdf8ff; /* background */
+            color: #1c1a28; /* on-surface */
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-canvas-white dark:bg-on-surface border-b border-cloud-mist dark:border-on-surface-variant transition-all duration-200 ease-in-out">
+<div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto">
+<a class="font-display-sm text-display-sm font-bold text-primary dark:text-primary-fixed-dim" href="#">Horea</a>
+<div class="hidden md:flex gap-element">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors px-stack-8 py-stack-4" href="#">Features</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors px-stack-8 py-stack-4" href="#">Pricing</a>
+<a class="font-body-md text-body-md text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary px-stack-8 py-stack-4" href="#">Subscriptions</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors px-stack-8 py-stack-4" href="#">Support</a>
+</div>
+<div class="flex gap-stack-16 items-center">
+<a class="font-body-md text-body-md text-primary font-medium hover:text-primary-container transition-colors" href="#">Log In</a>
+<a class="bg-primary-container text-canvas-white font-body-md text-body-md font-medium py-stack-8 px-stack-24 rounded-[12px] hover:bg-primary transition-colors" href="#">Get Started</a>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow pt-stack-100 pb-stack-100 px-stack-24 md:px-8 max-w-7xl mx-auto w-full">
+<!-- Hero Section -->
+<section class="mb-stack-48 text-center max-w-3xl mx-auto">
+<h1 class="font-display-md text-display-md text-on-surface mb-stack-16">Opakované platby</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                Pomocí opakovaných plateb je možné periodicky nebo na vyžádání strhávat finanční prostředky z karty zákazníka poté, co zákazník autorizoval počáteční platbu. Opakované platby se hodí např. pro různé předplatné nebo služby s měsíčními poplatky.
+            </p>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gap-section">
+<!-- Jak to funguje (Span 2 cols on lg) -->
+<div class="col-span-1 lg:col-span-2 bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-container opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-stack-16 flex items-center gap-stack-8">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">autorenew</span>
+                    Jak fungují opakované platby
+                </h2>
+<div class="space-y-stack-16">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Platební brána umožňuje provedení dvou typů opakovaných plateb:
+                    </p>
+<div class="flex gap-stack-16 items-start">
+<div class="bg-surface-container rounded-lg p-stack-8 mt-1">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">event_repeat</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Automatické opakované platby</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-stack-4">
+                                U kterých se s počáteční platbou nastaví perioda opakování (měsíční, roční, denní) a platby již dále probíhají automaticky bez nutnosti vaší další akce. Ideální pro předplatné.
+                            </p>
+</div>
+</div>
+<div class="flex gap-stack-16 items-start">
+<div class="bg-surface-container rounded-lg p-stack-8 mt-1">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">touch_app</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Opakované platby na vyžádání</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-stack-4">
+                                Každou následnou platbu strháváme na základě vašeho specifického požadavku. Výhodou je možnost řídit si částku a čas stržení. Vhodné pro platby podle čerpání služby.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bezpečnost (Span 1 col) -->
+<div class="col-span-1 bg-surface-container-high rounded-[26px] p-padding-card flex flex-col justify-between">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-stack-16 flex items-center gap-stack-8">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">lock</span>
+                        Bezpečnost
+                    </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-16">
+                        Vaše platební údaje jsou v bezpečí. Splňujeme nejpřísnější bezpečnostní standardy.
+                    </p>
+<ul class="space-y-stack-8 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-center gap-gap-element">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+                            Šifrované uložení karty
+                        </li>
+<li class="flex items-center gap-gap-element">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+                            PCI DSS certifikace
+                        </li>
+<li class="flex items-center gap-gap-element">
+<span class="material-symbols-outlined text-primary">security</span>
+                            3D Secure ověření
+                        </li>
+</ul>
+</div>
+<div class="mt-stack-24">
+<a class="inline-flex items-center font-body-sm text-body-sm text-primary font-medium hover:text-primary-container transition-colors" href="#">
+                        Více o bezpečnosti
+                        <span class="material-symbols-outlined ml-gap-element text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Správa předplatného -->
+<div class="col-span-1 lg:col-span-3 bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-stack-24 gap-stack-16">
+<h2 class="font-headline-lg text-headline-lg text-on-surface flex items-center gap-stack-8">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">manage_accounts</span>
+                        Správa předplatného
+                    </h2>
+<button class="bg-primary-container text-canvas-white font-body-sm text-body-sm font-medium py-stack-8 px-stack-16 rounded-[12px] hover:bg-primary transition-colors">
+                        Spravovat moje platby
+                    </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-stack-24">
+<div class="bg-cloud-mist rounded-xl p-stack-16">
+<div class="mb-stack-8 flex justify-between items-center">
+<span class="font-headline-sm text-headline-sm text-on-surface">Uhrazení platby</span>
+<span class="material-symbols-outlined text-outline">payment</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                            Je nutné, aby zákazník uhradil zakládající opakovanou platbu, čímž autorizuje provádění dalších plateb.
+                        </p>
+</div>
+<div class="bg-cloud-mist rounded-xl p-stack-16">
+<div class="mb-stack-8 flex justify-between items-center">
+<span class="font-headline-sm text-headline-sm text-on-surface">Zrušení</span>
+<span class="material-symbols-outlined text-outline">cancel</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                            Opakovanou platbu můžete kdykoliv snadno zrušit ve svém uživatelském účtu nebo přes odkaz v e-mailu.
+                        </p>
+</div>
+<div class="bg-cloud-mist rounded-xl p-stack-16">
+<div class="mb-stack-8 flex justify-between items-center">
+<span class="font-headline-sm text-headline-sm text-on-surface">Notifikace</span>
+<span class="material-symbols-outlined text-outline">notifications</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                            O každém stržení platby nebo případném problému s platbou vás budeme informovat prostřednictvím e-mailu.
+                        </p>
+</div>
+</div>
+</div>
+<!-- FAQ Section -->
+<div class="col-span-1 lg:col-span-3">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-stack-24 text-center">FAQ k platbám</h2>
+<div class="space-y-stack-8 max-w-4xl mx-auto">
+<details class="group bg-canvas-white rounded-xl border border-cloud-mist overflow-hidden">
+<summary class="flex justify-between items-center font-headline-sm text-headline-sm text-on-surface cursor-pointer p-stack-16 list-none hover:bg-surface-container-lowest transition-colors">
+                            Jak zruším opakovanou platbu?
+                            <span class="material-symbols-outlined transition-transform group-open:rotate-180 text-outline">expand_more</span>
+</summary>
+<div class="p-stack-16 pt-0 font-body-md text-body-md text-on-surface-variant border-t border-cloud-mist mt-2">
+                            Opakovanou platbu můžete zrušit kontaktováním naší podpory, nebo přímo ve správě vašeho profilu v sekci 'Předplatné', kde uvidíte všechny aktivní opakované platby a možnost jejich zrušení.
+                        </div>
+</details>
+<details class="group bg-canvas-white rounded-xl border border-cloud-mist overflow-hidden">
+<summary class="flex justify-between items-center font-headline-sm text-headline-sm text-on-surface cursor-pointer p-stack-16 list-none hover:bg-surface-container-lowest transition-colors">
+                            Proč se mi nedaří zaplatit přes platební bránu?
+                            <span class="material-symbols-outlined transition-transform group-open:rotate-180 text-outline">expand_more</span>
+</summary>
+<div class="p-stack-16 pt-0 font-body-md text-body-md text-on-surface-variant border-t border-cloud-mist mt-2">
+                            Může to být způsobeno nedostatečným zůstatkem na kartě, vypršením platnosti karty, nebo blokací online plateb ze strany vaší banky. Zkontrolujte nastavení karty ve vašem internetovém bankovnictví.
+                        </div>
+</details>
+<details class="group bg-canvas-white rounded-xl border border-cloud-mist overflow-hidden">
+<summary class="flex justify-between items-center font-headline-sm text-headline-sm text-on-surface cursor-pointer p-stack-16 list-none hover:bg-surface-container-lowest transition-colors">
+                            Kdy dojde k připsání platby?
+                            <span class="material-symbols-outlined transition-transform group-open:rotate-180 text-outline">expand_more</span>
+</summary>
+<div class="p-stack-16 pt-0 font-body-md text-body-md text-on-surface-variant border-t border-cloud-mist mt-2">
+                            Při platbě kartou dochází k autorizaci a připsání platby okamžitě, obvykle během několika sekund. U bankovních převodů to může trvat déle v závislosti na typu převodu a bance.
+                        </div>
+</details>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-cloud-mist dark:bg-on-surface transition-opacity duration-200 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-stack-24">
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface dark:text-canvas-white">
+                Horea
+            </div>
+<div class="flex flex-wrap justify-center gap-stack-16">
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Terms &amp; Conditions</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-primary dark:text-primary-fixed-dim underline hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Recurring Payments</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Contact Support</a>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant">
+                © 2024 Horea SaaS. All rights reserved.
+            </div>
+</div>
+</footer>
+</body></html>

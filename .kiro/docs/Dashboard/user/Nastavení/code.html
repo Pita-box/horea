@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+
+<html lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nastavení profilu | Horea</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "cloud-mist": "#f0f3fe",
+                      "outline-variant": "#c9c4da",
+                      "sunset-pink": "#ffaae6",
+                      "soft-gray": "#eeeeee",
+                      "on-error": "#ffffff",
+                      "surface-container-high": "#ece5f9",
+                      "surface-container-highest": "#e6dff3",
+                      "on-background": "#1c1a28",
+                      "inverse-on-surface": "#f4eeff",
+                      "secondary-fixed": "#e6deff",
+                      "background": "#fdf8ff",
+                      "on-tertiary-fixed-variant": "#880068",
+                      "tertiary-fixed-dim": "#ffaedc",
+                      "on-surface": "#1c1a28",
+                      "aqua-blue": "#2ed6ff",
+                      "primary-container": "#592eff",
+                      "electric-green": "#a2ea13",
+                      "secondary-container": "#cabeff",
+                      "on-tertiary": "#ffffff",
+                      "inverse-primary": "#c8bfff",
+                      "on-tertiary-fixed": "#3c002c",
+                      "surface": "#fdf8ff",
+                      "primary-fixed-dim": "#c8bfff",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed-variant": "#4100db",
+                      "on-tertiary-container": "#ffcae5",
+                      "tertiary-fixed": "#ffd8eb",
+                      "surface-bright": "#fdf8ff",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#592eff",
+                      "tertiary": "#880068",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e6dff3",
+                      "on-primary-container": "#dbd4ff",
+                      "lush-green": "#dfff9d",
+                      "secondary-fixed-dim": "#cabeff",
+                      "tertiary-container": "#b20089",
+                      "primary": "#4100dc",
+                      "surface-container": "#f1ebff",
+                      "surface-container-low": "#f7f1ff",
+                      "canvas-white": "#ffffff",
+                      "air-blue": "#bcf2ff",
+                      "outline": "#787589",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#312e3d",
+                      "primary-fixed": "#e5deff",
+                      "on-secondary-container": "#554b82",
+                      "input-border": "#d8ddef",
+                      "on-surface-variant": "#474557",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#190064",
+                      "secondary": "#61568f",
+                      "surface-dim": "#ddd7eb",
+                      "on-secondary-fixed-variant": "#493f76",
+                      "on-secondary-fixed": "#1d1148",
+                      "on-error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-8": "8px",
+                      "gap-element": "5px",
+                      "base": "4px",
+                      "stack-4": "4px",
+                      "padding-input-v": "12px",
+                      "padding-input-h": "10px",
+                      "stack-48": "48px",
+                      "stack-24": "24px",
+                      "gap-section": "30px",
+                      "stack-16": "16px",
+                      "stack-100": "100px",
+                      "padding-card": "40px"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "caption": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-lg": [
+                              "Montserrat"
+                      ],
+                      "body-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-md": [
+                              "Montserrat"
+                      ],
+                      "display-sm": [
+                              "Montserrat"
+                      ],
+                      "body-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ],
+                      "body-sm": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "caption": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "68px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-md": [
+                              "58px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-sm": [
+                              "38px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body { background-color: theme('colors.cloud-mist'); }
+        /* Toggle Switch Styles */
+        .toggle-checkbox:checked {
+          right: 0;
+          border-color: theme('colors.primary-container');
+        }
+        .toggle-checkbox:checked + .toggle-label {
+          background-color: theme('colors.primary-container');
+        }
+        .toggle-checkbox {
+          right: 0;
+          z-index: 1;
+          border-color: theme('colors.input-border');
+          transition: all 0.3s;
+        }
+        .toggle-label {
+          width: 44px;
+          height: 24px;
+          background-color: theme('colors.outline-variant');
+          border-radius: 9999px;
+          transition: all 0.3s;
+        }
+        .toggle-dot {
+          top: 2px;
+          left: 2px;
+          width: 20px;
+          height: 20px;
+          background-color: white;
+          border-radius: 50%;
+          transition: transform 0.3s ease-in-out;
+        }
+        .toggle-checkbox:checked + .toggle-label .toggle-dot {
+            transform: translateX(20px);
+        }
+      </style>
+</head>
+<body class="min-h-screen text-on-background font-body-sm flex flex-col md:flex-row">
+<!-- TopNavBar (Web & Mobile, adjusted for sidebar layout) -->
+<header class="fixed top-0 left-0 w-full z-50 bg-canvas-white text-primary font-body-md border-b border-cloud-mist flex justify-between items-center px-10 h-20 shadow-sm md:hidden md:border-b-0 md:shadow-none md:bg-transparent">
+<div class="font-display-sm text-display-sm font-bold text-primary">Horea</div>
+<div class="flex items-center gap-stack-16">
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</header>
+<!-- SideNav (Web Only) -->
+<aside class="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-canvas-white border-r border-cloud-mist z-40">
+<div class="p-10 flex items-center h-20 border-b border-cloud-mist">
+<span class="font-display-sm text-display-sm font-bold text-primary">Horea</span>
+</div>
+<nav class="flex-1 py-stack-24 px-stack-16 flex flex-col gap-stack-8 overflow-y-auto">
+<a class="flex items-center gap-stack-16 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-cloud-mist hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-stack-16 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-cloud-mist hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-body-md text-body-md">Reservations</span>
+</a>
+<a class="flex items-center gap-stack-16 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-cloud-mist hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="font-body-md text-body-md">Businesses</span>
+</a>
+<a class="flex items-center gap-stack-16 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-cloud-mist hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="design_services">design_services</span>
+<span class="font-body-md text-body-md">Services</span>
+</a>
+<a class="flex items-center gap-stack-16 px-4 py-3 rounded-lg text-primary font-bold bg-cloud-mist border-r-4 border-primary" href="#">
+<span class="material-symbols-outlined" data-icon="settings" data-weight="fill">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="p-stack-16 border-t border-cloud-mist">
+<button class="w-full flex items-center justify-center gap-stack-8 py-3 rounded-lg bg-primary-container text-on-primary font-body-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                Nový záznam
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 pt-20 md:pt-0 min-h-screen">
+<!-- TopAppBar (Web) - Contextual Header -->
+<div class="hidden md:flex bg-canvas-white h-20 items-center justify-between px-10 border-b border-cloud-mist sticky top-0 z-30">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Nastavení profilu</h1>
+<p class="font-caption text-caption text-outline">Spravujte veřejný vzhled a chování vašeho byznysu</p>
+</div>
+<div class="flex items-center gap-stack-16">
+<button class="w-10 h-10 rounded-full bg-cloud-mist flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden border border-cloud-mist">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmoQZt1bWx5NmVH7KXQ1TNGKSA5BpBK3B0IOdPU5OPmfvjP3kRuz-sqIvg5_KcUFmq8dAZ2PTbQbLrcXAVexbabn5W7bpg-TT-Y_6dDVR_VOBN1TQBUxgq9gzZP_YhOI2NiX7t7S2gnd-J8jmAwVSWZsGARIvByfqJdM9LtfnDuNov10D_a8WXozNlfEZzbaqXGHVjK9f-4BvNNi_oaAQRzI-ergGJPamsDdtrMtA41RpjgprPs0sbMuW-64JVBoGx4ULqYRg5RCI"/>
+</div>
+</div>
+</div>
+<div class="p-10 max-w-7xl mx-auto space-y-gap-section">
+<div class="flex flex-col lg:flex-row gap-gap-section">
+<!-- Left Column: Settings Forms -->
+<div class="w-full lg:w-2/3 space-y-gap-section">
+<!-- Veřejný profil Section -->
+<section class="bg-canvas-white rounded-[26px] p-padding-card">
+<div class="flex items-center gap-stack-8 mb-stack-24 pb-stack-16 border-b border-cloud-mist">
+<span class="material-symbols-outlined text-primary-container text-2xl" data-icon="public">public</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Veřejný profil</h2>
+</div>
+<div class="space-y-stack-24">
+<!-- Slug -->
+<div>
+<label class="block font-caption text-caption text-on-surface-variant mb-stack-8">URL adresa profilu</label>
+<div class="flex rounded-lg shadow-sm">
+<span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-input-border bg-soft-gray text-outline font-body-sm">horea.cz/</span>
+<input class="flex-1 block w-full min-w-0 rounded-none rounded-r-lg border-input-border px-padding-input-h py-padding-input-v text-on-surface font-body-sm focus:border-primary-container focus:ring-primary-container" type="text" value="studio-elegance"/>
+</div>
+<p class="mt-2 font-caption text-caption text-outline">Toto je unikátní odkaz, který můžete sdílet se zákazníky.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-stack-24 pt-stack-16">
+<!-- Logo Upload -->
+<div class="flex-1">
+<label class="block font-caption text-caption text-on-surface-variant mb-stack-8">Logo</label>
+<div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-input-border border-dashed rounded-xl bg-cloud-mist hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="space-y-1 text-center">
+<div class="w-16 h-16 mx-auto bg-canvas-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-outline text-3xl" data-icon="add_a_photo">add_a_photo</span>
+</div>
+<div class="flex font-body-sm text-outline justify-center mt-4">
+<span class="text-primary-container font-medium">Nahrát logo</span>
+</div>
+<p class="text-xs text-outline">PNG, JPG do 5MB</p>
+</div>
+</div>
+</div>
+<!-- Cover Photo Upload -->
+<div class="flex-[2]">
+<label class="block font-caption text-caption text-on-surface-variant mb-stack-8">Úvodní fotka</label>
+<div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-input-border border-dashed rounded-xl bg-cloud-mist hover:bg-surface-container-high transition-colors cursor-pointer group relative overflow-hidden h-full min-h-[140px]">
+<!-- Placeholder background image -->
+<div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-multiply" data-alt="A clean, modern beauty salon interior with soft lighting, minimalist styling, light wood accents, and a calming atmosphere, perfect for a high-end service business cover photo." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBfZiUPyifVL0l1EZ5CPRml_3LYJnLyLmn02aiA6QuPaeLDOgqBKSrcyEwUVQmvx5oTihTeBxB4jJI9ZKH07V6ANg7eHHE8PSooJxApr3gKCd3TRCN5fPrOyoZMRkspxw5O1w1hnnNDI2lD7xBkm091teHlxzp8v-NwHMxGvgKWxwn5-Al-QdW8OI8ovBrAUX1z0UuxJAkjciHSraVOV2O_IP0FQi1tKg3tkwi5H8oHG5B1Sfz2UV5W6ygouG5BNYLhpig0NrsULqs')"></div>
+<div class="relative z-10 space-y-1 text-center flex flex-col items-center justify-center h-full">
+<div class="w-12 h-12 bg-canvas-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-outline text-xl" data-icon="wallpaper">wallpaper</span>
+</div>
+<span class="text-primary-container font-medium font-body-sm bg-canvas-white/80 px-3 py-1 rounded-full text-xs">Změnit fotku</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Opening Hours Section -->
+<section class="bg-canvas-white rounded-[26px] p-padding-card">
+<div class="flex items-center justify-between mb-stack-24 pb-stack-16 border-b border-cloud-mist">
+<div class="flex items-center gap-stack-8">
+<span class="material-symbols-outlined text-aqua-blue text-2xl" data-icon="schedule">schedule</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Otevírací doba</h2>
+</div>
+<span class="font-caption text-caption text-outline">Standardní týden</span>
+</div>
+<div class="space-y-4">
+<!-- Day Row: Monday -->
+<div class="flex items-center gap-4 p-4 rounded-xl hover:bg-cloud-mist transition-colors group border border-transparent hover:border-input-border">
+<div class="w-24 font-body-sm text-on-surface-variant font-medium">Pondělí</div>
+<div class="flex-1 flex items-center gap-2">
+<input class="w-24 border-input-border rounded-lg px-2 py-1 text-sm text-on-surface focus:ring-primary-container focus:border-primary-container" type="time" value="09:00"/>
+<span class="text-outline">-</span>
+<input class="w-24 border-input-border rounded-lg px-2 py-1 text-sm text-on-surface focus:ring-primary-container focus:border-primary-container" type="time" value="17:00"/>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-outline group-hover:text-on-surface-variant">Otevřeno</span>
+<div class="relative inline-block w-[44px] align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer relative">
+<span class="toggle-dot absolute block bg-white shadow inset-y-0 left-0"></span>
+</label>
+</div>
+</div>
+</div>
+<!-- Day Row: Tuesday -->
+<div class="flex items-center gap-4 p-4 rounded-xl hover:bg-cloud-mist transition-colors group border border-transparent hover:border-input-border">
+<div class="w-24 font-body-sm text-on-surface-variant font-medium">Úterý</div>
+<div class="flex-1 flex items-center gap-2">
+<input class="w-24 border-input-border rounded-lg px-2 py-1 text-sm text-on-surface focus:ring-primary-container focus:border-primary-container" type="time" value="09:00"/>
+<span class="text-outline">-</span>
+<input class="w-24 border-input-border rounded-lg px-2 py-1 text-sm text-on-surface focus:ring-primary-container focus:border-primary-container" type="time" value="17:00"/>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-outline group-hover:text-on-surface-variant">Otevřeno</span>
+<div class="relative inline-block w-[44px] align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer relative">
+<span class="toggle-dot absolute block bg-white shadow inset-y-0 left-0"></span>
+</label>
+</div>
+</div>
+</div>
+<!-- Day Row: Sunday (Closed) -->
+<div class="flex items-center gap-4 p-4 rounded-xl bg-soft-gray/50 border border-input-border/50 opacity-75">
+<div class="w-24 font-body-sm text-outline font-medium">Neděle</div>
+<div class="flex-1 flex items-center gap-2">
+<div class="px-3 py-1 bg-surface-container-highest rounded text-sm text-outline">Zavřeno</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-outline">Zavřeno</span>
+<div class="relative inline-block w-[44px] align-middle select-none">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer relative">
+<span class="toggle-dot absolute block bg-white shadow inset-y-0 left-0"></span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Automation Settings Section -->
+<section class="bg-canvas-white rounded-[26px] p-padding-card">
+<div class="flex items-center gap-stack-8 mb-stack-24 pb-stack-16 border-b border-cloud-mist">
+<span class="material-symbols-outlined text-electric-green text-2xl" data-icon="smart_toy">smart_toy</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Automatizace &amp; Pravidla</h2>
+</div>
+<div class="space-y-stack-16">
+<!-- Automation Toggle 1 -->
+<div class="flex items-start justify-between p-4 rounded-xl border border-input-border hover:border-primary-container/30 transition-colors bg-cloud-mist/30">
+<div>
+<h3 class="font-body-md text-on-surface font-medium">Automatické schvalování rezervací</h3>
+<p class="font-caption text-caption text-outline mt-1 max-w-md">Rezervace budou okamžitě potvrzeny zákazníkovi bez nutnosti manuálního zásahu, pokud je volný termín.</p>
+</div>
+<div class="relative inline-block w-[44px] align-middle select-none mt-2">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer relative">
+<span class="toggle-dot absolute block bg-white shadow inset-y-0 left-0"></span>
+</label>
+</div>
+</div>
+<!-- Automation Toggle 2 -->
+<div class="flex items-start justify-between p-4 rounded-xl border border-input-border hover:border-primary-container/30 transition-colors bg-cloud-mist/30">
+<div>
+<h3 class="font-body-md text-on-surface font-medium">Povolit paralelní sloty</h3>
+<p class="font-caption text-caption text-outline mt-1 max-w-md">Umožňuje přijímat více rezervací na stejný čas. Vhodné pro provozy s více zaměstnanci.</p>
+</div>
+<div class="relative inline-block w-[44px] align-middle select-none mt-2">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer relative">
+<span class="toggle-dot absolute block bg-white shadow inset-y-0 left-0"></span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Buttons -->
+<div class="flex justify-end gap-stack-16 pt-stack-8">
+<button class="px-6 py-3 rounded-xl border border-outline text-outline font-body-sm font-medium hover:bg-cloud-mist transition-colors">
+                            Zrušit změny
+                        </button>
+<button class="px-6 py-3 rounded-xl bg-primary-container text-on-primary font-body-sm font-medium hover:opacity-90 transition-opacity shadow-sm">
+                            Uložit nastavení
+                        </button>
+</div>
+</div>
+<!-- Right Column: Mobile Preview -->
+<div class="w-full lg:w-1/3">
+<div class="sticky top-28">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-16 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" data-icon="smartphone">smartphone</span>
+                            Náhled profilu
+                        </h3>
+<!-- Mobile Device Mockup -->
+<div class="w-[300px] h-[600px] mx-auto bg-canvas-white rounded-[40px] border-[8px] border-surface-container-highest shadow-xl overflow-hidden relative flex flex-col">
+<!-- Cover Photo Area -->
+<div class="h-40 w-full bg-cover bg-center relative" data-alt="A clean, modern beauty salon interior serving as a cover photo background in a mobile app mockup, featuring light wood textures and soft lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAg28ydxkv01s59A70K6kAHJ_6UBNski91cqysXOxpaYV3rVRaWguE_P8XxlhmqXb4MKBX12wmOBnCzCILTDN9ZO_7edmbDmPz8KLhQgPQDcECc5o03GZkSMWT8cYfhND2MZmlet2_cJuHKC57H4FaooagFJFV_DF69RrZIAKyIE6M1VDMZQCFBDlXITNiNGQgLuaXAhi8Pu8gWKu9WjfKb2auYOZeXBEfjPv9xVa7M2W8JfqoNk5NlWeo6I0eUINugE_qdWhdT1D0')">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<!-- Avatar Overlap -->
+<div class="absolute -bottom-8 left-6 w-20 h-20 rounded-2xl bg-canvas-white p-1 shadow-md">
+<div class="w-full h-full rounded-xl bg-secondary-fixed flex items-center justify-center text-secondary font-bold text-2xl border border-cloud-mist">
+                                        SE
+                                    </div>
+</div>
+</div>
+<!-- Content Area -->
+<div class="flex-1 p-6 pt-10 flex flex-col bg-canvas-white">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Studio Elegance</h4>
+<p class="text-xs text-outline mb-4">horea.cz/studio-elegance</p>
+<div class="flex gap-2 mb-6">
+<span class="px-2 py-1 bg-surface-container-high text-primary-container text-[10px] rounded-full font-medium">Beauty</span>
+<span class="px-2 py-1 bg-lush-green/50 text-on-surface text-[10px] rounded-full font-medium flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-electric-green"></span>
+                                        Nyní otevřeno
+                                    </span>
+</div>
+<button class="w-full py-3 bg-primary-container text-on-primary rounded-xl font-body-sm font-medium mb-6">
+                                    Rezervovat termín
+                                </button>
+<div class="space-y-4">
+<div class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-outline" data-icon="location_on">location_on</span>
+                                        Václavské náměstí 1, Praha
+                                    </div>
+<div class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-outline" data-icon="schedule">schedule</span>
+                                        Dnes 09:00 - 17:00
+                                    </div>
+</div>
+</div>
+<!-- Bottom Fake Nav -->
+<div class="h-16 border-t border-cloud-mist bg-canvas-white flex justify-around items-center px-4 text-outline pb-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="home">home</span>
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 px-10 flex flex-col md:flex-row justify-between items-center gap-section bg-cloud-mist mt-stack-48">
+<div class="font-headline-sm text-headline-sm text-on-surface">Horea</div>
+<div class="flex gap-stack-16 text-caption font-caption">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Podpora</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Obchodní podmínky</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Ochrana údajů</a>
+</div>
+<div class="font-caption text-caption text-secondary">© 2024 Horea SaaS. Všechna práva vyhrazena.</div>
+</footer>
+</main>
+</body></html>

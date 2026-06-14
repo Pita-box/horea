@@ -12,7 +12,7 @@ describe('wrapEmail', () => {
     expect(html).toContain('<html lang="cs">');
     expect(html).toContain('Potvrzení rezervace');
     expect(html).toContain('<p>Rezervace byla přijata.</p>');
-    expect(html).toContain('podpora@horea.cz');
+    expect(html).toContain('info@horea.cz');
     expect(html).toContain('GDPR a zpracování osobních údajů');
   });
 

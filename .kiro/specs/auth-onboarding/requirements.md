@@ -8,11 +8,14 @@ Tato spec popisuje **autentizační vrstvu a první onboarding** SaaS platformy 
 
 Spec **NEPOKRÝVÁ** klientskou stranu (rezervační formulář, viz `R19` v `architecture/requirements.md`), placení předplatného (`subscription-payments`), veřejnou stránku podniku (`public-business-page`), správu služeb a otevírací doby po onboardingu (`services-and-availability`), správu rezervací (`reservation-management`) ani admin dashboard (`admin-dashboard`).
 
+Routing kontrakt platformy: `/` je veřejná landing page, ne dashboard. Všichni přihlášení uživatelé vstupují přes `/login` a po přihlášení přes `/dashboard`; konkrétní dashboard se serverově vykreslí podle typu účtu (`users.is_admin`). Veřejný profil podniku žije na `/{slug}` (např. `/barber-abc`) a implementuje ho spec `public-business-page`. Auth/onboarding routy proto nesmí zabrat systémové cesty ani slug prostor vyhrazený veřejným profilům; systémové cesty a citlivé názvy jsou blokované přes `RESERVED_SLUGS`.
+
 Spec je v souladu s platformovými požadavky `R9` (GDPR / DPA), `R10` (bezpečnost autentizace), `R11` (slug routing), `R18` (česká lokalizace), `R19` (klient bez registrace) a `R21` (typologie podniků).
 
 ## Glossary
 
 - **Podnikatel**: Registrovaný uživatel typu majitel podniku (tabulka `users`, `is_admin = false`). Cílový aktér celého toku.
+- **Admin**: Registrovaný interní uživatel s `users.is_admin = true`; po přihlášení vidí admin variantu `/dashboard`, ne samostatnou veřejně známou admin login cestu.
 - **Klient**: Koncový zákazník rezervující termín — **bez registrace**, není v rozsahu této specu (viz `R19`).
 - **Auth_Service**: Komponenta zajišťující registraci, přihlášení, ověření emailu a reset hesla. V MVP implementována nad Supabase Auth (viz `architecture/design.md`).
 - **Onboarding_Wizard**: Komponenta provádějící podnikatele šestikrokovým průvodcem (typ podniku → slug → profil → služba → otevírací doba → potvrzení) po prvním přihlášení.
@@ -63,10 +66,11 @@ Spec je v souladu s platformovými požadavky `R9` (GDPR / DPA), `R10` (bezpečn
 1. WHEN podnikatel odešle přihlašovací formulář s platným emailem a heslem, THE Auth_Service SHALL ověřit přihlašovací údaje a vytvořit přihlašovací relaci uloženou v HTTP-only secure cookie.
 2. IF kombinace emailu a hesla neodpovídá žádnému ověřenému účtu, THEN THE Auth_Service SHALL přihlášení odmítnout s českou chybovou hláškou „Nesprávný email nebo heslo" bez prozrazení, který z údajů je chybný.
 3. WHEN podnikatel zaškrtne pole „Zůstat přihlášen" a přihlášení uspěje, THE Session_Manager SHALL vytvořit dlouhodobou relaci v souladu s konfigurací Supabase Auth pro remember-me.
-4. WHEN podnikatel přihlášení uspěje a nemá založený podnik, THE Auth_Service SHALL přesměrovat podnikatele na první krok onboarding wizardu.
-5. WHEN podnikatel přihlášení uspěje a má založený podnik, THE Auth_Service SHALL přesměrovat podnikatele na dashboard.
-6. THE Auth_Service SHALL aplikovat rate limit na neúspěšné pokusy o přihlášení per IP a per email v souladu s `R10`.
-7. THE Auth_Service SHALL zobrazit veškeré chybové hlášky autentizačního toku v češtině v souladu s `R18`.
+4. WHEN přihlášení uspěje a `users.is_admin = true`, THE Auth_Service SHALL přesměrovat uživatele na `/dashboard`, kde se zobrazí admin varianta dashboardu podle role účtu.
+5. WHEN podnikatel (`users.is_admin = false`) přihlášení uspěje a nemá založený podnik, THE Auth_Service SHALL přesměrovat podnikatele na první nedokončený krok onboarding wizardu.
+6. WHEN podnikatel (`users.is_admin = false`) přihlášení uspěje a má založený podnik, THE Auth_Service SHALL přesměrovat podnikatele na user dashboard `/dashboard`.
+7. THE Auth_Service SHALL aplikovat rate limit na neúspěšné pokusy o přihlášení per IP a per email v souladu s `R10`.
+8. THE Auth_Service SHALL zobrazit veškeré chybové hlášky autentizačního toku v češtině v souladu s `R18`.
 
 ### Requirement 4: Odhlášení
 

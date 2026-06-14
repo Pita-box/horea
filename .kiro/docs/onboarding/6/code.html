@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Horea Onboarding - Souhrn a dokončení</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "electric-green": "#a2ea13",
+                        "canvas-white": "#ffffff",
+                        "air-blue": "#bcf2ff",
+                        "surface-container-highest": "#e6dff3",
+                        "on-surface-variant": "#474557",
+                        "on-background": "#1c1a28",
+                        "on-surface": "#1c1a28",
+                        "aqua-blue": "#2ed6ff",
+                        "tertiary-container": "#b20089",
+                        "inverse-surface": "#312e3d",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary-fixed": "#ffd8eb",
+                        "on-secondary-fixed-variant": "#493f76",
+                        "surface-container-high": "#ece5f9",
+                        "cloud-mist": "#f0f3fe",
+                        "on-secondary-container": "#554b82",
+                        "tertiary-fixed-dim": "#ffaedc",
+                        "tertiary": "#880068",
+                        "primary-fixed": "#e5deff",
+                        "primary-container": "#592eff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f7f1ff",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#4100db",
+                        "primary": "#4100dc",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#787589",
+                        "on-tertiary-container": "#ffcae5",
+                        "soft-gray": "#eeeeee",
+                        "surface": "#fdf8ff",
+                        "inverse-primary": "#c8bfff",
+                        "outline-variant": "#c9c4da",
+                        "surface-dim": "#ddd7eb",
+                        "surface-container": "#f1ebff",
+                        "secondary": "#61568f",
+                        "surface-bright": "#fdf8ff",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#592eff",
+                        "on-primary-container": "#dbd4ff",
+                        "sunset-pink": "#ffaae6",
+                        "on-primary-fixed": "#190064",
+                        "secondary-container": "#cabeff",
+                        "on-tertiary-fixed": "#3c002c",
+                        "on-secondary-fixed": "#1d1148",
+                        "on-tertiary-fixed-variant": "#880068",
+                        "inverse-on-surface": "#f4eeff",
+                        "background": "#fdf8ff",
+                        "lush-green": "#dfff9d",
+                        "surface-variant": "#e6dff3",
+                        "primary-fixed-dim": "#c8bfff",
+                        "secondary-fixed": "#e6deff",
+                        "input-border": "#d8ddef",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "26px",
+                        "button": "12px"
+                    },
+                    "spacing": {
+                        "gap-section": "30px",
+                        "stack-100": "100px",
+                        "base": "4px",
+                        "gap-element": "5px",
+                        "stack-16": "16px",
+                        "padding-input-h": "10px",
+                        "stack-48": "48px",
+                        "stack-24": "24px",
+                        "padding-card": "40px",
+                        "padding-input-v": "12px",
+                        "stack-8": "8px",
+                        "stack-4": "4px"
+                    },
+                    "fontFamily": {
+                        "display-md": ["Montserrat", "sans-serif"],
+                        "headline-lg": ["Montserrat", "sans-serif"],
+                        "display-sm": ["Montserrat", "sans-serif"],
+                        "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+                        "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-md": ["Plus Jakarta Sans", "sans-serif"],
+                        "display-lg": ["Montserrat", "sans-serif"],
+                        "caption": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-sm": ["Plus Jakarta Sans", "sans-serif"],
+                        "body-lg": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                        "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .onboarding-bg {
+            background: radial-gradient(circle at top left, #592eff 0%, #ffaae6 100%);
+            min-height: 100vh;
+        }
+        .progress-segment {
+            height: 4px;
+            border-radius: 999px;
+            flex-grow: 1;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .summary-item:not(:last-child) {
+            border-bottom: 1px solid #f0f3fe;
+        }
+    </style>
+</head>
+<body class="onboarding-bg flex flex-col font-body-md text-on-background">
+<!-- Progress Bar Section -->
+<div class="w-full max-w-2xl mx-auto pt-12 px-6">
+<div class="flex gap-2 mb-8">
+<!-- Full Progress (Step 6/6) -->
+<div class="progress-segment bg-canvas-white opacity-100"></div>
+<div class="progress-segment bg-canvas-white opacity-100"></div>
+<div class="progress-segment bg-canvas-white opacity-100"></div>
+<div class="progress-segment bg-canvas-white opacity-100"></div>
+<div class="progress-segment bg-canvas-white opacity-100"></div>
+<div class="progress-segment bg-canvas-white opacity-100"></div>
+</div>
+<div class="text-center mb-10">
+<h1 class="font-display-sm text-display-sm text-canvas-white mb-stack-8">Vše je připraveno</h1>
+<p class="font-body-lg text-body-lg text-canvas-white opacity-90 max-w-lg mx-auto leading-tight">
+                Po potvrzení vznikne neveřejný profil podniku ve stavu free. Publikace přijde až po aktivaci předplatného.
+            </p>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-start justify-center px-6 pb-24">
+<div class="w-full max-w-2xl bg-canvas-white rounded-card p-padding-card flex flex-col shadow-xl">
+<!-- Summary Header -->
+<div class="flex items-center gap-stack-8 mb-stack-24 text-primary">
+<span class="material-symbols-outlined text-[24px]">description</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Souhrn údajů</h2>
+</div>
+<!-- Summary List -->
+<div class="space-y-stack-16 mb-stack-24">
+<div class="summary-item py-stack-16 flex flex-col md:flex-row md:justify-between md:items-center gap-stack-4">
+<span class="font-body-sm text-on-surface-variant">Typ podniku</span>
+<span class="font-body-md font-semibold text-on-surface">Restaurace &amp; Bistro</span>
+</div>
+<div class="summary-item py-stack-16 flex flex-col md:flex-row md:justify-between md:items-center gap-stack-4">
+<span class="font-body-sm text-on-surface-variant">Název podniku</span>
+<span class="font-body-md font-semibold text-on-surface">La Bottega di Horea</span>
+</div>
+<div class="summary-item py-stack-16 flex flex-col md:flex-row md:justify-between md:items-center gap-stack-4">
+<span class="font-body-sm text-on-surface-variant">Kontakt</span>
+<div class="flex flex-col md:items-end">
+<span class="font-body-md font-semibold text-on-surface">hello@bottegahorea.cz</span>
+<span class="font-body-sm text-on-surface-variant">+420 777 123 456</span>
+</div>
+</div>
+<div class="summary-item py-stack-16 flex flex-col md:flex-row md:justify-between md:items-center gap-stack-4">
+<span class="font-body-sm text-on-surface-variant">První služba</span>
+<span class="font-body-md font-semibold text-on-surface">Degustační menu (1250 Kč)</span>
+</div>
+<div class="summary-item py-stack-16 flex flex-col md:flex-row md:justify-between md:items-center gap-stack-4">
+<span class="font-body-sm text-on-surface-variant">Otevírací doba</span>
+<div class="flex flex-col md:items-end">
+<span class="font-body-md font-semibold text-on-surface">Po - Pá (09:00 - 22:00)</span>
+<span class="font-body-md font-semibold text-on-surface">So - Ne (10:00 - 23:00)</span>
+</div>
+</div>
+</div>
+<!-- Information Box -->
+<div class="bg-air-blue bg-opacity-30 p-stack-16 rounded-lg flex gap-stack-16 items-start border border-aqua-blue border-opacity-20">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
+<p class="font-body-sm text-on-surface leading-tight">
+                    Váš profil bude připraven k editaci. Jakmile kliknete na dokončení, získáte přístup do administrace vašeho nového podniku.
+                </p>
+</div>
+<!-- Actions Container -->
+<div class="mt-stack-48 flex flex-col sm:flex-row items-center justify-between gap-stack-16">
+<button class="w-full sm:w-auto px-8 py-4 rounded-button font-body-md font-semibold text-on-surface-variant border border-cloud-mist hover:bg-soft-gray transition-colors">
+                    Zpět
+                </button>
+<button class="w-full sm:w-auto px-8 py-4 rounded-button font-body-md font-semibold bg-primary-container text-on-primary-container hover:bg-primary transition-all duration-300 shadow-lg shadow-primary/20">
+                    Dokončit a vytvořit profil
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer Logo Section -->
+<footer class="w-full py-12 flex flex-col items-center gap-stack-24">
+<img alt="Horea Logo" class="h-10 w-auto opacity-90" data-alt="A professional and elegant minimalist brand logo for 'Horea'. The text is rendered in an organic, fluid hand-lettered script font in deep charcoal slate. A single delicate dot in vibrant action violet follows the word, adding a touch of modern energy. The logo sits on a clean, high-contrast background, evoking a sense of clarity, premium service, and creative innovation." src="https://lh3.googleusercontent.com/aida/AP1WRLsUl1Q1dq1cqaHHQdsHYpxbOUnRiDdZoh6-XodQBZ6-1gxd4NO56fCj4N8yRZizaSJQb4pH-eh9AzRp5f1-dh1kKmfZic_QrYoVgK8CtO4tn4OT2lrmnieh7ygU6Mpc7aTUFAwvyRyTcYEFc_3iZczKmSYsw6P9Ue_A9ugDgFfLgdPscf57FX6i0h-R4L9I8GT1JCsBntQnBEV1xAHWMTVKPgQgIYPk3xnlVki21L8CMbK3tcHHkVL6194"/>
+<p class="font-body-sm text-canvas-white opacity-60">© 2024 Horea SaaS. Všechna práva vyhrazena.</p>
+</footer>
+<script>
+        // Subtle micro-interaction for the primary button
+        const mainBtn = document.querySelector('.bg-primary-container');
+        mainBtn.addEventListener('mousedown', () => {
+            mainBtn.style.transform = 'scale(0.98)';
+        });
+        mainBtn.addEventListener('mouseup', () => {
+            mainBtn.style.transform = 'scale(1)';
+        });
+        mainBtn.addEventListener('mouseleave', () => {
+            mainBtn.style.transform = 'scale(1)';
+        });
+    </script>
+</body></html>

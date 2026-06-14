@@ -1,0 +1,1173 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PublicProfileRenderer (snapshot) > při prázdném seznamu služeb zobrazí hlášku a nevykreslí rezervační formulář 1`] = `
+<div>
+  <div
+    class="flex min-h-screen flex-col bg-[var(--color-cloud-mist)]"
+  >
+    <main
+      class="mx-auto w-full max-w-7xl flex-1 px-4 pb-16 md:px-10"
+    >
+      <div
+        class="relative z-10 flex items-end justify-between gap-4 pt-8"
+      >
+        <div
+          class="h-32 w-32 shrink-0 overflow-hidden rounded-full border-4 border-[var(--color-canvas-white)] bg-[var(--color-canvas-white)] shadow-sm"
+        >
+          <div
+            aria-hidden="true"
+            class="flex h-full w-full items-center justify-center bg-[var(--color-air-blue)] text-[32px] font-semibold text-[var(--color-rich-violet)]"
+          >
+            P
+          </div>
+        </div>
+      </div>
+      <div
+        class="mt-4 flex flex-col gap-2"
+      >
+        <div
+          class="flex flex-wrap justify-between gap-2"
+        >
+          <div
+            class="flex items-center gap-3"
+          >
+            <h1
+              class="font-[var(--font-polysans)] text-[32px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--color-rich-violet)] md:text-[38px]"
+            >
+              Podnik Bez Služeb
+            </h1>
+          </div>
+          <ul
+            class="flex flex-wrap items-center justify-end gap-6 pb-2"
+          >
+            <li>
+              <a
+                aria-label="Zavolat"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-input-border)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:border-[var(--color-action-violet)] hover:text-[var(--color-action-violet)]"
+                href="tel:+420111222333"
+                title="Zavolat"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-phone "
+                  fill="none"
+                  height="20"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"
+                  />
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <p
+          class="text-[16px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+        >
+          Kadeřnictví
+        </p>
+        <p
+          class="mt-2 max-w-3xl whitespace-pre-line text-[16px] leading-relaxed text-[var(--color-slate-text)]"
+        >
+          Profil zatím bez rezervovatelných služeb.
+        </p>
+      </div>
+      <div
+        class="mt-[var(--section-gap)] grid grid-cols-1 gap-[var(--section-gap)] lg:grid-cols-3"
+      >
+        <div
+          class="flex flex-col gap-[var(--section-gap)] lg:col-span-2"
+        >
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <h2
+              class="mb-[var(--spacing-24)] font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+            >
+              Rezervace
+            </h2>
+            <div
+              class="flex items-center gap-2 rounded-[var(--radius-buttons)] border px-[var(--input-padding-x)] py-[var(--input-padding-y)] text-sm font-medium leading-[1.1] border-[var(--color-border-vychozi)] bg-[var(--color-dark)] text-[white]"
+            >
+              <svg
+                aria-hidden="true"
+                class="tabler-icon tabler-icon-info-circle mt-[1px] shrink-0"
+                fill="none"
+                height="18"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="18"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"
+                />
+                <path
+                  d="M12 9h.01"
+                />
+                <path
+                  d="M11 12h1v4h1"
+                />
+              </svg>
+              <span
+                class="min-w-0"
+              >
+                Tento podnik zatím nemá žádné rezervovatelné služby
+              </span>
+            </div>
+          </section>
+        </div>
+        <div
+          class="flex flex-col gap-[var(--section-gap)]"
+        >
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <div
+              class="mb-[var(--spacing-16)] flex flex-wrap items-center justify-between gap-2"
+            >
+              <h2
+                class="font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+              >
+                Otevírací doba
+              </h2>
+            </div>
+            <ul
+              class="flex flex-col gap-3"
+            >
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Pondělí
+                </span>
+                <span>
+                  09:00–17:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Úterý
+                </span>
+                <span>
+                  09:00–17:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Středa
+                </span>
+                <span>
+                  09:00–17:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Čtvrtek
+                </span>
+                <span>
+                  10:00–18:30
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Pátek
+                </span>
+                <span>
+                  09:00–14:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Sobota
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Neděle
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+            </ul>
+          </section>
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <h2
+              class="mb-[var(--spacing-16)] font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+            >
+              Kontakt
+            </h2>
+            <ul
+              class="flex flex-col gap-4"
+            >
+              <li
+                class="flex items-start gap-3"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-phone mt-[2px] shrink-0 text-[var(--color-action-violet)]"
+                  fill="none"
+                  height="22"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"
+                  />
+                </svg>
+                <a
+                  class="text-[16px] text-[var(--color-slate-text)] hover:text-[var(--color-action-violet)]"
+                  href="tel:+420111222333"
+                >
+                  +420111222333
+                </a>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer
+      class="mt-auto bg-[var(--color-cloud-mist)]"
+    >
+      <div
+        class="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-[16px] py-[48px] md:px-10"
+      >
+        <div
+          class="flex flex-col items-center gap-6 md:flex-row md:items-center md:justify-between"
+        >
+          <div
+            class="flex flex-col items-center gap-4 text-center md:items-start md:text-left"
+          >
+            <img
+              alt="Horea"
+              height="36"
+              src="/logo.svg"
+              width="104"
+            />
+            <div
+              class="flex flex-col gap-1 font-[var(--font-plus-jakarta-sans)] text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+            >
+              <p>
+                <a
+                  class="transition-colors hover:text-[var(--color-action-violet)]"
+                  href="mailto:info@horea.cz"
+                >
+                  info@horea.cz
+                </a>
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex items-center gap-3"
+          >
+            <a
+              aria-label="Facebook"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-action-violet)] hover:text-[var(--color-canvas-white)]"
+              href="https://www.facebook.com/horea"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <svg
+                aria-hidden="true"
+                class="tabler-icon tabler-icon-brand-facebook "
+                fill="none"
+                height="22"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="22"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"
+                />
+              </svg>
+            </a>
+            <a
+              aria-label="Instagram"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-action-violet)] hover:text-[var(--color-canvas-white)]"
+              href="https://www.instagram.com/horea"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <svg
+                aria-hidden="true"
+                class="tabler-icon tabler-icon-brand-instagram "
+                fill="none"
+                height="22"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="22"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4l0 -8"
+                />
+                <path
+                  d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
+                />
+                <path
+                  d="M16.5 7.5v.01"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          class="flex w-full flex-col items-center gap-4 border-t border-[color-mix(in_srgb,var(--color-slate-text)_12%,transparent)] pt-6 md:flex-row md:justify-between"
+        >
+          <nav
+            aria-label="Patička"
+            class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-[var(--font-plus-jakarta-sans)] text-sm"
+          >
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/kontakt"
+            >
+              Kontaktní údaje
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/predplatne"
+            >
+              Předplatné
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/vseobecne-podminky"
+            >
+              Všeobecné podmínky
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/ochrana-osobnich-udaju"
+            >
+              Zásady ochrany osobních údajů
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="#"
+            >
+              Nastavení cookies
+            </a>
+          </nav>
+          <p
+            class="text-center font-[var(--font-plus-jakarta-sans)] text-sm md:text-right text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+          >
+            © 
+            2026
+             Horea. Všechna práva vyhrazena.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+`;
+
+exports[`PublicProfileRenderer (snapshot) > vykreslí publikovaný profil bez loga a bez kontaktů (zástupný vizuál, žádné kontaktní řádky) 1`] = `
+<div>
+  <div
+    class="flex min-h-screen flex-col bg-[var(--color-cloud-mist)]"
+  >
+    <main
+      class="mx-auto w-full max-w-7xl flex-1 px-4 pb-16 md:px-10"
+    >
+      <div
+        class="relative z-10 flex items-end justify-between gap-4 pt-8"
+      >
+        <div
+          class="h-32 w-32 shrink-0 overflow-hidden rounded-full border-4 border-[var(--color-canvas-white)] bg-[var(--color-canvas-white)] shadow-sm"
+        >
+          <div
+            aria-hidden="true"
+            class="flex h-full w-full items-center justify-center bg-[var(--color-air-blue)] text-[32px] font-semibold text-[var(--color-rich-violet)]"
+          >
+            H
+          </div>
+        </div>
+      </div>
+      <div
+        class="mt-4 flex flex-col gap-2"
+      >
+        <div
+          class="flex flex-wrap justify-between gap-2"
+        >
+          <div
+            class="flex items-center gap-3"
+          >
+            <h1
+              class="font-[var(--font-polysans)] text-[32px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--color-rich-violet)] md:text-[38px]"
+            >
+              Holičství Bez Loga
+            </h1>
+          </div>
+        </div>
+        <p
+          class="text-[16px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+        >
+          Ostatní
+        </p>
+      </div>
+      <div
+        class="mt-[var(--section-gap)] grid grid-cols-1 gap-[var(--section-gap)] lg:grid-cols-3"
+      >
+        <div
+          class="flex flex-col gap-[var(--section-gap)] lg:col-span-2"
+        >
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <h2
+              class="mb-[var(--spacing-24)] font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+            >
+              Rezervace
+            </h2>
+            <div
+              data-testid="reservation-form"
+            >
+              Rezervační formulář
+            </div>
+          </section>
+        </div>
+        <div
+          class="flex flex-col gap-[var(--section-gap)]"
+        >
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <div
+              class="mb-[var(--spacing-16)] flex flex-wrap items-center justify-between gap-2"
+            >
+              <h2
+                class="font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+              >
+                Otevírací doba
+              </h2>
+            </div>
+            <ul
+              class="flex flex-col gap-3"
+            >
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Pondělí
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Úterý
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Středa
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Čtvrtek
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Pátek
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Sobota
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Neděle
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer
+      class="mt-auto bg-[var(--color-cloud-mist)]"
+    >
+      <div
+        class="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-[16px] py-[48px] md:px-10"
+      >
+        <div
+          class="flex flex-col items-center gap-6 md:flex-row md:items-center md:justify-between"
+        >
+          <div
+            class="flex flex-col items-center gap-4 text-center md:items-start md:text-left"
+          >
+            <img
+              alt="Horea"
+              height="36"
+              src="/logo.svg"
+              width="104"
+            />
+            <div
+              class="flex flex-col gap-1 font-[var(--font-plus-jakarta-sans)] text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+            >
+              <p>
+                <a
+                  class="transition-colors hover:text-[var(--color-action-violet)]"
+                  href="mailto:info@horea.cz"
+                >
+                  info@horea.cz
+                </a>
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex items-center gap-3"
+          >
+            <a
+              aria-label="Facebook"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-action-violet)] hover:text-[var(--color-canvas-white)]"
+              href="https://www.facebook.com/horea"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <svg
+                aria-hidden="true"
+                class="tabler-icon tabler-icon-brand-facebook "
+                fill="none"
+                height="22"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="22"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"
+                />
+              </svg>
+            </a>
+            <a
+              aria-label="Instagram"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-action-violet)] hover:text-[var(--color-canvas-white)]"
+              href="https://www.instagram.com/horea"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <svg
+                aria-hidden="true"
+                class="tabler-icon tabler-icon-brand-instagram "
+                fill="none"
+                height="22"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="22"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4l0 -8"
+                />
+                <path
+                  d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
+                />
+                <path
+                  d="M16.5 7.5v.01"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          class="flex w-full flex-col items-center gap-4 border-t border-[color-mix(in_srgb,var(--color-slate-text)_12%,transparent)] pt-6 md:flex-row md:justify-between"
+        >
+          <nav
+            aria-label="Patička"
+            class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-[var(--font-plus-jakarta-sans)] text-sm"
+          >
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/kontakt"
+            >
+              Kontaktní údaje
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/predplatne"
+            >
+              Předplatné
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/vseobecne-podminky"
+            >
+              Všeobecné podmínky
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/ochrana-osobnich-udaju"
+            >
+              Zásady ochrany osobních údajů
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="#"
+            >
+              Nastavení cookies
+            </a>
+          </nav>
+          <p
+            class="text-center font-[var(--font-plus-jakarta-sans)] text-sm md:text-right text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+          >
+            © 
+            2026
+             Horea. Všechna práva vyhrazena.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+`;
+
+exports[`PublicProfileRenderer (snapshot) > vykreslí publikovaný profil s logem, všemi kontakty, více službami a zavřenými dny 1`] = `
+<div>
+  <div
+    class="flex min-h-screen flex-col bg-[var(--color-cloud-mist)]"
+  >
+    <main
+      class="mx-auto w-full max-w-7xl flex-1 px-4 pb-16 md:px-10"
+    >
+      <div
+        class="relative z-10 flex items-end justify-between gap-4 pt-8"
+      >
+        <div
+          class="h-32 w-32 shrink-0 overflow-hidden rounded-full border-4 border-[var(--color-canvas-white)] bg-[var(--color-canvas-white)] shadow-sm"
+        >
+          <img
+            alt="Logo podniku Kavárna U Kočky"
+            height="128"
+            src="https://cdn.example.com/logo.png"
+            width="128"
+          />
+        </div>
+      </div>
+      <div
+        class="mt-4 flex flex-col gap-2"
+      >
+        <div
+          class="flex flex-wrap justify-between gap-2"
+        >
+          <div
+            class="flex items-center gap-3"
+          >
+            <h1
+              class="font-[var(--font-polysans)] text-[32px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--color-rich-violet)] md:text-[38px]"
+            >
+              Kavárna U Kočky
+            </h1>
+          </div>
+          <ul
+            class="flex flex-wrap items-center justify-end gap-6 pb-2"
+          >
+            <li>
+              <a
+                aria-label="Zavolat"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-input-border)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:border-[var(--color-action-violet)] hover:text-[var(--color-action-violet)]"
+                href="tel:+420704344177"
+                title="Zavolat"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-phone "
+                  fill="none"
+                  height="20"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"
+                  />
+                </svg>
+              </a>
+            </li>
+            <li>
+              <a
+                aria-label="Napsat e-mail"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-input-border)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:border-[var(--color-action-violet)] hover:text-[var(--color-action-violet)]"
+                href="mailto:kontakt@kavarna.cz"
+                title="Napsat e-mail"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-mail "
+                  fill="none"
+                  height="20"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10"
+                  />
+                  <path
+                    d="M3 7l9 6l9 -6"
+                  />
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <p
+          class="text-[16px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+        >
+          Beauty služby
+        </p>
+        <p
+          class="mt-2 max-w-3xl whitespace-pre-line text-[16px] leading-relaxed text-[var(--color-slate-text)]"
+        >
+          Útulná kavárna v centru města.
+Otevřeno přes celý týden.
+        </p>
+      </div>
+      <div
+        class="mt-[var(--section-gap)] grid grid-cols-1 gap-[var(--section-gap)] lg:grid-cols-3"
+      >
+        <div
+          class="flex flex-col gap-[var(--section-gap)] lg:col-span-2"
+        >
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <h2
+              class="mb-[var(--spacing-24)] font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+            >
+              Rezervace
+            </h2>
+            <div
+              data-testid="reservation-form"
+            >
+              Rezervační formulář
+            </div>
+          </section>
+        </div>
+        <div
+          class="flex flex-col gap-[var(--section-gap)]"
+        >
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <div
+              class="mb-[var(--spacing-16)] flex flex-wrap items-center justify-between gap-2"
+            >
+              <h2
+                class="font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+              >
+                Otevírací doba
+              </h2>
+            </div>
+            <ul
+              class="flex flex-col gap-3"
+            >
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Pondělí
+                </span>
+                <span>
+                  09:00–17:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Úterý
+                </span>
+                <span>
+                  09:00–17:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Středa
+                </span>
+                <span>
+                  09:00–17:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Čtvrtek
+                </span>
+                <span>
+                  10:00–18:30
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] "
+              >
+                <span>
+                  Pátek
+                </span>
+                <span>
+                  09:00–14:00
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Sobota
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+              <li
+                class="flex items-center justify-between gap-4 text-[16px] text-[var(--color-slate-text)] opacity-60"
+              >
+                <span>
+                  Neděle
+                </span>
+                <span>
+                  Zavřeno
+                </span>
+              </li>
+            </ul>
+          </section>
+          <section
+            class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--card-padding)]"
+          >
+            <h2
+              class="mb-[var(--spacing-16)] font-[var(--font-polysans)] text-[28px] font-bold text-[var(--color-rich-violet)]"
+            >
+              Kontakt
+            </h2>
+            <ul
+              class="flex flex-col gap-4"
+            >
+              <li
+                class="flex items-start gap-3"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-phone mt-[2px] shrink-0 text-[var(--color-action-violet)]"
+                  fill="none"
+                  height="22"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"
+                  />
+                </svg>
+                <a
+                  class="text-[16px] text-[var(--color-slate-text)] hover:text-[var(--color-action-violet)]"
+                  href="tel:+420704344177"
+                >
+                  +420704344177
+                </a>
+              </li>
+              <li
+                class="flex items-start gap-3"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-mail mt-[2px] shrink-0 text-[var(--color-action-violet)]"
+                  fill="none"
+                  height="22"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10"
+                  />
+                  <path
+                    d="M3 7l9 6l9 -6"
+                  />
+                </svg>
+                <a
+                  class="break-all text-[16px] text-[var(--color-slate-text)] hover:text-[var(--color-action-violet)]"
+                  href="mailto:kontakt@kavarna.cz"
+                >
+                  kontakt@kavarna.cz
+                </a>
+              </li>
+              <li
+                class="flex items-start gap-3"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-map-pin mt-[2px] shrink-0 text-[var(--color-action-violet)]"
+                  fill="none"
+                  height="22"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
+                  />
+                  <path
+                    d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"
+                  />
+                </svg>
+                <span
+                  class="text-[16px] text-[var(--color-slate-text)]"
+                >
+                  Náměstí Míru 1, Praha
+                </span>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer
+      class="mt-auto bg-[var(--color-cloud-mist)]"
+    >
+      <div
+        class="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-[16px] py-[48px] md:px-10"
+      >
+        <div
+          class="flex flex-col items-center gap-6 md:flex-row md:items-center md:justify-between"
+        >
+          <div
+            class="flex flex-col items-center gap-4 text-center md:items-start md:text-left"
+          >
+            <img
+              alt="Horea"
+              height="36"
+              src="/logo.svg"
+              width="104"
+            />
+            <div
+              class="flex flex-col gap-1 font-[var(--font-plus-jakarta-sans)] text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+            >
+              <p>
+                <a
+                  class="transition-colors hover:text-[var(--color-action-violet)]"
+                  href="mailto:info@horea.cz"
+                >
+                  info@horea.cz
+                </a>
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex items-center gap-3"
+          >
+            <a
+              aria-label="Facebook"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-action-violet)] hover:text-[var(--color-canvas-white)]"
+              href="https://www.facebook.com/horea"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <svg
+                aria-hidden="true"
+                class="tabler-icon tabler-icon-brand-facebook "
+                fill="none"
+                height="22"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="22"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"
+                />
+              </svg>
+            </a>
+            <a
+              aria-label="Instagram"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-action-violet)] hover:text-[var(--color-canvas-white)]"
+              href="https://www.instagram.com/horea"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <svg
+                aria-hidden="true"
+                class="tabler-icon tabler-icon-brand-instagram "
+                fill="none"
+                height="22"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="22"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4l0 -8"
+                />
+                <path
+                  d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
+                />
+                <path
+                  d="M16.5 7.5v.01"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          class="flex w-full flex-col items-center gap-4 border-t border-[color-mix(in_srgb,var(--color-slate-text)_12%,transparent)] pt-6 md:flex-row md:justify-between"
+        >
+          <nav
+            aria-label="Patička"
+            class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-[var(--font-plus-jakarta-sans)] text-sm"
+          >
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/kontakt"
+            >
+              Kontaktní údaje
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/predplatne"
+            >
+              Předplatné
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/vseobecne-podminky"
+            >
+              Všeobecné podmínky
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="/ochrana-osobnich-udaju"
+            >
+              Zásady ochrany osobních údajů
+            </a>
+            <a
+              class="text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)] transition-colors hover:text-[var(--color-action-violet)]"
+              href="#"
+            >
+              Nastavení cookies
+            </a>
+          </nav>
+          <p
+            class="text-center font-[var(--font-plus-jakarta-sans)] text-sm md:text-right text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+          >
+            © 
+            2026
+             Horea. Všechna práva vyhrazena.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+`;

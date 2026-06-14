@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Horea Onboarding - Krok 2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#61568f",
+                      "secondary-container": "#cabeff",
+                      "on-secondary-fixed": "#1d1148",
+                      "surface-bright": "#fdf8ff",
+                      "inverse-surface": "#312e3d",
+                      "tertiary-fixed": "#ffd8eb",
+                      "sunset-pink": "#ffaae6",
+                      "surface-container-high": "#ece5f9",
+                      "on-tertiary-fixed": "#3c002c",
+                      "tertiary": "#880068",
+                      "primary": "#4100dc",
+                      "surface-tint": "#592eff",
+                      "on-surface-variant": "#474557",
+                      "soft-gray": "#eeeeee",
+                      "primary-container": "#592eff",
+                      "cloud-mist": "#f0f3fe",
+                      "on-error": "#ffffff",
+                      "on-surface": "#1c1a28",
+                      "secondary-fixed-dim": "#cabeff",
+                      "on-secondary-fixed-variant": "#493f76",
+                      "background": "#fdf8ff",
+                      "primary-fixed-dim": "#c8bfff",
+                      "air-blue": "#bcf2ff",
+                      "canvas-white": "#ffffff",
+                      "on-tertiary-container": "#ffcae5",
+                      "outline": "#787589",
+                      "surface-dim": "#ddd7eb",
+                      "lush-green": "#dfff9d",
+                      "inverse-on-surface": "#f4eeff",
+                      "surface-container-highest": "#e6dff3",
+                      "surface-variant": "#e6dff3",
+                      "on-background": "#1c1a28",
+                      "on-primary-fixed-variant": "#4100db",
+                      "primary-fixed": "#e5deff",
+                      "on-secondary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed": "#e6deff",
+                      "error": "#ba1a1a",
+                      "electric-green": "#a2ea13",
+                      "on-primary": "#ffffff",
+                      "outline-variant": "#c9c4da",
+                      "on-error-container": "#93000a",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#b20089",
+                      "on-tertiary-fixed-variant": "#880068",
+                      "on-primary-fixed": "#190064",
+                      "on-primary-container": "#dbd4ff",
+                      "aqua-blue": "#2ed6ff",
+                      "input-border": "#d8ddef",
+                      "surface-container-low": "#f7f1ff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container": "#f1ebff",
+                      "tertiary-fixed-dim": "#ffaedc",
+                      "surface": "#fdf8ff",
+                      "inverse-primary": "#c8bfff",
+                      "on-secondary-container": "#554b82"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-8": "8px",
+                      "padding-card": "40px",
+                      "stack-4": "4px",
+                      "gap-element": "5px",
+                      "padding-input-v": "12px",
+                      "base": "4px",
+                      "stack-100": "100px",
+                      "stack-24": "24px",
+                      "padding-input-h": "10px",
+                      "stack-48": "48px",
+                      "stack-16": "16px",
+                      "gap-section": "30px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Montserrat"],
+                      "headline-lg": ["Montserrat"],
+                      "display-sm": ["Montserrat"],
+                      "caption": ["Plus Jakarta Sans"],
+                      "display-md": ["Montserrat"],
+                      "headline-sm": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "body-sm": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                      "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                      "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                      "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fdf8ff;
+            background-image: radial-gradient(circle at 50% 50%, rgba(89, 46, 255, 0.05) 0%, rgba(253, 248, 255, 1) 70%);
+            min-height: 100vh;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .canvas-card {
+            background-color: #ffffff;
+            border-radius: 26px;
+            border: 1px solid #f0f3fe;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface flex flex-col items-center justify-center p-6">
+<div class="max-w-xl w-full flex flex-col gap-gap-section">
+<!-- Progress Bar -->
+<div class="flex items-center gap-stack-8 px-4">
+<div class="h-1.5 flex-1 bg-primary rounded-full"></div>
+<div class="h-1.5 flex-1 bg-primary rounded-full"></div>
+<div class="h-1.5 flex-1 bg-cloud-mist rounded-full"></div>
+<div class="h-1.5 flex-1 bg-cloud-mist rounded-full"></div>
+</div>
+<!-- Main Content Card -->
+<main class="canvas-card p-padding-card flex flex-col gap-stack-24 transition-all duration-300 rounded-[26px]">
+<div class="flex flex-col gap-stack-8 text-center sm:text-left">
+<h1 class="font-display-sm text-display-sm text-primary tracking-tight text-center">Jak se jmenuje váš podnik?</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[600px] mx-auto text-center">Vyplňte název vašeho podniku, ze kterého po aktivaci účtu vytvoříme vaši unikátní rezervační stránku.</p>
+</div>
+<div class="flex flex-col gap-stack-16">
+<div class="flex flex-col gap-stack-4">
+<label class="font-caption text-caption text-on-surface-variant uppercase tracking-wider" for="business_name">Název podniku</label>
+<div class="relative group">
+<input class="w-full bg-canvas-white border-input-border border-2 rounded-[12px] px-padding-input-h py-padding-input-v focus:ring-2 focus:ring-primary focus:outline-none transition-all text-body-md font-body-md" id="business_name" placeholder="Zadejte název..." type="text"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary opacity-0 group-focus-within:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">storefront</span>
+</div>
+</div>
+</div>
+<!-- Live Preview Block -->
+<div class="bg-cloud-mist p-padding-input-v rounded-xl border border-dashed border-outline-variant flex items-center justify-between overflow-hidden">
+<div class="flex items-center gap-stack-8">
+<span class="material-symbols-outlined text-secondary text-lg">language</span>
+<div class="flex items-baseline gap-1">
+<span class="font-caption text-caption text-on-surface-variant">horea.cz/</span>
+<span class="font-body-md text-body-md text-primary font-bold" id="url_preview">vas-nazev</span>
+</div>
+</div>
+<span class="font-caption text-caption text-outline uppercase tracking-wider text-[10px]">Preview</span>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex flex-col sm:flex-row items-center gap-stack-16 pt-stack-16">
+<button class="group flex items-center gap-stack-8 px-stack-24 py-stack-16 rounded-[12px] border-2 border-cloud-mist text-secondary font-headline-sm hover:bg-cloud-mist transition-all duration-200" type="button"><span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>Zpět</button>
+<button class="w-full sm:w-auto flex items-center justify-center gap-stack-8 px-12 py-stack-16 rounded-[12px] bg-primary text-canvas-white font-headline-sm hover:opacity-90 active:scale-95 transition-all duration-200 shadow-lg shadow-primary/20" type="submit">Pokračovat<span class="material-symbols-outlined">arrow_forward</span></button>
+</div>
+</main>
+<!-- Illustration / Mood Section -->
+<section class="hidden md:flex items-center justify-center gap-stack-48 px-padding-card">
+<div class="flex-1 h-px bg-cloud-mist"></div>
+<div class="flex gap-stack-16">
+<div class="w-10 h-10 rounded-full bg-air-blue/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">spark</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-sunset-pink/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-lush-green/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="flex-1 h-px bg-cloud-mist"></div>
+</section>
+<!-- Branding Footer (Simple) -->
+<footer class="text-center">
+<span class="font-display-sm text-[24px] font-bold text-primary opacity-40">Horea</span>
+</footer>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        const input = document.getElementById('business_name');
+        const preview = document.getElementById('url_preview');
+
+        input.addEventListener('input', (e) => {
+            const val = e.target.value;
+            if (val.trim() === '') {
+                preview.textContent = 'vas-nazev';
+                preview.classList.remove('text-primary');
+                preview.classList.add('text-outline');
+            } else {
+                // Slugify text for preview
+                const slug = val
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+                
+                preview.textContent = slug || '...';
+                preview.classList.add('text-primary');
+                preview.classList.remove('text-outline');
+            }
+        });
+
+        // Simple enter key handling
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.querySelector('button.bg-primary').click();
+            }
+        });
+    </script>
+</body></html>

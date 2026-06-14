@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Podpora a kontakt - Horea</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#1c1a28",
+                    "tertiary-fixed": "#ffd8eb",
+                    "primary": "#4100dc",
+                    "surface-variant": "#e6dff3",
+                    "canvas-white": "#ffffff",
+                    "primary-container": "#592eff",
+                    "lush-green": "#dfff9d",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e6dff3",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed": "#3c002c",
+                    "primary-fixed-dim": "#c8bfff",
+                    "surface-dim": "#ddd7eb",
+                    "input-border": "#d8ddef",
+                    "error-container": "#ffdad6",
+                    "aqua-blue": "#2ed6ff",
+                    "secondary-fixed-dim": "#cabeff",
+                    "on-background": "#1c1a28",
+                    "inverse-on-surface": "#f4eeff",
+                    "background": "#fdf8ff",
+                    "on-tertiary-fixed-variant": "#880068",
+                    "surface-container": "#f1ebff",
+                    "electric-green": "#a2ea13",
+                    "on-primary-container": "#dbd4ff",
+                    "outline-variant": "#c9c4da",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#ece5f9",
+                    "on-tertiary": "#ffffff",
+                    "cloud-mist": "#f0f3fe",
+                    "tertiary-container": "#b20089",
+                    "secondary-container": "#cabeff",
+                    "soft-gray": "#eeeeee",
+                    "secondary-fixed": "#e6deff",
+                    "on-secondary-fixed": "#1d1148",
+                    "on-secondary-container": "#554b82",
+                    "tertiary": "#880068",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#312e3d",
+                    "on-tertiary-container": "#ffcae5",
+                    "inverse-primary": "#c8bfff",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#4100db",
+                    "on-primary-fixed": "#190064",
+                    "on-error-container": "#93000a",
+                    "primary-fixed": "#e5deff",
+                    "outline": "#787589",
+                    "secondary": "#61568f",
+                    "surface-bright": "#fdf8ff",
+                    "on-secondary-fixed-variant": "#493f76",
+                    "tertiary-fixed-dim": "#ffaedc",
+                    "surface-container-low": "#f7f1ff",
+                    "surface-tint": "#592eff",
+                    "sunset-pink": "#ffaae6",
+                    "air-blue": "#bcf2ff",
+                    "surface": "#fdf8ff",
+                    "on-surface-variant": "#474557"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gap-section": "30px",
+                    "stack-24": "24px",
+                    "stack-100": "100px",
+                    "stack-16": "16px",
+                    "base": "4px",
+                    "stack-48": "48px",
+                    "padding-input-v": "12px",
+                    "padding-input-h": "10px",
+                    "stack-4": "4px",
+                    "gap-element": "5px",
+                    "stack-8": "8px",
+                    "padding-card": "40px"
+            },
+            "fontFamily": {
+                    "display-sm": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Montserrat"],
+                    "display-md": ["Montserrat"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-sm": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-cloud-mist text-on-surface antialiased min-h-screen flex flex-col">
+<!-- TopNavBar JSON Component Execution -->
+<nav class="fixed top-0 w-full z-50 bg-canvas-white border-b border-cloud-mist flat no shadows transition-all duration-200 ease-in-out">
+<div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto">
+<!-- Brand -->
+<div class="font-display-sm text-display-sm font-bold text-primary">
+                Horea
+            </div>
+<!-- Navigation Links (Desktop) -->
+<ul class="hidden md:flex items-center gap-stack-24">
+<li>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Features</a>
+</li>
+<li>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Pricing</a>
+</li>
+<li>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Subscriptions</a>
+</li>
+<!-- Active Link Logic -> Support -->
+<li>
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Support</a>
+</li>
+</ul>
+<!-- Actions -->
+<div class="hidden md:flex items-center gap-stack-16">
+<button class="font-body-md text-body-md text-on-surface hover:text-primary transition-colors">Log In</button>
+<button class="bg-primary-container text-canvas-white rounded-xl px-[20px] py-[12px] font-body-md text-body-md hover:opacity-90 transition-opacity">Get Started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[120px] pb-stack-100 px-8 max-w-7xl mx-auto w-full flex flex-col gap-gap-section">
+<!-- Hero Section -->
+<header class="flex flex-col items-center text-center gap-stack-16 mb-stack-24">
+<h1 class="font-display-md text-display-md text-on-surface">Jak vám můžeme pomoci?</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Jsme tu pro vás. Vyberte si způsob, jakým nás chcete kontaktovat, nebo si prohlédněte často kladené otázky.</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gap-section items-start">
+<!-- Left Column: Contact Methods & Form -->
+<div class="lg:col-span-5 flex flex-col gap-gap-section">
+<!-- Contact Details Card -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card flex flex-col gap-stack-24 border border-cloud-mist">
+<h2 class="font-headline-md text-headline-md text-on-surface">Kontaktní údaje</h2>
+<div class="flex flex-col gap-stack-16">
+<div class="flex items-center gap-stack-16 p-4 rounded-xl bg-cloud-mist bg-opacity-50 hover:bg-opacity-100 transition-colors">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div class="flex flex-col">
+<span class="font-caption text-caption text-on-surface-variant">Emailová podpora</span>
+<a class="font-headline-sm text-headline-sm text-primary font-medium hover:text-primary-container transition-colors" href="mailto:info@horea.cz">info@horea.cz</a>
+</div>
+</div>
+<div class="flex items-center gap-stack-16 p-4 rounded-xl bg-cloud-mist bg-opacity-50 hover:bg-opacity-100 transition-colors">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+</div>
+<div class="flex flex-col">
+<span class="font-caption text-caption text-on-surface-variant">Telefonická podpora (Po-Pá, 9-17)</span>
+<a class="font-headline-sm text-headline-sm text-on-surface font-medium" href="tel:+420704344177">+420 704 344 177</a>
+</div>
+</div>
+<div class="flex items-center gap-stack-16 p-4 rounded-xl bg-cloud-mist bg-opacity-50 hover:bg-opacity-100 transition-colors">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</div>
+<div class="flex flex-col">
+<span class="font-caption text-caption text-on-surface-variant">Adresa sídla</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-medium">Tatarkova 24, 149 00 Praha</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Contact Form Card -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card flex flex-col gap-stack-24 border border-cloud-mist">
+<h2 class="font-headline-md text-headline-md text-on-surface">Napište nám</h2>
+<form class="flex flex-col gap-stack-16">
+<div class="flex flex-col gap-stack-8">
+<label class="font-caption text-caption text-on-surface" for="name">Celé jméno</label>
+<input class="w-full border border-input-border rounded-xl px-padding-input-h py-padding-input-v bg-canvas-white text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" id="name" placeholder="Jan Novák" type="text"/>
+</div>
+<div class="flex flex-col gap-stack-8">
+<label class="font-caption text-caption text-on-surface" for="email">Emailová adresa</label>
+<input class="w-full border border-input-border rounded-xl px-padding-input-h py-padding-input-v bg-canvas-white text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" id="email" placeholder="jan@priklad.cz" type="email"/>
+</div>
+<div class="flex flex-col gap-stack-8">
+<label class="font-caption text-caption text-on-surface" for="subject">Předmět</label>
+<input class="w-full border border-input-border rounded-xl px-padding-input-h py-padding-input-v bg-canvas-white text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" id="subject" placeholder="S čím potřebujete poradit?" type="text"/>
+</div>
+<div class="flex flex-col gap-stack-8">
+<label class="font-caption text-caption text-on-surface" for="message">Vaše zpráva</label>
+<textarea class="w-full border border-input-border rounded-xl px-padding-input-h py-padding-input-v bg-canvas-white text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all resize-none" id="message" placeholder="Popište nám svůj problém detailněji..." rows="4"></textarea>
+</div>
+<button class="mt-stack-8 bg-primary-container text-canvas-white rounded-xl px-[20px] py-[12px] font-headline-sm text-headline-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-gap-element" type="button">
+<span>Odeslat zprávu</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="send">send</span>
+</button>
+</form>
+</div>
+</div>
+<!-- Right Column: FAQ -->
+<div class="lg:col-span-7 flex flex-col h-full">
+<div class="bg-canvas-white rounded-[26px] p-padding-card flex flex-col h-full border border-cloud-mist">
+<div class="flex items-center gap-stack-16 mb-stack-24">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary-container shrink-0">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Často kladené otázky</h2>
+</div>
+<div class="flex flex-col gap-stack-16 faq-container">
+<!-- FAQ Item 1 -->
+<div class="border border-input-border rounded-xl overflow-hidden bg-cloud-mist bg-opacity-30">
+<button class="w-full text-left px-6 py-5 flex justify-between items-center bg-transparent focus:outline-none hover:bg-surface-container transition-colors faq-trigger">
+<span class="font-headline-sm text-headline-sm text-on-surface">Jak mohu změnit svůj tarif?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-6 pb-5 hidden faq-content">
+<p class="font-body-md text-body-md text-on-surface-variant pt-2">
+                                    Svůj tarif můžete změnit kdykoliv v sekci 'Můj účet' -&gt; 'Předplatné'. Změna se projeví okamžitě a případný rozdíl v ceně vám bude adekvátně vyúčtován.
+                                </p>
+</div>
+</div>
+<!-- FAQ Item 2 -->
+<div class="border border-input-border rounded-xl overflow-hidden bg-cloud-mist bg-opacity-30">
+<button class="w-full text-left px-6 py-5 flex justify-between items-center bg-transparent focus:outline-none hover:bg-surface-container transition-colors faq-trigger">
+<span class="font-headline-sm text-headline-sm text-on-surface">Kde najdu své faktury?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-6 pb-5 hidden faq-content">
+<p class="font-body-md text-body-md text-on-surface-variant pt-2">
+                                    Všechny vaše faktury jsou bezpečně uloženy v uživatelském panelu pod záložkou 'Historie plateb'. Můžete si je stáhnout ve formátu PDF.
+                                </p>
+</div>
+</div>
+<!-- FAQ Item 3 -->
+<div class="border border-input-border rounded-xl overflow-hidden bg-cloud-mist bg-opacity-30">
+<button class="w-full text-left px-6 py-5 flex justify-between items-center bg-transparent focus:outline-none hover:bg-surface-container transition-colors faq-trigger">
+<span class="font-headline-sm text-headline-sm text-on-surface">Nabízíte vrácení peněz?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-6 pb-5 hidden faq-content">
+<p class="font-body-md text-body-md text-on-surface-variant pt-2">
+                                    Ano, poskytujeme 14denní garanci vrácení peněz bez zbytečných otázek. Stačí kontaktovat naši podporu přes formulář výše.
+                                </p>
+</div>
+</div>
+<!-- FAQ Item 4 -->
+<div class="border border-input-border rounded-xl overflow-hidden bg-cloud-mist bg-opacity-30">
+<button class="w-full text-left px-6 py-5 flex justify-between items-center bg-transparent focus:outline-none hover:bg-surface-container transition-colors faq-trigger">
+<span class="font-headline-sm text-headline-sm text-on-surface">Jak funguje integrace s jinými systémy?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-6 pb-5 hidden faq-content">
+<p class="font-body-md text-body-md text-on-surface-variant pt-2">
+                                    Horea nabízí robustní API a předpřipravené konektory pro oblíbené nástroje. Detailní dokumentaci najdete v sekci pro vývojáře.
+                                </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer JSON Component Execution -->
+<footer class="w-full py-12 bg-cloud-mist border-t border-input-border">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-stack-24">
+<!-- Brand & Copyright -->
+<div class="flex flex-col md:flex-row items-center gap-stack-16">
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface">
+                    Horea
+                </div>
+<span class="font-body-sm text-body-sm text-on-surface-variant hidden md:block">|</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 Horea SaaS. All rights reserved.</span>
+</div>
+<!-- Footer Links -->
+<ul class="flex flex-wrap justify-center gap-stack-16 md:gap-stack-24">
+<li>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms &amp; Conditions</a>
+</li>
+<li>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+</li>
+<li>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Recurring Payments</a>
+</li>
+<li>
+<!-- Contextually slightly active looking to match JSON implication of support focus, though normally just standard link -->
+<a class="font-body-sm text-body-sm text-primary underline hover:text-primary transition-colors" href="#">Contact Support</a>
+</li>
+</ul>
+</div>
+</footer>
+<!-- Simple Accordion Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const triggers = document.querySelectorAll('.faq-trigger');
+            
+            triggers.forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const content = trigger.nextElementSibling;
+                    const icon = trigger.querySelector('.material-symbols-outlined');
+                    
+                    // Toggle current
+                    content.classList.toggle('hidden');
+                    
+                    // Rotate icon
+                    if (content.classList.contains('hidden')) {
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+        });
+    </script>
+</body></html>

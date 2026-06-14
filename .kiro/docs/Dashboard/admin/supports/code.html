@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Horea Admin - Support Ticketing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#474557",
+                        "on-secondary-container": "#554b82",
+                        "primary-container": "#592eff",
+                        "inverse-on-surface": "#f4eeff",
+                        "surface-variant": "#e6dff3",
+                        "inverse-primary": "#c8bfff",
+                        "on-secondary-fixed": "#1d1148",
+                        "soft-gray": "#eeeeee",
+                        "tertiary-fixed": "#ffd8eb",
+                        "electric-green": "#a2ea13",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#ffcae5",
+                        "on-primary-fixed-variant": "#4100db",
+                        "on-background": "#1c1a28",
+                        "primary": "#4100dc",
+                        "on-primary-container": "#dbd4ff",
+                        "background": "#fdf8ff",
+                        "surface-container": "#f1ebff",
+                        "on-primary-fixed": "#190064",
+                        "inverse-surface": "#312e3d",
+                        "secondary-fixed": "#e6deff",
+                        "sunset-pink": "#ffaae6",
+                        "surface-container-highest": "#e6dff3",
+                        "surface": "#fdf8ff",
+                        "tertiary-container": "#b20089",
+                        "on-surface": "#1c1a28",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#3c002c",
+                        "secondary": "#61568f",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#592eff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c9c4da",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#cabeff",
+                        "primary-fixed": "#e5deff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#493f76",
+                        "tertiary-fixed-dim": "#ffaedc",
+                        "canvas-white": "#ffffff",
+                        "primary-fixed-dim": "#c8bfff",
+                        "aqua-blue": "#2ed6ff",
+                        "on-error": "#ffffff",
+                        "cloud-mist": "#f0f3fe",
+                        "air-blue": "#bcf2ff",
+                        "secondary-container": "#cabeff",
+                        "surface-container-low": "#f7f1ff",
+                        "outline": "#787589",
+                        "surface-dim": "#ddd7eb",
+                        "surface-container-high": "#ece5f9",
+                        "surface-bright": "#fdf8ff",
+                        "lush-green": "#dfff9d",
+                        "on-tertiary-fixed-variant": "#880068",
+                        "input-border": "#d8ddef",
+                        "tertiary": "#880068"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gap-section": "30px",
+                        "stack-24": "24px",
+                        "stack-8": "8px",
+                        "stack-100": "100px",
+                        "stack-16": "16px",
+                        "padding-input-v": "12px",
+                        "gap-element": "5px",
+                        "stack-4": "4px",
+                        "padding-card": "40px",
+                        "base": "4px",
+                        "stack-48": "48px",
+                        "padding-input-h": "10px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Montserrat"],
+                        "display-sm": ["Montserrat"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-sm": ["38px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["18px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "caption": ["14px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "body-sm": ["16px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-lg": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-md": ["58px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["68px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d8ddef;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c9c4da;
+        }
+    </style>
+</head>
+<body class="bg-cloud-mist font-body-sm text-body-sm text-on-surface min-h-screen flex antialiased">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-cloud-mist dark:bg-surface-container-low border-r border-cloud-mist dark:border-outline-variant flex flex-col h-full py-stack-24 px-stack-16 z-20">
+<div class="mb-stack-48 px-stack-16">
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim">Horea Admin</h1>
+<p class="font-caption text-caption text-secondary mt-stack-4">Platform Control</p>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="flex flex-col">
+<!-- Overview -->
+<li class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary dark:text-secondary-fixed-dim hover:text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-sm text-body-sm">Overview</span>
+</li>
+<!-- Businesses -->
+<li class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary dark:text-secondary-fixed-dim hover:text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined">storefront</span>
+<span class="font-body-sm text-body-sm">Businesses</span>
+</li>
+<!-- Subscriptions -->
+<li class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary dark:text-secondary-fixed-dim hover:text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-sm text-body-sm">Subscriptions</span>
+</li>
+<!-- Users -->
+<li class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary dark:text-secondary-fixed-dim hover:text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-sm text-body-sm">Users</span>
+</li>
+<!-- Support (ACTIVE) -->
+<li class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer bg-primary text-on-primary rounded-lg font-semibold transition-all">
+<span class="material-symbols-outlined filled">confirmation_number</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</li>
+<!-- Settings -->
+<li class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary dark:text-secondary-fixed-dim hover:text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</li>
+</ul>
+</nav>
+<div class="mt-auto pt-stack-24 border-t border-input-border">
+<button class="w-full bg-primary text-on-primary rounded-[12px] py-stack-8 px-[20px] font-caption text-caption mb-stack-16 hover:bg-primary/90 transition-colors">
+                Create Tenant
+            </button>
+<ul class="flex flex-col">
+<li class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v cursor-pointer text-secondary dark:text-secondary-fixed-dim hover:text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest rounded-lg transition-all">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-sm text-body-sm">Logout</span>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar (Shared Component) -->
+<header class="w-full h-16 bg-canvas-white dark:bg-surface border-b border-cloud-mist dark:border-outline-variant flex justify-between items-center px-stack-24 shrink-0 z-10">
+<div class="flex items-center gap-stack-16 w-1/3">
+<!-- Search on left as requested -->
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-padding-input-h top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-cloud-mist border border-input-border rounded-[12px] pl-[36px] pr-padding-input-h py-padding-input-v font-body-sm text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Search tickets, businesses, or users..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-16">
+<div class="flex gap-element">
+<button class="w-10 h-10 flex items-center justify-center rounded-[16px] text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest transition-colors cursor-pointer active:scale-95 duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-[16px] text-primary hover:bg-soft-gray dark:hover:bg-surface-container-highest transition-colors cursor-pointer active:scale-95 duration-200">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden border-2 border-cloud-mist">
+<img alt="Administrator Avatar" class="w-full h-full object-cover" data-alt="A close-up headshot of a professional looking individual, serving as an avatar. The image has a clean, high-key lighting setup suitable for a modern corporate application. The background is a soft, neutral gradient that complements a light-mode UI aesthetic, blending seamlessly with minimalist design elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6Rcce8BjLxEgYXQeSMwwTRzmoikjkYBle6nfAbSnB_GL4SpjRssSloIcJ9taY9RRz5_8yMenmQCJzlJa4cLoNMafOro96MmwugtlZ0zYaHLFqdSyBpjBlz-7fPggO_r7M-jBws8wMwfyv1N_rZN-vXtTVl89GHJPWG8FAaQSolzGKgpLMChmAoGHj72dp7OY1V-bntfoSJ3Oms_6ZKgTEo6Z_FlECGTq0gf_F-eBUGLv2neB_j4Gb2FM0gpf7ULomzzxJJl4UBXg"/>
+</div>
+</div>
+</header>
+<!-- Page Content Canvas -->
+<div class="flex-1 overflow-y-auto p-stack-24 flex flex-col gap-section bg-cloud-mist">
+<!-- Platform Health Status -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-stack-16 shrink-0">
+<!-- Health Card 1 -->
+<div class="bg-canvas-white rounded-[26px] p-stack-24 border border-cloud-mist flex flex-col gap-stack-8 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-secondary">System Uptime</span>
+<span class="material-symbols-outlined text-electric-green filled">check_circle</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface mt-stack-4">99.99%</div>
+<div class="font-caption text-caption text-outline">Last 30 days</div>
+</div>
+<!-- Health Card 2 -->
+<div class="bg-canvas-white rounded-[26px] p-stack-24 border border-cloud-mist flex flex-col gap-stack-8 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-secondary">API Latency</span>
+<span class="material-symbols-outlined text-primary">speed</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface mt-stack-4">42<span class="font-body-md text-body-md text-secondary ml-1">ms</span></div>
+<div class="font-caption text-caption text-outline">Global average</div>
+</div>
+<!-- Health Card 3 -->
+<div class="bg-canvas-white rounded-[26px] p-stack-24 border border-cloud-mist flex flex-col gap-stack-8 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-secondary">Active Tickets</span>
+<span class="material-symbols-outlined text-primary">forum</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface mt-stack-4">124</div>
+<div class="font-caption text-caption text-outline">Across all queues</div>
+</div>
+<!-- Health Card 4 -->
+<div class="bg-canvas-white rounded-[26px] p-stack-24 border border-cloud-mist flex flex-col gap-stack-8 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-secondary">Urgent Action</span>
+<span class="material-symbols-outlined text-error filled">warning</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-error mt-stack-4">3</div>
+<div class="font-caption text-caption text-outline">SLA breach imminent</div>
+</div>
+</section>
+<!-- Inbox Layout (List + Detail) -->
+<section class="flex-1 flex gap-stack-16 min-h-[600px] pb-stack-24">
+<!-- Ticket List (Left Pane) -->
+<div class="w-1/3 min-w-[320px] max-w-[400px] bg-canvas-white rounded-[26px] border border-cloud-mist flex flex-col overflow-hidden shrink-0">
+<!-- List Header / Filters -->
+<div class="p-stack-16 border-b border-cloud-mist bg-canvas-white z-10">
+<div class="flex gap-element mb-stack-16 overflow-x-auto pb-stack-4">
+<button class="bg-primary-container text-primary px-stack-16 py-stack-8 rounded-[200px] font-caption text-caption whitespace-nowrap border border-primary/20">All Active (124)</button>
+<button class="bg-transparent text-secondary px-stack-16 py-stack-8 rounded-[200px] font-caption text-caption whitespace-nowrap border border-outline hover:bg-soft-gray transition-colors">Open</button>
+<button class="bg-transparent text-secondary px-stack-16 py-stack-8 rounded-[200px] font-caption text-caption whitespace-nowrap border border-outline hover:bg-soft-gray transition-colors">In Progress</button>
+</div>
+</div>
+<!-- List Items -->
+<div class="flex-1 overflow-y-auto bg-canvas-white">
+<!-- Item 1 (Selected) -->
+<div class="p-stack-16 border-l-4 border-l-primary bg-primary/5 border-b border-cloud-mist cursor-pointer flex flex-col gap-stack-8">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-on-surface font-semibold line-clamp-1 pr-4">Webhook delivery failing for Payment Intent</span>
+<span class="font-caption text-caption text-secondary text-xs shrink-0">10m ago</span>
+</div>
+<div class="font-caption text-caption text-secondary">Stripe Connect Inc.</div>
+<div class="flex gap-element mt-stack-4">
+<span class="px-2 py-1 rounded-[200px] bg-error/10 text-error font-caption text-[11px] border border-error/20">High Priority</span>
+<span class="px-2 py-1 rounded-[200px] bg-primary/10 text-primary font-caption text-[11px] border border-primary/20">Open</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-stack-16 border-l-4 border-l-transparent bg-canvas-white hover:bg-soft-gray border-b border-cloud-mist cursor-pointer transition-colors flex flex-col gap-stack-8">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-on-surface font-semibold line-clamp-1 pr-4">Cannot access Analytics Dashboard</span>
+<span class="font-caption text-caption text-secondary text-xs shrink-0">1h ago</span>
+</div>
+<div class="font-caption text-caption text-secondary">Acme Corp Ltd.</div>
+<div class="flex gap-element mt-stack-4">
+<span class="px-2 py-1 rounded-[200px] bg-outline-variant/30 text-secondary font-caption text-[11px] border border-outline-variant">Medium Priority</span>
+<span class="px-2 py-1 rounded-[200px] bg-electric-green/20 text-on-surface font-caption text-[11px] border border-electric-green/40">In Progress</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-stack-16 border-l-4 border-l-transparent bg-canvas-white hover:bg-soft-gray border-b border-cloud-mist cursor-pointer transition-colors flex flex-col gap-stack-8">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-on-surface font-semibold line-clamp-1 pr-4">Request for increased API rate limits</span>
+<span class="font-caption text-caption text-secondary text-xs shrink-0">3h ago</span>
+</div>
+<div class="font-caption text-caption text-secondary">DataFlow Systems</div>
+<div class="flex gap-element mt-stack-4">
+<span class="px-2 py-1 rounded-[200px] bg-cloud-mist text-secondary font-caption text-[11px] border border-outline-variant">Low Priority</span>
+<span class="px-2 py-1 rounded-[200px] bg-primary/10 text-primary font-caption text-[11px] border border-primary/20">Open</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="p-stack-16 border-l-4 border-l-transparent bg-canvas-white hover:bg-soft-gray border-b border-cloud-mist cursor-pointer transition-colors flex flex-col gap-stack-8">
+<div class="flex justify-between items-start">
+<span class="font-caption text-caption text-on-surface font-semibold line-clamp-1 pr-4">User provisioning error via SAML</span>
+<span class="font-caption text-caption text-secondary text-xs shrink-0">Yesterday</span>
+</div>
+<div class="font-caption text-caption text-secondary">Enterprise Global</div>
+<div class="flex gap-element mt-stack-4">
+<span class="px-2 py-1 rounded-[200px] bg-error/10 text-error font-caption text-[11px] border border-error/20">High Priority</span>
+<span class="px-2 py-1 rounded-[200px] bg-electric-green/20 text-on-surface font-caption text-[11px] border border-electric-green/40">In Progress</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Ticket Detail (Right Pane) -->
+<div class="flex-1 bg-canvas-white rounded-[26px] border border-cloud-mist flex flex-col overflow-hidden relative">
+<!-- Detail Header -->
+<div class="p-stack-24 border-b border-cloud-mist bg-canvas-white flex justify-between items-start z-10">
+<div class="flex flex-col gap-stack-8 max-w-[70%]">
+<div class="flex gap-stack-8 items-center mb-stack-4">
+<span class="px-2 py-1 rounded-[200px] bg-primary/10 text-primary font-caption text-[12px] border border-primary/20">Ticket #T-8921</span>
+<span class="font-caption text-caption text-secondary">Opened 10m ago by <a class="text-primary hover:underline" href="#">Stripe Connect Inc.</a></span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Webhook delivery failing for Payment Intent</h2>
+<div class="flex gap-stack-16 mt-stack-4">
+<div class="flex items-center gap-element text-secondary">
+<span class="material-symbols-outlined text-[18px]">dns</span>
+<span class="font-caption text-caption">Production Env</span>
+</div>
+<div class="flex items-center gap-element text-secondary">
+<span class="material-symbols-outlined text-[18px]">code</span>
+<span class="font-caption text-caption">API v2.1</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-stack-8 items-end">
+<div class="flex gap-stack-8">
+<button class="px-stack-16 py-stack-8 bg-transparent border border-outline rounded-[8px] font-caption text-caption text-secondary hover:bg-soft-gray transition-colors flex items-center gap-element">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                                    Assign to me
+                                </button>
+<button class="px-stack-16 py-stack-8 bg-transparent border border-outline rounded-[8px] font-caption text-caption text-secondary hover:bg-soft-gray transition-colors flex items-center gap-element">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+<select class="mt-stack-8 bg-cloud-mist border border-input-border rounded-[8px] px-stack-16 py-[6px] font-caption text-caption text-on-surface focus:outline-none focus:border-primary">
+<option selected="" value="open">Status: Open</option>
+<option value="progress">Status: In Progress</option>
+<option value="resolved">Status: Resolved</option>
+<option value="closed">Status: Closed</option>
+</select>
+</div>
+</div>
+<!-- Conversation Thread -->
+<div class="flex-1 overflow-y-auto p-stack-24 flex flex-col gap-stack-24 bg-cloud-mist/50">
+<!-- Initial Message (User) -->
+<div class="flex gap-stack-16 max-w-[85%]">
+<div class="w-10 h-10 rounded-full bg-soft-gray overflow-hidden shrink-0">
+<img alt="Customer Avatar" class="w-full h-full object-cover" data-alt="A portrait of a tech professional looking concerned, set against a bright, minimalist office background. The lighting is soft and natural, emphasizing a modern corporate feel suitable for a software application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFjxCabWbvNOXOX4ff3jpZzAwMHZkHSjaQhWKThuS3K08H_ODsKEHo9ZjrA58ybRsacaFA9hCFqH6-0ZeCdyCgJ3X2QOqzAQgCZ9ca2vAD8R5ZQjx-eAXTxl1uQ9lZXVTWjmzRxQAmPorj_amh-XUqP30lJky2QMoNyu-lCRtOUzpZuP000X_4T9sCtnwew2YOSmSigwBNtXkjiSHYtsT9qFbVDze0mLjdRS2tkVyB3-j31_YiJkv3woaW7e7XEwWeb64vM010-tU"/>
+</div>
+<div class="flex flex-col gap-stack-4">
+<div class="flex items-center gap-stack-8">
+<span class="font-caption text-caption font-semibold text-on-surface">Alex Mercer</span>
+<span class="font-caption text-caption text-secondary text-[12px]">10:42 AM</span>
+</div>
+<div class="bg-canvas-white p-stack-16 rounded-[16px] rounded-tl-none border border-cloud-mist shadow-sm">
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                                        Hi Support team, <br/><br/>
+                                        We are seeing consistent failures for webhooks being delivered to our endpoint `https://api.stripeconnect.com/v1/webhooks/horea`. The Horea dashboard is showing a 500 error on your end when attempting delivery. <br/><br/>
+                                        This started happening about 20 minutes ago and is affecting production payment flows. Can you urgently investigate?
+                                    </p>
+<div class="mt-stack-8 p-stack-8 bg-surface-container-low rounded-[8px] border border-input-border font-mono text-[12px] text-secondary overflow-x-auto">
+                                        Payload ID: evt_1OaY...<br/>
+                                        Error: Connection timeout
+                                    </div>
+</div>
+</div>
+</div>
+<!-- System Note -->
+<div class="flex justify-center">
+<div class="bg-surface-container py-1 px-stack-16 rounded-[200px] border border-outline-variant font-caption text-caption text-secondary text-[12px] flex items-center gap-element">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+                                System flagged potential infrastructure issue in region US-East.
+                            </div>
+</div>
+</div>
+<!-- Reply Box -->
+<div class="p-stack-24 border-t border-cloud-mist bg-canvas-white z-10 shrink-0">
+<div class="border border-input-border rounded-[12px] overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<!-- Editor Toolbar -->
+<div class="bg-cloud-mist border-b border-input-border px-stack-16 py-stack-8 flex gap-stack-8">
+<button class="text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-canvas-white"><span class="material-symbols-outlined text-[18px]">format_bold</span></button>
+<button class="text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-canvas-white"><span class="material-symbols-outlined text-[18px]">format_italic</span></button>
+<button class="text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-canvas-white"><span class="material-symbols-outlined text-[18px]">link</span></button>
+<div class="w-px h-5 bg-outline-variant my-auto mx-1"></div>
+<button class="text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-canvas-white"><span class="material-symbols-outlined text-[18px]">attach_file</span></button>
+</div>
+<!-- Textarea -->
+<textarea class="w-full h-[100px] p-stack-16 bg-canvas-white font-body-sm text-body-sm text-on-surface border-none focus:ring-0 resize-none" placeholder="Type your response... Use / for canned replies."></textarea>
+<!-- Reply Actions -->
+<div class="bg-canvas-white px-stack-16 py-stack-8 flex justify-between items-center">
+<span class="font-caption text-caption text-secondary text-[12px]">Markdown supported</span>
+<div class="flex gap-stack-8">
+<button class="px-[20px] py-stack-8 bg-transparent border border-cloud-mist rounded-[12px] font-caption text-caption text-secondary hover:bg-soft-gray transition-colors">
+                                        Add Internal Note
+                                    </button>
+<button class="px-[20px] py-stack-8 bg-primary text-on-primary rounded-[12px] font-caption text-caption hover:bg-primary/90 transition-colors flex items-center gap-element shadow-sm shadow-primary/20">
+                                        Send Reply
+                                        <span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

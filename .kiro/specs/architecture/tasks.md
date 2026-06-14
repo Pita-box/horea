@@ -98,52 +98,54 @@ Foundation pokrývá:
     - Vlastní e-mailové šablony zatím **NEpřepisovat** — patří do `auth-onboarding` specu
     - _Requirements: 10.5, 10.8_
 
-- [ ] 4. Provisioning Vercel projektu
-  - [~] 4.1 Vytvořit Vercel projekt a propojit s git repozitářem
+- [x] 4. Provisioning Vercel projektu
+  - [x] 4.1 Vytvořit Vercel projekt a propojit s git repozitářem
     - Push lokální repo na GitHub (privátní repo)
     - V Vercel dashboardu: import projektu z GitHubu, výběr Next.js framework presetu
     - Install Command nastavit na `pnpm install` (Vercel pnpm detekuje automaticky podle `pnpm-lock.yaml`), build běží přes `pnpm build`
     - Ověřit, že první deploy proběhne úspěšně (preview URL)
     - _Requirements: 3.4_
 
-  - [~] 4.2 Nastavit produkční environment variables ve Vercelu
-    - Přidat env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `GOPAY_GOID`, `GOPAY_CLIENT_ID`, `GOPAY_CLIENT_SECRET`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, `GOOGLE_DRIVE_BACKUP_FOLDER_ID`, `LOG_LEVEL`
+  - [x] 4.2 Nastavit environment variables ve Vercelu pro dostupné foundation služby
+    - Přidat env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, `GOOGLE_DRIVE_BACKUP_FOLDER_ID`, `LOG_LEVEL`
+    - GoPay env vars (`GOPAY_GOID`, `GOPAY_CLIENT_ID`, `GOPAY_CLIENT_SECRET`) doplnit až při GoPay aktivaci, protože GoPay vyžaduje plnohodnotný web
     - Hodnoty pro produkci, preview i development scope dle vhodnosti (development scope smí používat sandbox/test účty)
     - **Service role key** smí mít pouze server-side scope, nikdy `NEXT_PUBLIC_*` prefix
     - _Requirements: 5.5, 10.7_
 
-  - [~] 4.3 Konfigurace custom domény Horea.cz na Vercelu
+  - [ ]* 4.3 Konfigurace custom domény Horea.cz na Vercelu před veřejným provozem
     - Ve Vercel projektu: Settings → Domains → přidat `Horea.cz` a `www.horea.cz`
     - Vercel zobrazí DNS instrukce (A/CNAME) — zatím NEnastavovat na DNS, počkat na úkol 5.x (DNS přejde přes Cloudflare)
+    - Odloženo: aktuální vývoj a preview běží přes `https://horea.vercel.app`
     - _Requirements: 11.2, 9.5_
 
-- [ ] 5. Provisioning Cloudflare — DNS, WAF, edge rate limit
+- [x] 5. Provisioning Cloudflare — DNS baseline; produkční routing/hardening před veřejným provozem
   - [x] 5.1 Přidat doménu Horea.cz do Cloudflare a změnit nameservery u registrátora
     - V Cloudflare dashboardu: Add site, vybrat Free plan
     - U registrátora domény změnit nameservery na hodnoty z Cloudflare
     - Počkat na propagaci a aktivaci v Cloudflare (zelený stav)
     - _Requirements: 10.1, 9.5_
 
-  - [~] 5.2 Nastavit DNS záznamy směřující na Vercel
+  - [ ]* 5.2 Nastavit DNS záznamy směřující na Vercel před veřejným provozem
     - Přidat A / CNAME záznamy dle instrukcí z Vercelu (úkol 4.3)
     - Nastavit Proxy status na **proxied** (oranžový mrak), aby provoz šel přes Cloudflare
     - Ověřit, že `https://www.horea.cz` vrací response z Vercelu
     - _Requirements: 10.1, 9.5_
 
-  - [~] 5.3 Aktivovat základní Cloudflare WAF
+  - [ ]* 5.3 Aktivovat základní Cloudflare WAF před veřejným provozem
     - V Cloudflare dashboardu: Security → WAF → zapnout Cloudflare Managed Ruleset (OWASP základní)
     - Nastavit Security Level: Medium
     - Nastavit Bot Fight Mode: ON (free tier)
     - _Requirements: 10.2_
 
-  - [~] 5.4 Nastavit edge rate limit pro `/api/reservations` a `/api/auth/*`
+  - [ ]* 5.4 Nastavit edge rate limit pro `/api/reservations` a `/api/auth/*` před veřejným provozem
     - V Cloudflare dashboardu: Security → Rate Limiting → vytvořit pravidla:
       - `/api/reservations` — max 10 requestů / IP / minutu (anti-spam rezervací)
       - `/api/auth/*` — max 20 requestů / IP / minutu (anti-brute-force)
     - Akce: Block (HTTP 429)
     - _Requirements: 10.3, 10.8_
 
-  - [~] 5.5 Vynutit HTTPS a HSTS na úrovni Cloudflare
+  - [ ]* 5.5 Vynutit HTTPS a HSTS na úrovni Cloudflare před veřejným provozem
     - SSL/TLS: nastavit režim Full (Strict)
     - Edge Certificates: zapnout Always Use HTTPS, Automatic HTTPS Rewrites, HSTS (max-age 6 měsíců, includeSubDomains)
     - _Requirements: 10.1, 9.5_
@@ -187,11 +189,15 @@ Foundation pokrývá:
     - _Requirements: 18.1_
 
   - [x] 6.7 Vytvořit minimální sadu sdílených UI primitiv
-    - Vytvořit `src/components/ui/` se **třemi** primitivy, které využije každá feature, postavenými výhradně na tokenech z úkolu 6.3 (per `.kiro/steering/design-system.md`):
-      - `Button` (varianty `primary` / `ghost` / `outline` — Action Violet filled, transparent + Cloud Mist border, transparent + Slate Text border; radius 12px `--radius-buttons`)
+    - Vytvořit `src/components/ui/` s primitivy, které využije každá feature, postavenými výhradně na tokenech z úkolu 6.3 (per `.kiro/steering/design-system.md`):
+      - `Button` (varianty `primary` / `ghost` / `outline` / `icon` — Action Violet filled, transparent + Cloud Mist border, transparent + Slate Text border, icon control; radius dle design-system.md)
       - `Card` (Canvas White, radius 26px `--radius-cards`, bez stínu)
       - `Badge` (transparent, Neon Pink text, radius 200px `--radius-badges`)
-      - **Pouze tyto tři primitivy** s dokumentovanými variantami/radii/barvami — feature-specifické komponenty (formuláře, kalendář, dashboard widgety) zůstávají ve feature specs (Simplicity First)
+      - `Checkbox` (native checkbox se stabilním rozměrem 16px, Action Violet accent, Cloud Mist border)
+      - `Input` (radius 12px, Cloud Mist border, padding 12px 10px dle `--input-padding-*`)
+      - `Notice` (status/error message box na tokenech, bez ručně kopírovaných paddingů)
+      - Interní katalog `/components` zobrazuje aktuální primitivy a tokeny pro vizuální kontrolu
+      - Feature-specifické komponenty (formuláře, kalendář, dashboard widgety) zůstávají ve feature specs (Simplicity First)
     - _Requirements: 18.1_
 
 - [x] 7. Supabase schema baseline — DDL pro všechny entity
@@ -270,25 +276,31 @@ Foundation pokrývá:
     - _Requirements: 1.4, 5.6, 6.4, 10.7_
 
   - [x] 9.2 Implementovat Next.js middleware pro chráněné cesty
-    - Vytvořit `src/middleware.ts` matchující `/dashboard/:path*` a `/admin/:path*`
+    - Vytvořit `src/middleware.ts` matchující `/dashboard/:path*`
     - V matched cestě: refresh session přes `supabase.auth.getUser()`
     - Pokud neautentizovaný: redirect na `/login` (samotná `/login` stránka patří do `auth-onboarding`)
-    - Pokud cesta začíná `/admin` a uživatel není admin (`users.is_admin = false`): redirect na `/dashboard` s flash message
+    - Dashboard je role-aware: admin i běžný uživatel vstupují přes `/dashboard`; žádný `/admin` matcher ani veřejně známá admin cesta
     - _Requirements: 1.4, 17.3_
 
-- [ ] 10. Resend setup
-  - [~] 10.1 Založit Resend účet a verifikovat doménu
-    - Manuálně: založit Resend účet, přidat doménu `Horea.cz`
-    - V Cloudflare DNS přidat SPF, DKIM, DMARC záznamy dle Resend instrukcí
-    - Počkat na verifikaci a uložit `RESEND_API_KEY` do Vercel env (úkol 4.2 už refer na klíč; zde se hodnota doplní)
-    - _Requirements: 13.1, 13.7_
+- [x] 10. Resend setup
+  - [x] 10.1 Založit Resend účet a nastavit dev/default sender
+    - Manuálně: založit Resend účet a vytvořit API key pro odesílání
+    - Uložit `RESEND_API_KEY` do Vercel env (úkol 4.2 už refer na klíč; zde se hodnota doplní)
+    - Pro dev/preview používat default sender `Horea <onboarding@resend.dev>` přes `RESEND_FROM_EMAIL` fallback
+    - _Requirements: 13.1_
 
   - [x] 10.2 Vytvořit Resend SDK wrapper a base e-mailovou šablonu
     - Nainstalovat `resend`, `react-email` (volitelně pro JSX šablony — pro MVP stačí prostý HTML/text)
-    - `src/lib/email/client.ts` — singleton `Resend` instance s API klíčem z env
+    - `src/lib/email/client.ts` — singleton `Resend` instance s API klíčem z env a default `from` sender helper
     - `src/lib/email/templates/base.ts` — funkce `wrapEmail({subject, body})` vracející HTML s českou paticí (název platformy, kontakt na podporu, GDPR link placeholder)
     - **Žádné konkrétní e-mailové šablony** — patří do feature specs (rezervace, fakturace…)
     - _Requirements: 13.1, 14.2_
+
+  - [ ]* 10.3 Verifikovat produkční doménu `horea.cz` v Resendu před veřejným provozem
+    - V Resend dashboardu přidat doménu `horea.cz`
+    - V Cloudflare DNS přidat SPF, DKIM, DMARC záznamy dle Resend instrukcí
+    - Počkat na verifikaci a přepnout `RESEND_FROM_EMAIL` na produkční adresu na doméně `horea.cz`
+    - _Requirements: 13.7_
 
 - [x] 11. Logging baseline + request ID middleware
   - [x] 11.1 Implementovat strukturovaný logger utility
@@ -303,9 +315,10 @@ Foundation pokrývá:
     - Logger v server contextu čte `x-request-id` z `next/headers` a přibalí do každého logu
     - _Requirements: 20.2_
 
-- [ ] 12. GoPay setup (sandbox credentials, žádný integration kód)
-  - [~] 12.1 Založit GoPay sandbox účet a získat credentials
+- [ ]* 12. GoPay setup před placeným režimem (sandbox credentials, žádný integration kód)
+  - [ ]* 12.1 Založit GoPay sandbox účet a získat credentials
     - Manuálně: registrace GoPay sandbox merchant účtu
+    - Odloženo do doby, kdy bude dostupný plnohodnotný veřejný web pro schválení GoPay
     - Uložit `GOPAY_GOID`, `GOPAY_CLIENT_ID`, `GOPAY_CLIENT_SECRET` do Vercel env (development scope) a `.env.local`
     - Produkční merchant approval pro recurring (viz `design.md` *Open Questions* bod 2) — provozní úkol mimo kód
     - **Žádný integrace kód zde** — patří do `subscription-payments` specu
@@ -323,11 +336,11 @@ Foundation pokrývá:
     - **Žádný integrace kód zde** — patří do `subscription-payments` / dedikovaného backup specu
     - _Requirements: 8.1, 8.4_
 
-- [~] 14. Checkpoint — ověřit foundation lokálně i v preview
-  - Ověřit `pnpm lint`, `pnpm format:check`, `pnpm test:run`, `pnpm test:e2e` projdou
-  - Ověřit, že Vercel preview deploy se zelenou (úspěšný build)
-  - Ověřit, že `https://www.horea.cz` vrací výchozí Next.js stránku přes Cloudflare → Vercel
-  - Ověřit, že Supabase migrace jsou aplikované a anonymní SELECT z `businesses` respektuje RLS
+- [x] 14. Checkpoint — ověřit foundation lokálně i ve Vercel preview
+  - [x] Ověřit `pnpm lint`, `pnpm format:check`, `pnpm test:run`, `pnpm test:e2e` projdou
+  - [x] Ověřit, že Vercel deploy je zelený a `https://horea.vercel.app` vrací HTTP 200
+  - [x] Produkční doména `https://www.horea.cz` není aktuální blocker; custom domain + Cloudflare routing jsou pre-launch úkoly 4.3 a 5.2
+  - [x] Ověřit, že Supabase migrace jsou aplikované a anonymní SELECT z `businesses` respektuje RLS
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 15. CI baseline — GitHub Actions
@@ -351,9 +364,10 @@ Foundation pokrývá:
     - Sekce: Prerekvizity (Node 20, pnpm — např. přes `corepack enable`, Supabase CLI, GitHub, Vercel CLI volitelně), Setup (clone, `pnpm install`, `cp .env.example .env.local` + doplnit hodnoty), Local dev (`pnpm dev`), Database migrace (`pnpm dlx supabase db push`), Testy (`pnpm test:run`, `pnpm test:e2e`), CI a deploy (push do main → Vercel automatic), Foundation vs feature specs (odkaz na `.kiro/specs/`)
     - _Requirements: 3.4_
 
-- [~] 17. Závěrečný checkpoint
-  - Projít všechny předchozí úkoly checklistem: tooling OK, externí služby provisioned, schéma + RLS aplikované, auth wiring + middleware funkční, logging baseline OK, CI zelená
-  - Ověřit, že feature specs (`auth-onboarding`, `public-business-page`, atd.) mají vše potřebné k zahájení implementace
+- [x] 17. Závěrečný checkpoint
+  - [x] Projít všechny předchozí úkoly checklistem: tooling OK, dostupné externí služby provisioned, schéma + RLS aplikované, auth wiring + middleware funkční, logging baseline OK, CI zelená
+  - [x] Ověřit, že feature specs (`auth-onboarding`, `public-business-page`, atd.) mají vše potřebné k zahájení implementace
+  - [x] Zapsat odložené pre-launch bloky: GoPay aktivace, custom domain + Cloudflare routing/hardening, produkční Resend doména
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
@@ -373,12 +387,12 @@ Foundation pokrývá:
   "waves": [
     { "id": 0, "tasks": ["1.1"] },
     { "id": 1, "tasks": ["1.2", "1.3"] },
-    { "id": 2, "tasks": ["2.1", "2.2", "2.3", "2.5", "3.1", "12.1", "13.1"] },
+    { "id": 2, "tasks": ["2.1", "2.2", "2.3", "2.5", "3.1", "13.1"] },
     { "id": 3, "tasks": ["2.4", "3.2", "3.3", "4.1"] },
-    { "id": 4, "tasks": ["4.2", "4.3", "7.1"] },
+    { "id": 4, "tasks": ["4.2", "7.1"] },
     { "id": 5, "tasks": ["5.1", "7.2"] },
-    { "id": 6, "tasks": ["5.2", "7.3"] },
-    { "id": 7, "tasks": ["5.3", "5.4", "5.5", "7.4"] },
+    { "id": 6, "tasks": ["7.3"] },
+    { "id": 7, "tasks": ["7.4"] },
     { "id": 8, "tasks": ["7.5"] },
     { "id": 9, "tasks": ["7.6"] },
     { "id": 10, "tasks": ["8.1"] },
@@ -388,6 +402,7 @@ Foundation pokrývá:
     { "id": 14, "tasks": ["6.4", "6.6", "9.2"] },
     { "id": 15, "tasks": ["6.7", "11.2"] },
     { "id": 16, "tasks": ["15.1", "15.2", "16.1", "16.2"] }
-  ]
+  ],
+  "deferred": ["4.3", "5.2", "5.3", "5.4", "5.5", "10.3", "12.1"]
 }
 ```

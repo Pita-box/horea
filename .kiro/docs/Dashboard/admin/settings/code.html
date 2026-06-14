@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Configuration - Horea Admin</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#474557",
+                        "on-secondary-container": "#554b82",
+                        "primary-container": "#592eff",
+                        "inverse-on-surface": "#f4eeff",
+                        "surface-variant": "#e6dff3",
+                        "inverse-primary": "#c8bfff",
+                        "on-secondary-fixed": "#1d1148",
+                        "soft-gray": "#eeeeee",
+                        "tertiary-fixed": "#ffd8eb",
+                        "electric-green": "#a2ea13",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#ffcae5",
+                        "on-primary-fixed-variant": "#4100db",
+                        "on-background": "#1c1a28",
+                        "primary": "#4100dc",
+                        "on-primary-container": "#dbd4ff",
+                        "background": "#fdf8ff",
+                        "surface-container": "#f1ebff",
+                        "on-primary-fixed": "#190064",
+                        "inverse-surface": "#312e3d",
+                        "secondary-fixed": "#e6deff",
+                        "sunset-pink": "#ffaae6",
+                        "surface-container-highest": "#e6dff3",
+                        "surface": "#fdf8ff",
+                        "tertiary-container": "#b20089",
+                        "on-surface": "#1c1a28",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#3c002c",
+                        "secondary": "#61568f",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#592eff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c9c4da",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#cabeff",
+                        "primary-fixed": "#e5deff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#493f76",
+                        "tertiary-fixed-dim": "#ffaedc",
+                        "canvas-white": "#ffffff",
+                        "primary-fixed-dim": "#c8bfff",
+                        "aqua-blue": "#2ed6ff",
+                        "on-error": "#ffffff",
+                        "cloud-mist": "#f0f3fe",
+                        "air-blue": "#bcf2ff",
+                        "secondary-container": "#cabeff",
+                        "surface-container-low": "#f7f1ff",
+                        "outline": "#787589",
+                        "surface-dim": "#ddd7eb",
+                        "surface-container-high": "#ece5f9",
+                        "surface-bright": "#fdf8ff",
+                        "lush-green": "#dfff9d",
+                        "on-tertiary-fixed-variant": "#880068",
+                        "input-border": "#d8ddef",
+                        "tertiary": "#880068"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gap-section": "30px",
+                        "stack-24": "24px",
+                        "stack-8": "8px",
+                        "stack-100": "100px",
+                        "stack-16": "16px",
+                        "padding-input-v": "12px",
+                        "gap-element": "5px",
+                        "stack-4": "4px",
+                        "padding-card": "40px",
+                        "base": "4px",
+                        "stack-48": "48px",
+                        "padding-input-h": "10px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Montserrat"],
+                        "display-sm": ["Montserrat"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-sm": ["38px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["18px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "caption": ["14px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "body-sm": ["16px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-lg": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-md": ["58px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["68px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .toggle-checkbox:checked { right: 0; border-color: #4100dc; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #4100dc; }
+    </style>
+</head>
+<body class="bg-cloud-mist font-body-md text-on-surface antialiased flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-cloud-mist border-r border-cloud-mist h-screen w-64 fixed left-0 top-0 flex flex-col py-stack-24 px-stack-16 z-50">
+<!-- Header -->
+<div class="mb-stack-48 px-stack-16 flex items-center gap-stack-16">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary">Horea Admin</h1>
+<p class="font-caption text-caption text-secondary">Platform Control</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto">
+<!-- Overview -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-sm text-body-sm">Overview</span>
+</a>
+<!-- Businesses -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="font-body-sm text-body-sm">Businesses</span>
+</a>
+<!-- Subscriptions -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-body-sm text-body-sm">Subscriptions</span>
+</a>
+<!-- Users -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-sm text-body-sm">Users</span>
+</a>
+<!-- Support -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</a>
+<!-- Settings (ACTIVE) -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+</div>
+<!-- CTA & Footer -->
+<div class="mt-auto pt-stack-24 border-t border-input-border">
+<button class="w-full bg-primary-container text-on-primary rounded-xl py-padding-input-v px-stack-16 font-body-sm text-body-sm font-semibold hover:opacity-90 transition-opacity mb-stack-16">
+                Create Tenant
+            </button>
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-sm text-body-sm">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="ml-64 flex-1 flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="w-full h-16 bg-canvas-white border-b border-cloud-mist flex justify-between items-center px-stack-24 sticky top-0 z-40">
+<!-- Search -->
+<div class="flex items-center bg-cloud-mist rounded-xl px-padding-input-h py-2 w-64 border border-transparent focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-secondary mr-2 text-[20px]" data-icon="search">search</span>
+<input class="bg-transparent border-none outline-none font-body-sm text-body-sm text-on-surface w-full placeholder-secondary" placeholder="Search settings..." type="text"/>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-stack-16">
+<button class="w-10 h-10 rounded-full hover:bg-soft-gray transition-colors flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-soft-gray transition-colors flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-cloud-mist cursor-pointer">
+<img alt="Administrator Avatar" class="w-full h-full object-cover" data-alt="A close-up portrait of a professional individual looking confident, set against a clean, minimal white background. The lighting is soft and bright, emphasizing a modern corporate aesthetic. The image exudes approachability and competence, fitting for a digital platform administrator profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhxqSM9gmKNphLU-tqwvKBgxGjVbXCLAfZa3zK2m7ZKhRO_itBPpPxrPHXLN0sxjfABzUFS7USA0QkBIx_qMRdl-bKFZj_6PFKiIrRxV9T9c2gbD-hLrdFFbLwXJ1i-GSYgDzDV5SR-UDQ_TIOlMIKDcHkK9tWDFQ0ueLPqYd90n-bz9q9Ml4GIu3ENPkCBuUtUKPjJ9Q1e58M9-0Q86EKKlRNWtOyO3fzmG4fIKNAp9BnEr7XEb5nMXvQkrrTvDg44MZDlCeS9D8"/>
+</div>
+</div>
+</header>
+<!-- Canvas Area -->
+<main class="flex-1 p-padding-card flex flex-col gap-gap-section max-w-[1200px] w-full mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col gap-stack-8 mb-stack-8">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Global Configuration</h2>
+<p class="font-body-md text-body-md text-secondary max-w-2xl">Manage core platform settings, brand identity, and system-wide integrations across all tenants.</p>
+</div>
+<!-- Global Maintenance Card -->
+<section class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-24">
+<div class="flex items-start gap-stack-16">
+<div class="w-12 h-12 rounded-xl bg-error-container text-error flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[28px]" data-icon="construction">construction</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-4">System Maintenance Mode</h3>
+<p class="font-body-sm text-body-sm text-secondary">Enable this to temporarily lock out all non-admin users across the platform. An ongoing maintenance message will be displayed.</p>
+</div>
+</div>
+<!-- Toggle -->
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in shrink-0">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-transform duration-200 ease-in-out border-soft-gray checked:translate-x-full checked:border-primary" id="maintenance-toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-soft-gray cursor-pointer transition-colors duration-200 ease-in-out" for="maintenance-toggle"></label>
+</div>
+</section>
+<!-- Brand Settings Bento Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gap-section">
+<!-- Logos Column -->
+<div class="lg:col-span-2 bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist flex flex-col gap-stack-24">
+<div class="flex items-center gap-stack-8 border-b border-soft-gray pb-stack-16">
+<span class="material-symbols-outlined text-primary" data-icon="palette">palette</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Brand Assets</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-24">
+<!-- Primary Logo -->
+<div class="flex flex-col gap-stack-8">
+<label class="font-caption text-caption text-secondary">Primary Platform Logo</label>
+<div class="border-2 border-dashed border-input-border rounded-xl h-32 flex flex-col items-center justify-center gap-stack-8 bg-cloud-mist hover:bg-soft-gray transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-secondary" data-icon="cloud_upload">cloud_upload</span>
+<span class="font-body-sm text-body-sm text-secondary">Upload SVG or PNG</span>
+</div>
+</div>
+<!-- Favicon -->
+<div class="flex flex-col gap-stack-8">
+<label class="font-caption text-caption text-secondary">Favicon (32x32)</label>
+<div class="border-2 border-dashed border-input-border rounded-xl h-32 flex flex-col items-center justify-center gap-stack-8 bg-cloud-mist hover:bg-soft-gray transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-secondary" data-icon="image">image</span>
+<span class="font-body-sm text-body-sm text-secondary">Upload ICO or PNG</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Colors Column -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist flex flex-col gap-stack-24">
+<h3 class="font-headline-sm text-headline-sm text-on-surface border-b border-soft-gray pb-stack-16">Global Colors</h3>
+<div class="flex flex-col gap-stack-16">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary">Primary Brand</span>
+<div class="flex items-center gap-stack-8">
+<span class="font-caption text-caption text-outline">#4100DC</span>
+<div class="w-8 h-8 rounded-lg bg-primary shadow-sm border border-soft-gray"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary">Accent Container</span>
+<div class="flex items-center gap-stack-8">
+<span class="font-caption text-caption text-outline">#592EFF</span>
+<div class="w-8 h-8 rounded-lg bg-primary-container shadow-sm border border-soft-gray"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary">Canvas Base</span>
+<div class="flex items-center gap-stack-8">
+<span class="font-caption text-caption text-outline">#F0F3FE</span>
+<div class="w-8 h-8 rounded-lg bg-cloud-mist shadow-sm border border-outline-variant"></div>
+</div>
+</div>
+</div>
+<button class="mt-auto w-full border border-outline text-secondary hover:bg-cloud-mist rounded-xl py-2 font-caption text-caption transition-colors">
+                        Advanced Theme Editor
+                    </button>
+</div>
+</section>
+<!-- API Keys & Integrations -->
+<section class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist">
+<div class="flex items-center justify-between mb-stack-24 border-b border-soft-gray pb-stack-16">
+<div class="flex items-center gap-stack-8">
+<span class="material-symbols-outlined text-primary" data-icon="key">key</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">API &amp; Integration Keys</h3>
+</div>
+<button class="bg-primary text-on-primary rounded-xl px-stack-16 py-2 font-caption text-caption hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span> New Key
+                    </button>
+</div>
+<div class="flex flex-col gap-stack-16">
+<!-- Key Row 1 -->
+<div class="flex flex-col md:flex-row md:items-center justify-between p-stack-16 bg-cloud-mist rounded-xl border border-transparent hover:border-outline-variant transition-colors">
+<div class="flex flex-col mb-stack-8 md:mb-0">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Stripe Billing Prod</span>
+<span class="font-caption text-caption text-secondary">Last used: 2 mins ago</span>
+</div>
+<div class="flex items-center gap-stack-16">
+<div class="bg-canvas-white px-4 py-2 rounded-lg border border-input-border font-mono text-sm text-secondary tracking-widest">
+                                sk_live_••••••••••••8x9A
+                            </div>
+<button class="text-secondary hover:text-primary transition-colors p-2" title="Copy Key">
+<span class="material-symbols-outlined text-[20px]" data-icon="content_copy">content_copy</span>
+</button>
+<button class="text-secondary hover:text-error transition-colors p-2" title="Revoke">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Key Row 2 -->
+<div class="flex flex-col md:flex-row md:items-center justify-between p-stack-16 bg-cloud-mist rounded-xl border border-transparent hover:border-outline-variant transition-colors">
+<div class="flex flex-col mb-stack-8 md:mb-0">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">SendGrid Transactional</span>
+<span class="font-caption text-caption text-secondary">Last used: 1 hour ago</span>
+</div>
+<div class="flex items-center gap-stack-16">
+<div class="bg-canvas-white px-4 py-2 rounded-lg border border-input-border font-mono text-sm text-secondary tracking-widest">
+                                SG.•••••••••••••••••zP2
+                            </div>
+<button class="text-secondary hover:text-primary transition-colors p-2" title="Copy Key">
+<span class="material-symbols-outlined text-[20px]" data-icon="content_copy">content_copy</span>
+</button>
+<button class="text-secondary hover:text-error transition-colors p-2" title="Revoke">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- System Email Templates -->
+<section class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist mb-stack-48">
+<div class="flex items-center gap-stack-8 mb-stack-24 border-b border-soft-gray pb-stack-16">
+<span class="material-symbols-outlined text-primary" data-icon="mail">mail</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">System Email Templates</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-16">
+<!-- Template Card -->
+<div class="border border-input-border rounded-xl p-stack-16 flex flex-col gap-stack-16 hover:border-primary transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" data-icon="waving_hand">waving_hand</span>
+</div>
+<span class="bg-electric-green/20 text-[#4a6b09] px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">Active</span>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-surface mb-1">Welcome Onboarding</h4>
+<p class="font-caption text-caption text-secondary line-clamp-2">Sent to new tenant owners upon successful registration.</p>
+</div>
+<div class="mt-auto pt-stack-8 flex items-center text-primary font-caption text-caption group-hover:underline">
+                            Edit Template <span class="material-symbols-outlined text-[16px] ml-1" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Template Card -->
+<div class="border border-input-border rounded-xl p-stack-16 flex flex-col gap-stack-16 hover:border-primary transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" data-icon="lock_reset">lock_reset</span>
+</div>
+<span class="bg-electric-green/20 text-[#4a6b09] px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">Active</span>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-surface mb-1">Password Reset</h4>
+<p class="font-caption text-caption text-secondary line-clamp-2">Standard security template for user account recovery.</p>
+</div>
+<div class="mt-auto pt-stack-8 flex items-center text-primary font-caption text-caption group-hover:underline">
+                            Edit Template <span class="material-symbols-outlined text-[16px] ml-1" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Template Card -->
+<div class="border border-input-border rounded-xl p-stack-16 flex flex-col gap-stack-16 hover:border-primary transition-colors cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+</div>
+<span class="bg-soft-gray text-secondary px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">Draft</span>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-surface mb-1">Monthly Invoice</h4>
+<p class="font-caption text-caption text-secondary line-clamp-2">Automated billing receipt sent at the end of cycle.</p>
+</div>
+<div class="mt-auto pt-stack-8 flex items-center text-primary font-caption text-caption group-hover:underline">
+                            Edit Template <span class="material-symbols-outlined text-[16px] ml-1" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

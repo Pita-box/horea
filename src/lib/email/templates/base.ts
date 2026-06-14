@@ -33,8 +33,8 @@ export function wrapEmail({ subject, body }: WrapEmailInput): string {
                 <div style="font-size:16px;line-height:1.6;color:#1b1530;">${body}</div>
                 <hr style="border:0;border-top:1px solid #dfe4ef;margin:32px 0 20px;" />
                 <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#667085;">Horea</p>
-                <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#667085;">Podpora: <a href="mailto:podpora@horea.cz" style="color:#5b2eff;">podpora@horea.cz</a></p>
-                <p style="margin:0;font-size:13px;line-height:1.5;color:#667085;"><a href="https://www.horea.cz/gdpr" style="color:#5b2eff;">GDPR a zpracování osobních údajů</a></p>
+                <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#667085;">Podpora: <a href="mailto:info@horea.cz" style="color:#5b2eff;">info@horea.cz</a></p>
+                <p style="margin:0;font-size:13px;line-height:1.5;color:#667085;"><a href="https://www.horea.cz/ochrana-osobnich-udaju" style="color:#5b2eff;">GDPR a zpracování osobních údajů</a></p>
               </td>
             </tr>
           </table>

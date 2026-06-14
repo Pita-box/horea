@@ -76,6 +76,51 @@ export function toPragueDisplay(utcDate: Date | string): string {
 }
 
 /**
+ * Naformátuje UTC okamžik jako ISO 8601 v pásmu Europe/Prague včetně offsetu,
+ * např. `2024-07-15T13:30:00+02:00` (léto) nebo `2024-01-15T13:30:00+01:00` (zima).
+ *
+ * Používá se pro strojově čitelný export (CSV — R17.3): zachovává přesný okamžik
+ * i s informací o pásmu, takže import do jiného nástroje nevyžaduje znalost
+ * Europe/Prague.
+ *
+ * @param utcDate UTC okamžik jako `Date` nebo ISO řetězec (typicky hodnota z DB).
+ */
+export function toPragueIso(utcDate: Date | string): string {
+  const date = typeof utcDate === 'string' ? new Date(utcDate) : utcDate;
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Neplatné datum k zobrazení: "${String(utcDate)}".`);
+  }
+
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TIME_ZONE,
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(date);
+
+  const map: Record<string, string> = {};
+  for (const part of parts) {
+    if (part.type !== 'literal') {
+      map[part.type] = part.value;
+    }
+  }
+
+  const hour = map.hour === '24' ? '00' : map.hour;
+
+  const offsetMs = pragueOffsetMs(date);
+  const sign = offsetMs >= 0 ? '+' : '-';
+  const absMs = Math.abs(offsetMs);
+  const offsetHours = String(Math.floor(absMs / 3_600_000)).padStart(2, '0');
+  const offsetMinutes = String(Math.floor((absMs % 3_600_000) / 60_000)).padStart(2, '0');
+
+  return `${map.year}-${map.month}-${map.day}T${hour}:${map.minute}:${map.second}${sign}${offsetHours}:${offsetMinutes}`;
+}
+
+/**
  * Převede lokální čas zadaný v pásmu Europe/Prague na UTC `Date` pro uložení do DB.
  * Vstup je „nástěnný" čas, jak ho zadá majitel podniku — tedy hodnota z HTML
  * `<input type="datetime-local">` ve tvaru `YYYY-MM-DDTHH:mm` (sekundy volitelné).

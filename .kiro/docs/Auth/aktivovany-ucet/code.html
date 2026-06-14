@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Horea SaaS - Účet potvrzen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .bloom-effect {
+            background: radial-gradient(circle at 50% 50%, rgba(89, 46, 255, 0.05) 0%, transparent 70%);
+        }
+        .canvas-bg {
+            background-color: #f0f3fe; /* Cloud Mist */
+        }
+        .surface-white {
+            background-color: #ffffff; /* Canvas White */
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary": "#880068",
+                      "primary-fixed": "#e5deff",
+                      "primary-container": "#592eff",
+                      "tertiary-fixed-dim": "#ffaedc",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#f7f1ff",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed": "#ffd8eb",
+                      "surface-container-high": "#ece5f9",
+                      "cloud-mist": "#f0f3fe",
+                      "on-secondary-container": "#554b82",
+                      "on-secondary-fixed-variant": "#493f76",
+                      "on-background": "#1c1a28",
+                      "on-surface-variant": "#474557",
+                      "secondary-fixed-dim": "#cabeff",
+                      "tertiary-container": "#b20089",
+                      "inverse-surface": "#312e3d",
+                      "aqua-blue": "#2ed6ff",
+                      "on-surface": "#1c1a28",
+                      "air-blue": "#bcf2ff",
+                      "canvas-white": "#ffffff",
+                      "electric-green": "#a2ea13",
+                      "surface-container-highest": "#e6dff3",
+                      "primary-fixed-dim": "#c8bfff",
+                      "surface-variant": "#e6dff3",
+                      "lush-green": "#dfff9d",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#e6deff",
+                      "input-border": "#d8ddef",
+                      "secondary-container": "#cabeff",
+                      "sunset-pink": "#ffaae6",
+                      "on-primary-fixed": "#190064",
+                      "on-primary-container": "#dbd4ff",
+                      "background": "#fdf8ff",
+                      "inverse-on-surface": "#f4eeff",
+                      "on-tertiary-fixed": "#3c002c",
+                      "on-secondary-fixed": "#1d1148",
+                      "on-tertiary-fixed-variant": "#880068",
+                      "surface-dim": "#ddd7eb",
+                      "outline-variant": "#c9c4da",
+                      "inverse-primary": "#c8bfff",
+                      "surface-tint": "#592eff",
+                      "surface-bright": "#fdf8ff",
+                      "on-error": "#ffffff",
+                      "surface-container": "#f1ebff",
+                      "secondary": "#61568f",
+                      "on-primary-fixed-variant": "#4100db",
+                      "error": "#ba1a1a",
+                      "surface-container-lowest": "#ffffff",
+                      "surface": "#fdf8ff",
+                      "soft-gray": "#eeeeee",
+                      "on-tertiary-container": "#ffcae5",
+                      "primary": "#4100dc",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#787589"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-100": "100px",
+                      "base": "4px",
+                      "stack-16": "16px",
+                      "padding-input-h": "10px",
+                      "gap-element": "5px",
+                      "gap-section": "30px",
+                      "stack-8": "8px",
+                      "padding-input-v": "12px",
+                      "stack-4": "4px",
+                      "stack-48": "48px",
+                      "stack-24": "24px",
+                      "padding-card": "40px"
+              },
+              "fontFamily": {
+                      "display-md": ["Montserrat"],
+                      "headline-sm": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Montserrat"],
+                      "display-sm": ["Montserrat"],
+                      "display-lg": ["Montserrat"],
+                      "body-lg": ["Plus Jakarta Sans"],
+                      "caption": ["Plus Jakarta Sans"],
+                      "body-sm": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                      "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                      "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                      "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="canvas-bg min-h-screen flex flex-col font-body-md text-on-surface overflow-x-hidden">
+<!-- Header / TopAppBar -->
+<header class="bg-transparent docked full-width top-0 z-50">
+<nav class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="font-display-sm text-display-sm font-semibold text-primary dark:text-primary-fixed">
+                Horea SaaS
+            </div>
+<div class="flex items-center gap-stack-16">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed p-2 hover:bg-primary-fixed/20 rounded-full transition-colors">
+                    language
+                </button>
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed p-2 hover:bg-primary-fixed/20 rounded-full transition-colors">
+                    help_outline
+                </button>
+</div>
+</nav>
+</header>
+<!-- Main Content: Success Screen -->
+<main class="flex-grow flex items-center justify-center px-6 py-stack-48 relative overflow-hidden">
+<!-- Abstract Decoration Elements (Minimalist Adora Influence) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bloom-effect pointer-events-none opacity-50"></div>
+<div class="absolute top-20 right-[10%] w-64 h-64 bg-sunset-pink/10 rounded-[64px] rotate-12 blur-3xl pointer-events-none"></div>
+<div class="absolute bottom-20 left-[5%] w-96 h-96 bg-air-blue/10 rounded-[64px] -rotate-6 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 w-full max-w-2xl">
+<div class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist text-center flex flex-col items-center">
+<!-- Success Illustration Area -->
+<div class="mb-stack-24 relative">
+<div class="w-32 h-32 bg-lush-green rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary text-[64px]" style="font-variation-settings: 'FILL' 1;">
+                            check_circle
+                        </span>
+</div>
+<!-- Small decorative dots -->
+<div class="absolute -top-4 -right-4 w-8 h-8 bg-aqua-blue/20 rounded-full"></div>
+<div class="absolute -bottom-2 -left-6 w-12 h-12 bg-sunset-pink/20 rounded-full"></div>
+</div>
+<!-- Success Message -->
+<h1 class="font-display-sm text-display-sm text-on-surface mb-stack-16">
+                    Váš účet byl úspěšně potvrzen!
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mb-stack-48">
+                    Nyní se můžete přihlásit a začít využívat všechny funkce Horea. Vaše kreativní cesta za efektivitou začíná právě teď.
+                </p>
+<!-- Primary Action Button -->
+<a class="bg-primary-container text-on-primary font-headline-sm text-headline-sm py-4 px-10 rounded-[12px] hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary-container/20" href="/login">
+                    Přejít k přihlášení
+                </a>
+<!-- Minimal Decoration Grid Pattern for Card -->
+<div class="mt-stack-48 w-full flex justify-center gap-4">
+<div class="w-1.5 h-1.5 bg-primary-fixed-dim rounded-full opacity-30"></div>
+<div class="w-1.5 h-1.5 bg-primary-fixed-dim rounded-full opacity-60"></div>
+<div class="w-1.5 h-1.5 bg-primary-fixed-dim rounded-full"></div>
+</div>
+</div>
+<!-- Contextual Illustration (Adora style minimalist) -->
+<div class="mt-stack-24 grid grid-cols-3 gap-gap-section px-stack-16">
+<div class="aspect-square bg-canvas-white border border-cloud-mist rounded-[20px] p-4 flex flex-col justify-between items-center group hover:border-primary-container/30 transition-colors">
+<div class="w-full h-2 bg-lush-green/30 rounded-full mb-2"></div>
+<span class="material-symbols-outlined text-primary opacity-50 group-hover:opacity-100 transition-opacity">rocket_launch</span>
+<div class="w-1/2 h-1 bg-soft-gray rounded-full"></div>
+</div>
+<div class="aspect-square bg-canvas-white border border-cloud-mist rounded-[20px] p-4 flex flex-col justify-between items-center group hover:border-primary-container/30 transition-colors">
+<div class="w-full h-2 bg-aqua-blue/30 rounded-full mb-2"></div>
+<span class="material-symbols-outlined text-primary opacity-50 group-hover:opacity-100 transition-opacity">auto_awesome</span>
+<div class="w-1/2 h-1 bg-soft-gray rounded-full"></div>
+</div>
+<div class="aspect-square bg-canvas-white border border-cloud-mist rounded-[20px] p-4 flex flex-col justify-between items-center group hover:border-primary-container/30 transition-colors">
+<div class="w-full h-2 bg-sunset-pink/30 rounded-full mb-2"></div>
+<span class="material-symbols-outlined text-primary opacity-50 group-hover:opacity-100 transition-opacity">grid_view</span>
+<div class="w-1/2 h-1 bg-soft-gray rounded-full"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-transparent full-width bottom-0">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-10 py-8 max-w-7xl mx-auto gap-stack-16">
+<div class="text-on-surface font-bold font-body-sm text-body-sm">
+                Horea SaaS
+            </div>
+<div class="flex gap-stack-24">
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-primary transition-colors" href="#">Security</a>
+</div>
+<div class="text-secondary dark:text-secondary-fixed font-body-sm text-body-sm opacity-60">
+                © 2024 Horea SaaS. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Subtle micro-interaction: Pulse effect for the check icon on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkIcon = document.querySelector('.bg-lush-green');
+            if (checkIcon) {
+                checkIcon.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                setTimeout(() => {
+                    checkIcon.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        checkIcon.style.transform = 'scale(1)';
+                    }, 300);
+                }, 500);
+            }
+        });
+    </script>
+</body></html>

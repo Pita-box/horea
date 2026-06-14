@@ -1,4 +1,4 @@
-# Horea — Style Reference
+# Horea — Style Reference (Adora style)
 > Digital Canvas with Violet Bloom. A pristine workspace where key actions pop with vibrant, focused energy.
 
 **Theme:** light
@@ -10,7 +10,7 @@ Adora's design system evokes a digital canvas aesthetic with its predominantly w
 | Name | Value | Token | Role |
 |------|-------|-------|------|
 | Canvas White | `#ffffff` | `--color-canvas-white` | Page backgrounds, card surfaces, internal component backgrounds |
-| Cloud Mist | `#e0e0db` | `--color-cloud-mist` | Subtle borders for buttons and cards, faint dividers |
+| Cloud Mist | `#f0f3fe` | `--color-cloud-mist` | Subtle borders for buttons and cards, faint dividers |
 | Slate Text | `#353241` | `--color-slate-text` | Primary body text, neutral links, general UI text |
 | Rich Violet | `#21164c` | `--color-rich-violet` | Headlines, important textual elements, primary icon fills |
 | Action Violet | `#592eff` | `--color-action-violet` | Primary call-to-action buttons, active badges, distinctive links and interactive icons — provides energetic focus |
@@ -21,6 +21,7 @@ Adora's design system evokes a digital canvas aesthetic with its predominantly w
 | Aqua Blue | `#2ed6ff` | `--color-aqua-blue` | Accent text for labels, decorative badges, icon tints |
 | Electric Green | `#a2ea13` | `--color-electric-green` | Success states, accent text for labels, decorative badges, icon tints |
 | Soft Gray Fill | `#eeeeee` | `--color-soft-gray-fill` | Subtle background fills for minor interactive elements or sections |
+| Input Border | `#d8ddef` | `--color-input-border` | Okraje formulářových polí (input, textarea) — přebíjí Cloud Mist konkrétně pro form fieldy. |
 
 ## Tokens — Typography
 
@@ -49,6 +50,21 @@ Adora's design system evokes a digital canvas aesthetic with its predominantly w
 | body | 18px | 1.1 | — | `--text-body` |
 | body-lg | 20px | 1.1 | — | `--text-body-lg` |
 | heading-sm | 32px | 1.1 | — | `--text-heading-sm` |
+
+### Výchozí body text (globální pravidlo)
+
+Globální výchozí styl běžného body textu (nastaveno na `body` v `globals.css`):
+
+- **font-size:** `18px`
+- **font-weight:** `500`
+- **color:** `#353241` (`--color-slate-text`)
+
+**Výjimka — dekorativní doplňkové texty.** Toto pravidlo NEPLATÍ pro tlumené
+doplňkové texty používající barvu `color-mix(in srgb, var(--color-slate-text) 70%, white)`
+(typicky utilita `text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]`). Ty jsou
+záměrně dekorativní/sekundární a zachovávají si vlastní barvu, velikost i váhu — neměň je
+na 18px/500/#353241. Headingy, badge, tlačítka a captiony mají vlastní explicitní utility
+(velikost/váha) a ty mají přednost před tímto výchozím nastavením.
 
 ## Tokens — Spacing & Shapes
 
@@ -85,6 +101,7 @@ Adora's design system evokes a digital canvas aesthetic with its predominantly w
 - **Section gap:** 30px
 - **Card padding:** 40px
 - **Element gap:** 5px
+- **Input padding:** 12px 10px
 
 ## Components
 
@@ -96,7 +113,7 @@ Background: Action Violet (#592eff). Text: Canvas White (#ffffff), Plus Jakarta 
 ### Ghost Button
 **Role:** Button with transparent background and defined text/border color
 
-Background: transparent. Text: Slate Text (#353241), Plus Jakarta Sans. Border: Cloud Mist (#e0e0db), 1px solid. Radius: 12px. Padding: 0px vertical, 20px horizontal.
+Background: transparent. Text: Slate Text (#353241), Plus Jakarta Sans. Border: Cloud Mist (#f0f3fe), 1px solid. Radius: 12px. Padding: 0px vertical, 20px horizontal.
 
 ### Outline Nav Button
 **Role:** Navigation button with distinct border
@@ -132,7 +149,7 @@ Text: Action Violet (#592eff), Plus Jakarta Sans, weight 500. No underline by de
 
 ### Do
 - Use Action Violet (#592eff) exclusively for primary interactive elements, ensuring every click feels significant.
-- Apply Cloud Mist (#e0e0db) for subtle borders and dividers, maintaining a lightweight visual structure.
+- Apply Cloud Mist (#f0f3fe) for subtle borders and dividers, maintaining a lightweight visual structure.
 - Pair PolySans for all marketing headlines (58px, 68px) with Rich Violet (#21164c) to project confidence.
 - Utilize Plus Jakarta Sans for all body text, UI labels, and navigation with Slate Text (#353241) to ensure high legibility.
 - Maintain a consistent border-radius of 26px for all main content cards and 12px for conventional buttons, establishing a signature softly rounded aesthetic.
@@ -141,6 +158,7 @@ Text: Action Violet (#592eff), Plus Jakarta Sans, weight 500. No underline by de
 
 ### Don't
 - Do not use saturated colors other than Action Violet, Electric Green, Neon Pink, or Aqua Blue for interactive elements.
+- **Růžová jako popředí (text / ikona / rámeček) na bílém nebo skoro-bílém pozadí: vždy `var(--color-neon-pink)` (#f843c2), NIKDY `var(--color-sunset-pink)` (#ffaae6).** Sunset Pink je příliš světlý → na bílém nečitelný. Sunset Pink používej jen jako dekorativní výplň/pozadí (gradient accent cards, tinted plochy), ne jako barvu popředí na světlém podkladu.
 - Avoid deep shadows or sharp corners on any UI component; elevation should be minimal, if present.
 - Do not vary letter-spacing; the consistent tight tracking is fundamental to Adora's precise typographic style.
 - Do not introduce gradients into UI components; gradients are reserved for branding or background illustrations if explicitly specified.
@@ -151,9 +169,10 @@ Text: Action Violet (#592eff), Plus Jakarta Sans, weight 500. No underline by de
 
 | Level | Name | Value | Purpose |
 |-------|------|-------|---------|
-| 1 | Canvas White | `#ffffff` | Primary page background and default container background |
-| 2 | Soft Gray Fill | `#eeeeee` | Backgrounds for minor or secondary interactive elements, subtle section breaks |
-| 3 | Card White | `#ffffff` | Background for feature cards and main content blocks, with noticeable rounded corners |
+| 1 | Cloud Mist | `#f0f3fe` | Primary app/page (body) background canvas |
+| 2 | Canvas White | `#ffffff` | Default container and card surface background, elevated surfaces |
+| 3 | Soft Gray Fill | `#eeeeee` | Backgrounds for minor or secondary interactive elements, subtle section breaks |
+| 4 | Card White | `#ffffff` | Background for feature cards and main content blocks, with noticeable rounded corners |
 
 ## Imagery
 
@@ -167,8 +186,8 @@ The page uses a contained layout model, with max-width content sections centered
 
 Quick Color Reference:
 - text: #353241
-- background: #ffffff
-- border: #e0e0db
+- background: #f0f3fe (body); cards use #ffffff
+- border: #f0f3fe
 - accent: #21164c
 - primary action: #592eff (filled action)
 
@@ -190,7 +209,7 @@ Example Component Prompts:
 :root {
   /* Colors */
   --color-canvas-white: #ffffff;
-  --color-cloud-mist: #e0e0db;
+  --color-cloud-mist: #f0f3fe;
   --color-slate-text: #353241;
   --color-rich-violet: #21164c;
   --color-action-violet: #592eff;
@@ -201,6 +220,7 @@ Example Component Prompts:
   --color-aqua-blue: #2ed6ff;
   --color-electric-green: #a2ea13;
   --color-soft-gray-fill: #eeeeee;
+  --color-input-border: #d8ddef;
 
   /* Typography — Font Families */
   --font-polysans: 'PolySans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -274,7 +294,7 @@ Example Component Prompts:
 @theme {
   /* Colors */
   --color-canvas-white: #ffffff;
-  --color-cloud-mist: #e0e0db;
+  --color-cloud-mist: #f0f3fe;
   --color-slate-text: #353241;
   --color-rich-violet: #21164c;
   --color-action-violet: #592eff;
@@ -285,6 +305,7 @@ Example Component Prompts:
   --color-aqua-blue: #2ed6ff;
   --color-electric-green: #a2ea13;
   --color-soft-gray-fill: #eeeeee;
+  --color-input-border: #d8ddef;
 
   /* Typography */
   --font-polysans: 'PolySans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

@@ -139,7 +139,7 @@ flowchart TB
     end
 
     subgraph Vercel["Vercel - Next.js App Router"]
-        Pages[SSR / SSG stránky<br/>/slug, /dashboard, /admin]
+        Pages[SSR / SSG stránky<br/>/slug, /dashboard]
         API[Route Handlers<br/>REST/JSON API]
         Cron[Vercel Cron<br/>denní úlohy]
     end
@@ -180,7 +180,8 @@ flowchart TB
 - **Supabase** poskytuje databázi (Postgres), autentizaci (e-mail/heslo, magic linky později) a úložiště souborů. Multi-tenancy je řešena na úrovni databáze přes **Row Level Security** podle `business_id`.
 - **Externí služby** komunikují přes API:
   - **GoPay** — výchozí platební brána, odesílá webhooky o stavu plateb.
-  - **Resend** — odesílání transakčních e-mailů (notifikace rezervací, fakturace).
+  - **Resend** — odesílání kritických/nízkoobjemových transakčních e-mailů (auth, faktury, kontakt, admin notifikace).
+  - **SMTP2GO** — odesílání vysokoobjemových notifikací rezervací (oddělené od Resendu kvůli dennímu limitu). Selhání obou je odolné přes retry outbox (`email_outbox` + cron).
   - **Google Drive + Sheets API** — záloha dat (denní CSV + per-business Sheet).
 
 ---
@@ -197,9 +198,10 @@ Tato sekce popisuje hlavní komponenty platformy a jejich vzájemné integračn�
 | **Next.js app na Vercelu** | Webová aplikace (SSR + SSG + API) | Vstup: HTTP požadavky z Cloudflare, webhooky od GoPay, cron triggery z Vercel Cron. Výstup: volání Supabase, Resend, GoPay API, Google Drive/Sheets API. |
 | **Supabase Postgres + Auth + Storage** | Datová vrstva, autentizace, úložiště souborů | Vstup: dotazy z Next.js API (anon JWT pro klientské operace, server-side klíč pouze v server kontextu). Výstup: data, JWT tokeny, signed URLs pro Storage. |
 | **GoPay** | Platební brána | Vstup: požadavky z Next.js API (založení recurring platby, charge, QR generation). Výstup: webhook na Next.js endpoint `/api/webhooks/gopay` s podepsaným payloadem o stavu platby. |
-| **Resend** | Transakční e-maily | Vstup: HTTP API volání z Next.js (send email s šablonou). Výstup: doručené e-maily; v případě selhání error response, který Next.js loguje. |
+| **Resend** | Transakční e-maily (auth, faktury, kontakt, admin) | Vstup: HTTP API volání z Next.js. Výstup: doručené e-maily; při selhání error response → klasifikace a případně retry outbox. |
+| **SMTP2GO** | Notifikace rezervací (oddělený odesílatel kvůli limitům) | Vstup: HTTP API volání z Next.js (notifikace rezervací). Výstup: doručené e-maily; při selhání → retry outbox na stejném poskytovateli. |
 | **Google Drive + Sheets API** | Záloha + per-business export | Vstup: API volání z Next.js Cron (denní backup) a z dashboardu (on-demand export), autentizace přes OAuth refresh token osobního Google účtu provozovatele. Výstup: zápis do per-business Google Sheet a/nebo CSV souboru ve fallback Drive složce. |
-| **Vercel Cron** | Plánovač denních úloh | Trigger: cron expression. Volá: interní Next.js endpointy (`/api/cron/billing`, `/api/cron/backup`, `/api/cron/cleanup`). |
+| **Vercel Cron** | Plánovač denních úloh | Trigger: cron expression. Volá: interní Next.js endpointy (`/api/cron/billing`, `/api/cron/warnings`, `/api/cron/cleanup`, `/api/cron/email-retry`). |
 
 ### Integrační body (high-level)
 
@@ -208,10 +210,12 @@ Tato sekce popisuje hlavní komponenty platformy a jejich vzájemné integračn�
 - **Vercel ↔ GoPay:**
   - **Outbound:** založení recurring schedule, manuální charge, generování QR.
   - **Inbound:** webhook na `/api/webhooks/gopay` (POST, podepsaný HMAC). Webhook handler je idempotentní — opakovaný webhook se stejným payment ID nevyvolá duplicitní stavovou změnu.
-- **Vercel ↔ Resend:** synchronní HTTP volání pro odeslání e-mailu. Selhání odeslání nesmí blokovat hlavní transakci (rezervace, platba) — e-mail je v případě potřeby zařazen do retry fronty (v MVP jednoduchý DB záznam `pending_emails` + retry v cronu).
+- **Vercel ↔ e-mail (Resend + SMTP2GO):** odesílání je rozdělené mezi dva poskytovatele kvůli izolaci limitů. **Resend** posílá kritické a nízkoobjemové e-maily (auth: ověření registrace / reset hesla přes Supabase Admin `generateLink`, faktury, kontaktní formulář, admin/cron notifikace). **SMTP2GO** (HTTP API) posílá vysokoobjemové **notifikace rezervací**, takže nesdílí denní limit Resendu s loginem/registrací. Produkční odesílání z `horea.cz` vyžaduje verifikovanou doménu + SPF/DKIM u obou. Selhání odeslání nesmí blokovat hlavní transakci (rezervace, platba).
+  - **Retry outbox (implementováno):** best-effort e-maily (notifikace rezervací, faktury, admin — NE auth) se posílají inline; při **přechodné chybě** (quota/429, 5xx, síť) se uloží do tabulky `email_outbox` (status `pending`) a cron `/api/cron/email-retry` je dožene s exponenciálním backoffem (2 m → 10 m → 1 h → 6 h → 24 h, max 6 pokusů, retry na stejném poskytovateli). Permanentní chyby (4xx) → `dead`. Vyřízené řádky se po 7 dnech promazávají (PII hygiena). Auth e-maily mimo outbox (uživatel čeká okamžitě).
 - **Vercel Cron → Vercel API → Google Drive/Sheets:** denní cron volá interní endpoint, ten sekvenčně zpracuje aktivní + grace podniky, pro každý zapíše inkrementální data do per-business Sheet v osobním Google Drive provozovatele. Autentizace běží přes OAuth refresh token; service account se nepoužívá, protože osobní Google Drive nemá Shared Drives. Při rate-limitu nebo chybě fallback na zápis CSV do dedikované Drive složky a pokračuje v dalším podniku.
 - **Vercel Cron → Vercel API (billing):** denní cron prochází podniky s blížícím se koncem cyklu, zakládá GoPay charge nebo posílá QR e-mail při selhání auto-charge.
 - **Vercel Cron → Vercel API (cleanup):** denní cron identifikuje podniky ve stavu `expired` po 3 měsících a iniciuje mazání tenant dat.
+- **Vercel Cron → Vercel API (email-retry):** cron á 15 min dožene splatné `pending` řádky `email_outbox` a promaže staré vyřízené (chráněno `CRON_SECRET`).
 
 ### Smluvní pravidla mezi komponentami
 
@@ -267,6 +271,7 @@ Tato sekce popisuje **logický datový model** platformy na úrovni hlavních en
 - **subscriptions** — předplatné podniku. Patří `business_id`. Klíčové atributy: `plan` (`start` / `pokrocily` / `max`), `status` (`free` / `active` / `grace_period` / `expired` / `deleted_data`), `current_period_start`, `current_period_end`, GoPay recurring schedule ID.
 - **payments** — historie platebních pokusů (úspěšných i neúspěšných) pro účetní auditovatelnost. Patří `business_id`. Klíčové atributy: částka, měna (`CZK`), variabilní symbol, GoPay payment ID, stav (`pending` / `paid` / `failed`), způsob (`auto_charge` / `qr_manual` / `admin_manual`), faktura URL.
 - **coupons** — slevové / komp / trial kupóny spravované adminem. Klíčové atributy: kód, typ slevy (procento / fixní částka / free trial dnů / comp účet), platnost, počet použití.
+- **email_outbox** *(infra, není tenant-scoped)* — retry fronta best-effort e-mailů (notifikace rezervací, faktury, admin), které selhaly přechodnou chybou. Klíčové atributy: `category`, `provider` (`smtp2go` / `resend`), příjemce + tělo, `status` (`pending` / `sent` / `dead`), `attempts`, `next_attempt_at`, `last_error_code`. Obsahuje PII (příjemce + tělo) → RLS deny-all (jen service_role), staré vyřízené řádky se promazávají. Nemá `business_id`. Detail v sekci *Integrační body* a v `subscription-payments`/`reservation-management` e-mailové vrstvě.
 
 ### ER diagram
 
@@ -735,7 +740,7 @@ Tato sekce popisuje **obecné principy práce s chybami** napříč platformou. 
 
 ### Zásady
 
-- **Best-effort kanály neblokují core.** Selhání e-mailu (Resend), backupu (Google) nebo zálohy nesmí způsobit selhání rezervace nebo platby. E-maily se v případě potřeby řadí do retry fronty (jednoduchý DB záznam `pending_emails`).
+- **Best-effort kanály neblokují core.** Selhání e-mailu (Resend / SMTP2GO), backupu (Google) nebo zálohy nesmí způsobit selhání rezervace nebo platby. Best-effort e-maily (notifikace rezervací, faktury, admin) se při přechodné chybě (quota/429, 5xx, síť) řadí do retry outboxu (`email_outbox` + cron `/api/cron/email-retry` s exponenciálním backoffem); auth e-maily jsou mimo outbox.
 - **Idempotence webhooků.** GoPay (a budoucí webhooky) garantují at-least-once doručení. Handlery jsou navrženy tak, aby opakované zpracování nezpůsobilo duplicitu.
 - **Transakce na hranici business operace.** Vytvoření rezervace = jedna DB transakce. Aktivace předplatného po platbě = jedna transakce. Žádné polovičaté stavy mezi tabulkami.
 - **Žádný stack trace klientovi.** Klient vidí čitelnou hlášku s request ID. Stack trace je pouze v logu.
@@ -791,7 +796,7 @@ Cílem MVP je **uvést platformu do provozu pro prvních ~50 podniků** s minim�
 - Dashboard rezervací pro podnikatele.
 - E-mailové notifikace (Resend).
 - Předplatné (GoPay recurring + QR fallback).
-- Admin dashboard (uživatelé, předplatná, kupóny, manuální párování plateb).
+- Admin varianta dashboardu na `/dashboard` podle `users.is_admin` (uživatelé, předplatná, kupóny, manuální párování plateb).
 - Denní backup do Google Sheets.
 - GDPR / DPA / manuální mazání.
 
@@ -856,6 +861,76 @@ Tento architektonický dokument je **master**. Jednotlivé funkční oblasti jso
 | **reservation-management** | Dashboard rezervací podnikatele — seznam, filtr, schválení/odmítnutí, editace, mazání, export, upsert klienta. |
 | **services-and-availability** | Správa služeb (CRUD, trvání, cena), správa otvírací doby, slot výpočet, detekce konfliktu, kapacita. |
 | **subscription-payments** | GoPay integrace (recurring + webhook), QR fallback, variabilní symbol, stavový automat předplatného, fakturace, e-mailové notifikace platby. |
-| **admin-dashboard** | Admin UI — seznam uživatelů, override předplatného, kupóny, manuální párování plateb, statistiky, audit log. |
+| **admin-dashboard** | Admin UI vykreslené jako role-aware varianta `/dashboard` — seznam uživatelů, override předplatného, kupóny, manuální párování plateb, statistiky, audit log. |
 
 > **Pořadí implementace** není pevně dáno tímto dokumentem — je věcí roadmapy. Logická závislost: `auth-onboarding` → `services-and-availability` + `public-business-page` → `reservation-management` → `subscription-payments` → `admin-dashboard`.
+
+---
+
+## Dostupné URL (routes) pro testování
+
+> Přehled všech rout aplikace pro manuální testování. Bázová URL ve vývoji: `http://localhost:3000` (`pnpm dev`). Testovací publikovaný podnik: slug `masazni-salon-mai`. Ochrana je vynucena `src/middleware.ts` (Access_Guard pro `/admin/*`, auth + subscription gate pro `/dashboard/*`).
+
+### Veřejné stránky (bez přihlášení)
+
+| URL | Popis |
+|---|---|
+| `/` | Úvodní (landing) stránka — hero, výhody, funkce, obory, ceník, FAQ, CTA. |
+| `/login` | Přihlášení. |
+| `/register` | Registrace nového majitele. |
+| `/forgot-password` | Žádost o reset hesla. |
+| `/reset-password` | Nastavení nového hesla (z odkazu v e-mailu). |
+| `/verify-email` | Ověření e-mailu (z odkazu v e-mailu). |
+| `/error` | Obecná chybová stránka. |
+| `/components` | Interní přehled UI komponent a design tokenů. |
+| `/{slug}` | Veřejná stránka podniku + rezervační formulář (např. `/masazni-salon-mai`). Nepublikovaný/neexistující → hláška, že podnik nepublikoval profil. |
+
+### Onboarding (přihlášený majitel, bez dokončeného onboardingu)
+
+| URL | Popis |
+|---|---|
+| `/onboarding/1` | Krok 1 — slug podniku. |
+| `/onboarding/2` | Krok 2 — typ podniku. |
+| `/onboarding/3` | Krok 3 — kontaktní údaje. |
+| `/onboarding/4` | Krok 4 — první služby. |
+| `/onboarding/5` | Krok 5 — otevírací doba. |
+| `/onboarding/6` | Krok 6 — shrnutí / dokončení. |
+
+### Dashboard majitele (přihlášení + aktivní/grace předplatné)
+
+| URL | Popis | Pozn. |
+|---|---|---|
+| `/dashboard` | Přehled (metriky). | Dostupné i `free` uživateli. |
+| `/dashboard/services` | Správa služeb (CRUD). | |
+| `/dashboard/opening-hours` | Správa otevírací doby. | |
+| `/dashboard/settings` | Nastavení podniku. | |
+| `/dashboard/subscription` | Předplatné — výběr tarifu, auto-obnova, změna tarifu, kupón. | |
+| `/dashboard/reservations` | Seznam/kalendář rezervací, filtry, vytvoření, export CSV. | Gate: vyžaduje `{active, grace_period}`. |
+| `/dashboard/reservations/[id]` | Detail rezervace + akce (schválit/odmítnout/zrušit/upravit/smazat/docházka). | Gate. |
+| `/dashboard/clients` | Evidence klientů. | Gate. |
+| `/dashboard/clients/[id]` | Detail klienta + historie + anonymizace (GDPR). | Gate. |
+
+### Admin dashboard (přihlášení + `users.is_admin = true`)
+
+| URL | Popis |
+|---|---|
+| `/admin` | Přehled platformy a statistiky (volba období). |
+| `/admin/businesses` | Seznam podniků (filtry, vyhledávání). |
+| `/admin/businesses/[id]` | Detail podniku + admin akce (override, free trial, comp, pozastavení, vynucené smazání, opětovné odeslání faktury). |
+| `/admin/audit` | Auditní stopa (read-only, filtry). |
+| `/admin/coupons` | Správa kupónů (CRUD + deaktivace). |
+| `/admin/payments` | Čekající platby — vyhledání dle VS a ruční spárování. |
+
+### API / route handlery
+
+| Metoda | URL | Ochrana | Popis |
+|---|---|---|---|
+| GET | `/dashboard/reservations/export` | Auth (majitel) | Export rezervací do CSV se shodnými filtry jako seznam. |
+| POST | `/api/checkout` | Auth (majitel) | Zahájení předplatného / aktivace kupónu. |
+| POST | `/api/webhooks/gopay` | HMAC podpis (`x-gopay-signature`) | Platební notifikace GoPay (idempotentní). |
+| GET/POST | `/api/cron/billing` | `Authorization: Bearer <CRON_SECRET>` | Měsíční strhávání splatných předplatných. |
+| GET/POST | `/api/cron/warnings` | `CRON_SECRET` | Varovné e-maily (den 23 / den 83 od kotvy). |
+| GET/POST | `/api/cron/cleanup` | `CRON_SECRET` | Mazání tenant dat po 90 dnech. |
+| GET/POST | `/logout` | Auth | Odhlášení a redirect. |
+
+> **Pozn. k testování:** Cron a webhook endpointy vyžadují tajemství z env (`CRON_SECRET`, `GOPAY_WEBHOOK_SECRET`); bez něj vrací 401/500. GoPay/Resend volání proti reálným službám se ve vývoji bez konfigurace neprovedou. Gate na `/dashboard/reservations*` a `/dashboard/clients*` vyžaduje předplatné ve stavu `active`/`grace_period` (lze nastavit přes `/admin/businesses/[id]` override nebo free trial).

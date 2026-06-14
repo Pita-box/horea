@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { applyRememberMeToCookieOptions, isRememberEnabled, REMEMBER_COOKIE } from './remember-me';
+
 function requirePublicEnv(
   name: 'NEXT_PUBLIC_SUPABASE_URL' | 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
 ): string {
@@ -32,6 +34,8 @@ export async function updateSession(
           return request.cookies.getAll();
         },
         setAll(cookiesToSet, headers) {
+          const remember = isRememberEnabled(request.cookies.get(REMEMBER_COOKIE)?.value);
+
           cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
@@ -45,7 +49,7 @@ export async function updateSession(
           });
 
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
+            response.cookies.set(name, value, applyRememberMeToCookieOptions(options, remember));
           });
 
           Object.entries(headers).forEach(([key, value]) => {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>URL</key>
+	<string>https://app.kiro.dev/signin?state=5cd66e22-6ba6-4204-b1ac-430afcfda690&amp;code_challenge=gzDWs9OAFbw3fQbpqaIkOomcP0-M8payzOk18-GQnmo&amp;code_challenge_method=S256&amp;redirect_uri=http%3A%2F%2Flocalhost%3A3128&amp;redirect_from=KiroIDE</string>
+</dict>
+</plist>

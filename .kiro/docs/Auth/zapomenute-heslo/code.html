@@ -1,0 +1,277 @@
+<!DOCTYPE html><html class="light" lang="cs"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#880068",
+                    "primary-fixed": "#e5deff",
+                    "primary-container": "#592eff",
+                    "tertiary-fixed-dim": "#ffaedc",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f7f1ff",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffd8eb",
+                    "surface-container-high": "#ece5f9",
+                    "cloud-mist": "#f0f3fe",
+                    "on-secondary-container": "#554b82",
+                    "on-secondary-fixed-variant": "#493f76",
+                    "on-background": "#1c1a28",
+                    "on-surface-variant": "#474557",
+                    "secondary-fixed-dim": "#cabeff",
+                    "tertiary-container": "#b20089",
+                    "inverse-surface": "#312e3d",
+                    "aqua-blue": "#2ed6ff",
+                    "on-surface": "#1c1a28",
+                    "air-blue": "#bcf2ff",
+                    "canvas-white": "#ffffff",
+                    "electric-green": "#a2ea13",
+                    "surface-container-highest": "#e6dff3",
+                    "primary-fixed-dim": "#c8bfff",
+                    "surface-variant": "#e6dff3",
+                    "lush-green": "#dfff9d",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#e6deff",
+                    "input-border": "#d8ddef",
+                    "secondary-container": "#cabeff",
+                    "sunset-pink": "#ffaae6",
+                    "on-primary-fixed": "#190064",
+                    "on-primary-container": "#dbd4ff",
+                    "background": "#fdf8ff",
+                    "inverse-on-surface": "#f4eeff",
+                    "on-tertiary-fixed": "#3c002c",
+                    "on-secondary-fixed": "#1d1148",
+                    "on-tertiary-fixed-variant": "#880068",
+                    "surface-dim": "#ddd7eb",
+                    "outline-variant": "#c9c4da",
+                    "inverse-primary": "#c8bfff",
+                    "surface-tint": "#592eff",
+                    "surface-bright": "#fdf8ff",
+                    "on-error": "#ffffff",
+                    "surface-container": "#f1ebff",
+                    "secondary": "#61568f",
+                    "on-primary-fixed-variant": "#4100db",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#fdf8ff",
+                    "soft-gray": "#eeeeee",
+                    "on-tertiary-container": "#ffcae5",
+                    "primary": "#4100dc",
+                    "on-tertiary": "#ffffff",
+                    "outline": "#787589"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-100": "100px",
+                    "base": "4px",
+                    "stack-16": "16px",
+                    "padding-input-h": "10px",
+                    "gap-element": "5px",
+                    "gap-section": "30px",
+                    "stack-8": "8px",
+                    "padding-input-v": "12px",
+                    "stack-4": "4px",
+                    "stack-48": "48px",
+                    "stack-24": "24px",
+                    "padding-card": "40px"
+            },
+            "fontFamily": {
+                    "display-md": ["Montserrat"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Montserrat"],
+                    "display-sm": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-sm": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f0f3fe; /* Cloud Mist */
+            color: #1c1a28; /* On Background */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .canvas-card {
+            background-color: #ffffff;
+            border: 1px solid #f0f3fe;
+        }
+        .input-focus-ring:focus {
+            outline: none;
+            border-color: #592eff;
+            box-shadow: 0 0 0 2px rgba(89, 46, 255, 0.1);
+        }
+        .glass-background {
+            background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md text-body-md bg-gradient-to-br from-primary-container/5 to-sunset-pink/5">
+<!-- Top Navigation Header -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-transparent">
+<nav class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="font-display-sm text-display-sm font-semibold text-primary dark:text-primary-fixed">
+                Horea SaaS
+            </div>
+<div class="flex items-center gap-stack-24">
+<button class="hover:text-primary-container transition-colors text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined">language</span>
+<span class="font-caption text-caption">CZ</span>
+</button>
+<button class="hover:text-primary-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</nav>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center px-4 pt-20 pb-12">
+<div class="w-full max-w-[480px]">
+<!-- Decorative Bloom Elements -->
+<div class="relative">
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-primary-container/10 rounded-full blur-[80px]"></div>
+<div class="absolute -bottom-24 -right-24 w-64 h-64 bg-sunset-pink/20 rounded-full blur-[80px]"></div>
+<!-- Forgot Password Card -->
+<div class="canvas-card relative z-10 rounded-[26px] p-padding-card shadow-sm">
+<div class="flex flex-col items-center text-center mb-stack-48">
+<div class="w-16 h-16 bg-primary-fixed rounded-xl flex items-center justify-center mb-stack-24 text-primary">
+<span class="material-symbols-outlined text-[32px]">lock_reset</span>
+</div>
+<h1 class="font-display-sm text-display-sm mb-stack-8 text-on-surface">Zapomenuté heslo</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[320px]">
+                            Zadejte svůj e-mail a my vám zašleme odkaz pro obnovení hesla.
+                        </p>
+</div>
+<form class="space-y-stack-24" id="forgot-password-form">
+<div class="flex flex-col gap-stack-8">
+<label class="font-caption text-caption text-on-surface px-1" for="email">Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full pl-12 pr-4 py-padding-input-v border border-input-border rounded-[12px] bg-canvas-white font-body-sm text-body-sm input-focus-ring transition-all" id="email" name="email" placeholder="jmeno@firma.cz" required="" type="email">
+</div>
+</div>
+<button class="group relative w-full bg-primary-container text-on-primary py-4 px-6 rounded-[12px] font-headline-sm text-headline-sm hover:opacity-90 active:scale-[0.98] transition-all overflow-hidden" type="submit">
+<span class="relative z-10">Odeslat odkaz</span>
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+</button>
+</form>
+<div class="mt-stack-32 text-center">
+<a class="inline-flex items-center gap-2 text-primary font-medium hover:underline transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span class="font-body-sm text-body-sm">Zpět na přihlášení</span>
+</a>
+</div>
+</div>
+<!-- Subtle Informational Badge -->
+<div class="mt-stack-24 text-center">
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-cloud-mist border border-input-border rounded-full text-on-surface-variant font-caption text-caption">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+                        Zabezpečené šifrování dat 256-bit
+                    </div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Component -->
+<footer class="mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-10 py-8 max-w-7xl mx-auto gap-stack-16">
+<div class="font-body-sm text-body-sm text-secondary dark:text-secondary-fixed">
+                © 2024 Horea SaaS. All rights reserved.
+            </div>
+<div class="flex gap-stack-24 items-center">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and feedback
+        const form = document.getElementById('forgot-password-form');
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const button = form.querySelector('button');
+            const originalContent = button.innerHTML;
+            
+            // Loading state simulation
+            button.disabled = true;
+            button.innerHTML = `
+                <div class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Odesílám...</span>
+                </div>
+            `;
+
+            setTimeout(() => {
+                // Success feedback
+                button.classList.replace('bg-primary-container', 'bg-electric-green');
+                button.classList.add('text-on-background');
+                button.innerHTML = `
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>Odkaz byl odeslán</span>
+                    </div>
+                `;
+                
+                // Reset after 3 seconds for demo purposes
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.classList.replace('bg-electric-green', 'bg-primary-container');
+                    button.classList.remove('text-on-background');
+                    button.innerHTML = originalContent;
+                }, 3000);
+            }, 1500);
+        });
+
+        // Add subtle mouse-tracking movement to the background bloom
+        document.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) / 50;
+            const moveY = (e.clientY - window.innerHeight / 2) / 50;
+            
+            const blooms = document.querySelectorAll('.blur-\\[80px\\]');
+            blooms.forEach((bloom, index) => {
+                const multiplier = index === 0 ? 1 : -1;
+                bloom.style.transform = `translate(${moveX * multiplier}px, ${moveY * multiplier}px)`;
+            });
+        });
+    </script>
+
+
+</body></html>

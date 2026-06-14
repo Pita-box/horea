@@ -4,7 +4,7 @@ Rezervační SaaS pro malé české podniky. Foundation workflow a feature speci
 
 ## Prerekvizity
 
-- Node.js 20 LTS (`.nvmrc` je nastavené na `20`)
+- Node.js 22 LTS (`.nvmrc` = `22`; konkrétně **22.12+** kvůli `require(ESM)` ve vitest 4 / vite 8). Doporučená sudá LTS linie 22 nebo 24; liché „Current" verze 23/25 nepoužívat v produkci.
 - pnpm 8.15.0 (`corepack enable`)
 - Supabase CLI (`pnpm exec supabase --version` po instalaci dependencies)
 - GitHub účet a repozitář
@@ -25,16 +25,20 @@ Povinné proměnné pro lokální foundation práci:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RESEND_API_KEY`
-- `GOPAY_GOID`
-- `GOPAY_CLIENT_ID`
-- `GOPAY_CLIENT_SECRET`
 - `GOOGLE_OAUTH_CLIENT_ID`
 - `GOOGLE_OAUTH_CLIENT_SECRET`
 - `GOOGLE_OAUTH_REFRESH_TOKEN`
 - `GOOGLE_DRIVE_BACKUP_FOLDER_ID`
 - `LOG_LEVEL`
 
+Volitelné nebo pozdější proměnné:
+
+- `RESEND_FROM_EMAIL` — default je `Horea <onboarding@resend.dev>` pro dev/test
+- `GOPAY_GOID`, `GOPAY_CLIENT_ID`, `GOPAY_CLIENT_SECRET` — doplnit až při GoPay aktivaci
+
 Google backup používá osobní Google Drive přes OAuth refresh token. Backup složka musí být vytvořená přes stejný OAuth client, aby scope `drive.file` měl k cíli přístup. Service account se nepoužívá, protože osobní Google Drive nepodporuje Shared Drives a service account nelze spolehlivě přidat jako běžný účet.
+
+Resend má pro dev/test výchozí sender `Horea <onboarding@resend.dev>`. Produkční odesílání z `horea.cz` vyžaduje verifikovanou doménu v Resendu a DNS záznamy SPF/DKIM/DMARC v Cloudflare.
 
 ## Local Dev
 

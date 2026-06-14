@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Horea SaaS - Přihlášení</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#880068",
+                    "primary-fixed": "#e5deff",
+                    "primary-container": "#592eff",
+                    "tertiary-fixed-dim": "#ffaedc",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f7f1ff",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffd8eb",
+                    "surface-container-high": "#ece5f9",
+                    "cloud-mist": "#f0f3fe",
+                    "on-secondary-container": "#554b82",
+                    "on-secondary-fixed-variant": "#493f76",
+                    "on-background": "#1c1a28",
+                    "on-surface-variant": "#474557",
+                    "secondary-fixed-dim": "#cabeff",
+                    "tertiary-container": "#b20089",
+                    "inverse-surface": "#312e3d",
+                    "aqua-blue": "#2ed6ff",
+                    "on-surface": "#1c1a28",
+                    "air-blue": "#bcf2ff",
+                    "canvas-white": "#ffffff",
+                    "electric-green": "#a2ea13",
+                    "surface-container-highest": "#e6dff3",
+                    "primary-fixed-dim": "#c8bfff",
+                    "surface-variant": "#e6dff3",
+                    "lush-green": "#dfff9d",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#e6deff",
+                    "input-border": "#d8ddef",
+                    "secondary-container": "#cabeff",
+                    "sunset-pink": "#ffaae6",
+                    "on-primary-fixed": "#190064",
+                    "on-primary-container": "#dbd4ff",
+                    "background": "#fdf8ff",
+                    "inverse-on-surface": "#f4eeff",
+                    "on-tertiary-fixed": "#3c002c",
+                    "on-secondary-fixed": "#1d1148",
+                    "on-tertiary-fixed-variant": "#880068",
+                    "surface-dim": "#ddd7eb",
+                    "outline-variant": "#c9c4da",
+                    "inverse-primary": "#c8bfff",
+                    "surface-tint": "#592eff",
+                    "surface-bright": "#fdf8ff",
+                    "on-error": "#ffffff",
+                    "surface-container": "#f1ebff",
+                    "secondary": "#61568f",
+                    "on-primary-fixed-variant": "#4100db",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#fdf8ff",
+                    "soft-gray": "#eeeeee",
+                    "on-tertiary-container": "#ffcae5",
+                    "primary": "#4100dc",
+                    "on-tertiary": "#ffffff",
+                    "outline": "#787589"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-100": "100px",
+                    "base": "4px",
+                    "stack-16": "16px",
+                    "padding-input-h": "10px",
+                    "gap-element": "5px",
+                    "gap-section": "30px",
+                    "stack-8": "8px",
+                    "padding-input-v": "12px",
+                    "stack-4": "4px",
+                    "stack-48": "48px",
+                    "stack-24": "24px",
+                    "padding-card": "40px"
+            },
+            "fontFamily": {
+                    "display-md": ["Montserrat"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Montserrat"],
+                    "display-sm": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-sm": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f0f3fe; /* Cloud Mist */
+        }
+        .canvas-card {
+            background-color: #ffffff; /* Canvas White */
+            border: 1px solid #f0f3fe; /* Cloud Mist border */
+        }
+        .input-field {
+            border: 1px solid #d8ddef; /* Input Border */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #592eff;
+            box-shadow: 0 0 0 3px rgba(89, 46, 255, 0.1);
+        }
+        .btn-primary {
+            background-color: #592eff; /* Action Violet */
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen font-body-md text-on-surface">
+<!-- Top Navigation (Shell Implementation) -->
+<header class="w-full px-6 py-4 max-w-7xl mx-auto flex justify-between items-center fixed top-0 left-0 right-0 z-50">
+<div class="flex items-center gap-stack-8">
+<img alt="Horea SaaS Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida/AP1WRLsUl1Q1dq1cqaHHQdsHYpxbOUnRiDdZoh6-XodQBZ6-1gxd4NO56fCj4N8yRZizaSJQb4pH-eh9AzRp5f1-dh1kKmfZic_QrYoVgK8CtO4tn4OT2lrmnieh7ygU6Mpc7aTUFAwvyRyTcYEFc_3iZczKmSYsw6P9Ue_A9ugDgFfLgdPscf57FX6i0h-R4L9I8GT1JCsBntQnBEV1xAHWMTVKPgQgIYPk3xnlVki21L8CMbK3tcHHkVL6194"/>
+</div>
+<div class="flex items-center gap-stack-16">
+<button class="material-symbols-outlined p-2 hover:bg-soft-gray rounded-full transition-colors text-on-surface-variant">language</button>
+<button class="material-symbols-outlined p-2 hover:bg-soft-gray rounded-full transition-colors text-on-surface-variant">help_outline</button>
+</div>
+</header>
+<!-- Main Content: Login Canvas -->
+<main class="flex-grow flex items-center justify-center px-6 py-stack-100">
+<div class="canvas-card w-full max-w-[480px] rounded-[26px] p-padding-card flex flex-col gap-stack-24">
+<!-- Branding & Title -->
+<div class="text-center space-y-stack-8">
+<h1 class="font-headline-md text-headline-md text-on-surface">Vítejte zpět</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Přihlaste se ke svému účtu Horea SaaS</p>
+</div>
+<!-- Login Form -->
+<form class="flex flex-col gap-stack-16" onsubmit="event.preventDefault();">
+<div class="flex flex-col gap-base">
+<label class="font-caption text-caption text-on-surface-variant ml-1" for="email">Email</label>
+<input class="input-field w-full px-padding-input-h py-padding-input-v rounded-xl font-body-sm bg-surface-container-lowest" id="email" placeholder="vas@email.cz" required="" type="email"/>
+</div>
+<div class="flex flex-col gap-base">
+<div class="flex justify-between items-center px-1">
+<label class="font-caption text-caption text-on-surface-variant" for="password">Heslo</label>
+<a class="font-caption text-caption text-primary-container hover:opacity-80 transition-opacity" href="#">Zapomněli jste heslo?</a>
+</div>
+<div class="relative">
+<input class="input-field w-full px-padding-input-h py-padding-input-v rounded-xl font-body-sm bg-surface-container-lowest" id="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-[20px]" onclick="togglePassword()" type="button">visibility</button>
+</div>
+</div>
+<div class="flex items-center gap-stack-8 pt-base">
+<input class="w-4 h-4 rounded border-input-border text-primary-container focus:ring-primary-container" id="remember" type="checkbox"/>
+<label class="font-body-sm text-body-sm text-on-surface-variant" for="remember">Zůstat přihlášen</label>
+</div>
+<button class="btn-primary w-full py-padding-input-v rounded-xl font-headline-sm text-headline-sm text-white mt-stack-8" type="submit">
+                    Přihlásit se
+                </button>
+</form>
+<!-- Secondary Actions -->
+<div class="text-center border-t border-cloud-mist pt-stack-16">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Nemáte účet? 
+                    <a class="text-primary-container font-semibold hover:opacity-80 transition-opacity" href="#">Zaregistrujte se</a>
+</p>
+</div>
+</div>
+</main>
+<!-- Footer (Shell Implementation) -->
+<footer class="w-full px-10 py-8 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-stack-16 mt-auto">
+<p class="font-body-sm text-body-sm text-secondary-fixed-variant opacity-70">© 2024 Horea SaaS. All rights reserved.</p>
+<div class="flex gap-stack-24">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+</div>
+</footer>
+<!-- Atmosphere Effects -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-container opacity-5 blur-[120px] pointer-events-none rounded-full"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-sunset-pink opacity-5 blur-[120px] pointer-events-none rounded-full"></div>
+<script>
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            const icon = event.currentTarget;
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                icon.innerText = 'visibility_off';
+            } else {
+                pwdInput.type = 'password';
+                icon.innerText = 'visibility';
+            }
+        }
+
+        // Simple button active state visual feedback
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('opacity-80'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('opacity-80'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('opacity-80'));
+        });
+    </script>
+</body></html>

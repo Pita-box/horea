@@ -6,12 +6,53 @@ This is a Codex index over Kiro feature specs. Detailed requirements, design, ta
 
 | Order | Feature | Source | Depends on | Next slice |
 | --- | --- | --- | --- | --- |
-| 1 | `auth-onboarding` | `.kiro/specs/auth-onboarding/` | `architecture` schema/auth baseline | Onboarding draft schema, slug normalization, DPA constants |
+| 1 | `auth-onboarding` | `.kiro/specs/auth-onboarding/` | `architecture` schema/auth baseline | Core hotové (registrace, login, verify, onboarding wizard 1–6, DPA flow). Probíhá UI redesign auth/onboarding dle `.kiro/docs/Auth/*` + `.kiro/docs/Dashboard/*` (viz „Cross-cutting UI redesign" níže) |
 | 2 | `services-and-availability` | `.kiro/specs/services-and-availability/` | `architecture`, `auth-onboarding` tenant context | `Slot_Calculator` tests and pure function |
 | 3 | `public-business-page` | `.kiro/specs/public-business-page/` | `services-and-availability` slot logic, published business model | Public renderer and `/{slug}` routing utility |
-| 4 | `reservation-management` | `.kiro/specs/reservation-management/` | `public-business-page`, `services-and-availability`, active subscription status | Shared reservation creation/email refactor, dashboard read layer |
-| 5 | `subscription-payments` | `.kiro/specs/subscription-payments/` | `architecture` payment model, auth/business ownership | Subscription state machine and payment identifiers |
-| 6 | `admin-dashboard` | `.kiro/specs/admin-dashboard/` | `subscription-payments`, admin role/RLS override | Audit log core and admin access guard |
+| 4 | `reservation-management` | `.kiro/specs/reservation-management/` | `public-business-page`, `services-and-availability`, active subscription status | DONE 100% — all tasks incl. optional PBT/unit/integration/E2E complete |
+| 5 | `subscription-payments` | `.kiro/specs/subscription-payments/` | `architecture` payment model, auth/business ownership | DONE — all required tasks complete (250 passed, build green, migrations 0024–0030 applied). Deferred: optional `*` PBT/unit/integration/E2E tests |
+| 6 | `admin-dashboard` | `.kiro/specs/admin-dashboard/` | `subscription-payments`, admin role/RLS override | DONE 100% — all tasks incl. optional PBT/unit/integration/E2E complete (415 passed, build OK under Node 20, migrations 0031–0040 applied) |
+
+## Cross-cutting UI redesign (probíhá, mimo per-feature tasky)
+
+Vizuální sjednocení podle podkladů v `.kiro/docs/` (Adora style). Detailní chronologie v `plans/build-journal.md`. Nemění pořadí ani závislosti featur — jde o UI vrstvu nad hotovou funkčností.
+
+- **Auth stránky** — sdílený `AuthShell` (hlavička logo→`/` + support→`/kontakt`, blobs, `PublicFooter`); Registrace (2-sloupcový layout + live password checker), Login (stejný layout, funkční „Zůstat přihlášen"), Zapomenuté heslo, Verify-email (Neaktivovaný účet / Aktivovaný účet). Šířka formulářů pod `lg` sjednocena na `max-w-md`.
+- **Onboarding** — full-screen gradient + `AuthHeader`/`PublicFooter`; krok 2 slug preview, krok 3 profil (ikony, telefon přesně 9 číslic), krok 5 `TimePicker` + `Switch`, krok 6 souhrn „Souhrn údajů".
+- **Dashboard** — nový shell `DashboardChrome` (znovupoužitelné `DashboardSidebar`/`DashboardHeader`/`DashboardFooter`, role-driven `variant` owner/admin) nahradil horní `DashboardNav`; sdílí ho i admin oblast (`/admin/*` přes `admin/layout.tsx`). **Vyhledávání v headeru** (`DashboardSearch`) — viz „Dashboard search" níže. Fake analytics z reference zatím nestavěny (chybí data). Podstránky (services/reservations/clients/…) čekají na migraci vzhledu.
+- **Marketing** — `(marketing)` route group: homepage, `/kontakt`, `/vseobecne-podminky` (vč. DPA jako sekce 7), `/ochrana-osobnich-udaju`, `/predplatne`; sdílený `PublicHeader`/`PublicFooter`.
+
+## Dashboard search (rozšiřitelná feature, probíhá)
+
+Vyhledávání v dashboard headeru. Zdrojová architektura — výsledky se skládají z více zdrojů, snadno rozšiřitelné. Detail v `plans/build-journal.md`.
+
+- **Stav: funkční (owner).** Zdroje: položky **nastavení** + **FAQ** (statický index, `src/lib/search/static-index.ts`, lokální fulltext bez diakritiky) a **klienti** (jméno/e-mail/telefon, server action `searchClientsAction`, tenant-scoped přes `business_id`+RLS, debounce 300 ms). UI: `DashboardSearch` (combobox, seskupené výsledky, klik mimo/Escape). Šířka inputu až `calc(var(--spacing)*150)` (~600px), responzivní.
+- **Plan-gating:** napojeno na DB matici funkcí (`src/lib/plans/feature-matrix.ts → planHasFeature(matrix, plan, 'client_search')`), kterou edituje admin v `/admin/plans`. `capabilities.ts` **smazáno**. Free/bez tarifu zatím neomezeno. Zamčený stav klientů ukáže hlášku „dostupné ve vyšším tarifu".
+- **FAQ stránka:** `/dashboard/faq` (`FaqAccordion`) — FAQ výsledky search na ni míří.
+- **Rozšíření do budoucna:** přidat skupiny (rezervace, faktury, …) jako další zdroje; admin varianta search (podniky/platby); klávesová navigace šipkami; fulltext přes DB pro velké objemy.
+
+## Hotovo — Entitlements / balíčky (body 4–5)
+
+Postaveno (viz `plans/build-journal.md`, migrace `0042_plan_features`). Výchozí stav: vše povolené pro všechny tarify (test mode); admin teď jednotlivé funkce zapíná/vypíná per tarif.
+
+- **Dashboard stránka „Tarify a funkce"** (`/dashboard/plans`) — owner přehled 3 tarifů + porovnávací tabulka funkcí, čte matici z DB (`loadPlanFeatureMatrix`). Napojeno na search.
+- **Admin správa matice funkcí → balíčky** (`/admin/plans`) — admin přepíná `Switch` toggly funkce × tarif (optimistická aktualizace + rollback), `setPlanFeatureAction` (admin check + service-role upsert + audit `plan_feature_update`).
+  - DB: tabulka `plan_features(plan, feature_key, enabled, updated_at)`, migrace `0042` (aplikováno). Chybějící řádek = povoleno (fail-open default).
+  - Runtime gating čte matici (`planHasFeature(matrix, plan, key)`); zatím využito pro `client_search`.
+- **Hotovo — návaznost:** `search` plan-gating napojen na tuto matici (dříve `capabilities.ts`, smazáno).
+
+### Zbývá / k zvážení (budoucí slice)
+
+- Gating dalších funkcí (kromě `client_search`) — napojit `planHasFeature` na zbylých 10 funkcí tam, kde dává smysl je omezovat tarifem.
+- Politika pro free/bez tarifu (teď neomezeno) — rozhodnout, zda free = nejnižší tarif nebo vlastní množina.
+
+### Funkční divergence od původních specs (zaznamenat při příští aktualizaci spec dokumentů)
+
+- **Registrace**: `supabase.auth.signUp` → `admin.createUser({ email_confirm: false })`, aby Supabase neposílal vlastní confirm e-mail (vlastní Resend odkaz s tokenem pro stránku „Aktivovaný účet").
+- **DPA**: zrušen samostatný `DPA_TEXT` placeholder + jeho checkbox-text; DPA žije jako sekce 7 VOP, registrace na ni jen odkazuje (mechanika verzovaného souhlasu `dpa_version_accepted`/re-acceptance zachována).
+- **E-maily**: rozděleni odesílatelé (Resend = auth/faktury/kontakt/admin, SMTP2GO = notifikace rezervací) + transactional outbox s retry (migrace `0041_email_outbox`).
+- **„Zůstat přihlášen"**: cookie `horea-remember` řídí session vs. persistentní auth cookies (server + middleware).
+- **Redirecty**: přihlášený uživatel je z `/login`, `/register`, `/verify-email` (default) a `/error` (jen při zdravém guard state) přesměrován na `/dashboard`.
 
 ## Implementation Rules
 

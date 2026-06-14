@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Studio Elegance - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#787589",
+                        "inverse-primary": "#c8bfff",
+                        "on-secondary-container": "#554b82",
+                        "secondary-fixed": "#e6deff",
+                        "electric-green": "#a2ea13",
+                        "surface-bright": "#fdf8ff",
+                        "on-tertiary-fixed": "#3c002c",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#4100db",
+                        "inverse-on-surface": "#f4eeff",
+                        "surface": "#fdf8ff",
+                        "tertiary-fixed-dim": "#ffaedc",
+                        "lush-green": "#dfff9d",
+                        "outline-variant": "#c9c4da",
+                        "surface-container-lowest": "#ffffff",
+                        "canvas-white": "#ffffff",
+                        "on-surface": "#1c1a28",
+                        "surface-variant": "#e6dff3",
+                        "surface-tint": "#592eff",
+                        "surface-dim": "#ddd7eb",
+                        "surface-container-low": "#f7f1ff",
+                        "on-surface-variant": "#474557",
+                        "secondary-container": "#cabeff",
+                        "on-tertiary-fixed-variant": "#880068",
+                        "air-blue": "#bcf2ff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#b20089",
+                        "on-tertiary-container": "#ffcae5",
+                        "sunset-pink": "#ffaae6",
+                        "primary-fixed-dim": "#c8bfff",
+                        "aqua-blue": "#2ed6ff",
+                        "soft-gray": "#eeeeee",
+                        "secondary": "#61568f",
+                        "background": "#fdf8ff",
+                        "inverse-surface": "#312e3d",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffd8eb",
+                        "on-secondary-fixed": "#1d1148",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e6dff3",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary": "#880068",
+                        "on-primary-fixed": "#190064",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#dbd4ff",
+                        "input-border": "#d8ddef",
+                        "on-secondary-fixed-variant": "#493f76",
+                        "primary-container": "#592eff",
+                        "primary": "#4100dc",
+                        "surface-container-high": "#ece5f9",
+                        "surface-container": "#f1ebff",
+                        "cloud-mist": "#f0f3fe",
+                        "primary-fixed": "#e5deff",
+                        "on-background": "#1c1a28"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "26px",
+                        "button": "12px"
+                    },
+                    "spacing": {
+                        "gap-element": "5px",
+                        "base": "4px",
+                        "stack-48": "48px",
+                        "padding-card": "40px",
+                        "stack-4": "4px",
+                        "padding-input-v": "12px",
+                        "stack-8": "8px",
+                        "stack-16": "16px",
+                        "stack-100": "100px",
+                        "padding-input-h": "10px",
+                        "gap-section": "30px",
+                        "stack-24": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "display-sm": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "display-md": ["Montserrat"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display-lg": ["Montserrat"],
+                        "body-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["16px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "display-sm": ["38px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-lg": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-lg": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "caption": ["14px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "display-md": ["58px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-lg": ["68px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["18px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f0f3fe; }
+    </style>
+</head>
+<body class="bg-cloud-mist font-body-sm text-on-surface antialiased flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-64 py-8 px-4 flex-col gap-6 bg-cloud-mist dark:bg-surface-dim z-20">
+<div class="flex items-center gap-4 px-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-lg">A</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">Adora</h1>
+<p class="font-caption text-caption text-on-surface-variant">Service Management</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<a class="text-primary dark:text-inverse-primary font-semibold flex items-center gap-3 px-4 py-3 rounded-lg bg-canvas-white dark:bg-surface-container-highest scale-98 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-on-surface-variant dark:text-outline flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray dark:hover:bg-surface-variant transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Reservations
+            </a>
+<a class="text-on-surface-variant dark:text-outline flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray dark:hover:bg-surface-variant transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">home_repair_service</span>
+                Services
+            </a>
+<a class="text-on-surface-variant dark:text-outline flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray dark:hover:bg-surface-variant transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">group</span>
+                Clients
+            </a>
+<a class="text-on-surface-variant dark:text-outline flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray dark:hover:bg-surface-variant transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+                Analytics
+            </a>
+</div>
+<div class="mt-auto flex flex-col gap-2">
+<button class="bg-primary-container text-on-primary py-3 rounded-button font-body-sm font-semibold mb-4 hover:opacity-90 transition-opacity">
+                Upgrade Plan
+            </button>
+<a class="text-on-surface-variant dark:text-outline flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray dark:hover:bg-surface-variant transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help Center
+            </a>
+<a class="text-on-surface-variant dark:text-outline flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray dark:hover:bg-surface-variant transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="w-full h-16 bg-canvas-white dark:bg-surface-container flex justify-between items-center px-8 z-10 sticky top-0">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-padding-input-v rounded-button border border-input-border bg-transparent focus:outline-none focus:border-primary-container transition-colors w-64 text-body-sm font-body-sm" placeholder="Hledat..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-soft-gray transition-colors text-on-surface-variant cursor-pointer transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-soft-gray transition-colors text-on-surface-variant cursor-pointer transition-all duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden ml-2 cursor-pointer transition-all duration-200">
+<img alt="Business Owner Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlefnWYV4-jVzcKiXj2mG1cZCeruIX7btpIMcYBt-6-i6RTRmkb0dzaG51waBxtV4KhHS7M1RW0QqcWOnCxYdjCxO8LEyhbOhneEDM9Ov7IXFPiEcBHq2KUnZSAbO3xAhPKISt2rO6hFdfHHT7I1tL-lekUceyu2Zr0HZuX7lZo8UVztLWYXx27Rd0iAB5RU-ej2D0pqLbYyGrFfQVwTj1h7QthMO51_1CIn8-L2MvFp_kNjhrki7cXwsbSYcFyBHDD4SaUtVpd5w"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-8">
+<div class="max-w-7xl mx-auto flex flex-col gap-section">
+<!-- Header -->
+<div class="flex flex-col gap-stack-8">
+<h2 class="font-display-sm text-display-sm text-on-surface">Dobré dopoledne, Studio Elegance</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Tady je přehled vašeho dnešního dne.</p>
+</div>
+<!-- Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stat 1 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex items-center gap-6">
+<div class="w-16 h-16 rounded-full bg-air-blue/20 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl">payments</span>
+</div>
+<div>
+<p class="font-caption text-caption text-on-surface-variant mb-1">Dnešní tržby</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">12 450 Kč</p>
+</div>
+</div>
+<!-- Stat 2 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex items-center gap-6">
+<div class="w-16 h-16 rounded-full bg-lush-green/20 flex items-center justify-center text-electric-green">
+<span class="material-symbols-outlined text-3xl">event_available</span>
+</div>
+<div>
+<p class="font-caption text-caption text-on-surface-variant mb-1">Aktivní rezervace</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">24</p>
+</div>
+</div>
+<!-- Stat 3 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex items-center gap-6">
+<div class="w-16 h-16 rounded-full bg-sunset-pink/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">person_add</span>
+</div>
+<div>
+<p class="font-caption text-caption text-on-surface-variant mb-1">Noví klienti</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">8</p>
+</div>
+</div>
+</div>
+<!-- Middle Row -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left Column: Upcoming Reservations -->
+<div class="lg:col-span-2 bg-canvas-white rounded-card p-padding-card flex flex-col gap-6">
+<div class="flex justify-between items-center border-b border-soft-gray pb-4">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Nadcházející rezervace</h3>
+<button class="text-primary-container font-caption text-caption font-semibold hover:underline">Zobrazit vše</button>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-4 rounded-xl hover:bg-cloud-mist transition-colors cursor-pointer border border-transparent hover:border-soft-gray">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden flex-shrink-0">
+<img alt="Anna Nováková" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASxi1eD_rRrLvJhSJ7IeK1Sa2BKGbUv1vhDLEBJVR2WCvEbnDO5Y9VtObDVr0nFpxRCO675O5FH1FqZeiEhVVkBbd0xre76O-5dloXR9HdOWLgcC19-_u2yExTT8NwqtINYdkOnTboSD5HQPr9QcYe-RhFj33Xf9SeEm9dPywfbuBN2gunH7jIrXvQ6SFDJaCttVNZETKC0At3HcZFFErEJJ5fV0X8HPOiPbOzwvjxtvIoKZuYRUxiK4dYQVlyQ6F2VPcCioWyyLU"/>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Anna Nováková</p>
+<p class="font-caption text-caption text-on-surface-variant">Kompletní kosmetické ošetření</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<p class="font-body-sm text-body-sm text-on-surface-variant">09:00</p>
+<span class="px-3 py-1 rounded-full border border-electric-green text-on-surface font-caption text-xs bg-lush-green/10">Schváleno</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-4 rounded-xl hover:bg-cloud-mist transition-colors cursor-pointer border border-transparent hover:border-soft-gray">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden flex-shrink-0">
+<img alt="Petr Svoboda" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBigCyRfDkZhWmUw5MegtZGNkr1Vt9DZwQ3UVHMaPP3yavaBpNo8SziPHRaUhJq50lDhx4rYqC0i_E_UwyRFRweP7VGW9ipwzbs5N-_uWsFV3gMhSJgjyp2h6982LPDpYgwavB_f56X6L9Btxzx_39TGkgvBfsF1l3nR3lTjBJ03YP62hIX0NqV-2ZrC3khjXEF5j7Nr9LaD28kg-Tx5D8xuj8Cty_z9muGuA7xQxl5CCcTvolIjDr_M7LE5Q1YLlI9vmHU7ZwXbw"/>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Petr Svoboda</p>
+<p class="font-caption text-caption text-on-surface-variant">Klasická masáž (60 min)</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<p class="font-body-sm text-body-sm text-on-surface-variant">10:30</p>
+<span class="px-3 py-1 rounded-full border border-electric-green text-on-surface font-caption text-xs bg-lush-green/10">Schváleno</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center justify-between p-4 rounded-xl hover:bg-cloud-mist transition-colors cursor-pointer border border-transparent hover:border-soft-gray">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden flex-shrink-0">
+<img alt="Klára Svobodová" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZx7ISXJx0w8VqldyMf8Ul5HBI5N0k1nkgbeTaMBf_gbaTi5ijY3JnFzQ8MQQV9Tp_NK7VoH5AoIuh1t0-x7Nvw2pW30_2uY4oK2dWgrGNbMRbFc2Y_QucV2EMO8EcViLN4IkNDjfLG1qQ115FUbD2cHMUtvuzjU3tEkh9JvprmTewgbDcsu7z7OoM09QkFsnyffUDWE41v1DwXUPXsYUFTQZWLu1fPEF0lJaj3ot1Wf62DBoW2t8eBnUY7A36OxQ17WSAGMBzJPY"/>
+</div>
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Klára Svobodová</p>
+<p class="font-caption text-caption text-on-surface-variant">Manikúra &amp; Pedikúra</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<p class="font-body-sm text-body-sm text-on-surface-variant">13:00</p>
+<span class="px-3 py-1 rounded-full border border-outline text-on-surface-variant font-caption text-xs bg-soft-gray/50">Čeká</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Quick Actions -->
+<div class="bg-canvas-white rounded-card p-padding-card flex flex-col gap-6">
+<h3 class="font-headline-sm text-headline-sm text-on-surface border-b border-soft-gray pb-4">Rychlé akce</h3>
+<div class="flex flex-col gap-4">
+<button class="w-full bg-primary-container text-on-primary py-4 px-6 rounded-button font-body-md font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">add_circle</span>
+                                Nová rezervace
+                            </button>
+<button class="w-full bg-transparent border border-outline text-on-surface py-4 px-6 rounded-button font-body-md font-semibold flex items-center justify-center gap-2 hover:bg-soft-gray transition-colors">
+<span class="material-symbols-outlined">post_add</span>
+                                Přidat službu
+                            </button>
+</div>
+<div class="mt-auto pt-6 border-t border-soft-gray flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Online profil</p>
+<p class="font-caption text-caption text-on-surface-variant">Klienti se mohou rezervovat</p>
+</div>
+<!-- Toggle -->
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 checked:border-electric-green" id="toggle" name="toggle" style="right: 0; border-color: #a2ea13;" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-electric-green cursor-pointer" for="toggle"></label>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Weekly Trend Chart Placeholder -->
+<div class="bg-canvas-white rounded-card p-padding-card flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Týdenní trend</h3>
+<div class="flex gap-2">
+<span class="w-3 h-3 rounded-full bg-primary-container inline-block"></span>
+<p class="font-caption text-caption text-on-surface-variant text-xs">Rezervace</p>
+</div>
+</div>
+<!-- Decorative Chart Area -->
+<div class="h-64 w-full bg-cloud-mist/50 rounded-xl relative flex items-end justify-between px-8 pt-8 pb-4">
+<!-- Simulated Bars -->
+<div class="w-12 bg-primary-container/20 hover:bg-primary-container/40 rounded-t-md transition-colors relative group" style="height: 40%;">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">12</div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-caption text-on-surface-variant">Po</span>
+</div>
+<div class="w-12 bg-primary-container/40 hover:bg-primary-container/60 rounded-t-md transition-colors relative group" style="height: 65%;">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">18</div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-caption text-on-surface-variant">Út</span>
+</div>
+<div class="w-12 bg-primary-container/80 hover:bg-primary-container rounded-t-md transition-colors relative group" style="height: 90%;">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">24</div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-caption text-on-surface-variant">St</span>
+</div>
+<div class="w-12 bg-primary-container/50 hover:bg-primary-container/70 rounded-t-md transition-colors relative group" style="height: 70%;">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">20</div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-caption text-on-surface-variant">Čt</span>
+</div>
+<div class="w-12 bg-primary-container/90 hover:bg-primary-container rounded-t-md transition-colors relative group" style="height: 95%;">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">26</div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-caption text-on-surface-variant">Pá</span>
+</div>
+<div class="w-12 bg-primary-container/30 hover:bg-primary-container/50 rounded-t-md transition-colors relative group" style="height: 50%;">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">15</div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-caption text-on-surface-variant">So</span>
+</div>
+<div class="w-12 bg-primary-container/10 hover:bg-primary-container/30 rounded-t-md transition-colors relative group" style="height: 20%;">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">5</div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-caption text-on-surface-variant">Ne</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -7,9 +7,13 @@
  */
 @theme {
   /* Colors */
+  --color-border-vychozi: lab(90.952% 0 -.0000119209);
   --color-canvas-white: #ffffff;
-  --color-cloud-mist: #e0e0db;
+  --color-cloud-mist: #f0f3fe;
+  --color-milky-gray:#eff3f4;
   --color-slate-text: #353241;
+  --color-light-violet:#dedfef;
+  --color-slate-violet:#d3c8ff;
   --color-rich-violet: #21164c;
   --color-action-violet: #592eff;
   --color-air-blue: #bcf2ff;
@@ -19,6 +23,9 @@
   --color-aqua-blue: #2ed6ff;
   --color-electric-green: #a2ea13;
   --color-soft-gray-fill: #eeeeee;
+  --color-dark:#171717;
+  /* Přepisuje Cloud Mist konkrétně pro okraje formulářových polí (na žádost uživatele). */
+  --color-input-border: #d8ddef;
 
   /* Typography — Font Families */
   --font-polysans:
@@ -46,18 +53,14 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* Spacing (4px base) */
-  --spacing-4: 4px;
-  --spacing-8: 8px;
-  --spacing-12: 12px;
-  --spacing-16: 16px;
-  --spacing-20: 20px;
-  --spacing-24: 24px;
-  --spacing-32: 32px;
-  --spacing-40: 40px;
-  --spacing-48: 48px;
-  --spacing-60: 60px;
-  --spacing-100: 100px;
+  /*
+   * Spacing tokens NEJSOU v @theme záměrně — viz :root níže.
+   * Kdyby tu byly (--spacing-4 … --spacing-100), Tailwind v4 by je registroval do
+   * spacing scale a přebil by číselné utility (h-20 → var(--spacing-20)=20px místo
+   * standardních 80px), což lámalo rozestupy v celé appce. Ponecháváme je jako čisté
+   * CSS proměnné v :root, takže reference var(--spacing-N) fungují, ale číselné
+   * utility (h-20, p-4, gap-4 …) používají standardní calc(var(--spacing)*N).
+   */
 
   /* Border Radius */
   --radius-lg: 8px;
@@ -83,13 +86,129 @@
   --surface-card-white: #ffffff;
 }
 
+:root {
+  /* Spacing scale (4px base) — čisté CSS proměnné, NE Tailwind theme tokeny.
+   * Použití přes var(--spacing-N) v arbitrary utilitách: gap-[var(--spacing-16)] apod. */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-60: 60px;
+  --spacing-100: 100px;
+
+  --section-gap: 30px;
+  --card-padding: 40px;
+  --element-gap: 5px;
+  --input-padding-y: 12px;
+  --input-padding-x: 10px;
+}
+
 /*
  * Base — minimální stylový baseline dle design-system.md "Do" guidance.
  * Žádné komponentové styly (ty patří do úkolu 6.7).
  */
 body {
-  background-color: var(--color-canvas-white);
+  background-color: var(--color-cloud-mist);
   color: var(--color-slate-text);
   font-family: var(--font-plus-jakarta-sans);
+  /* Globální výchozí styl body textu (na žádost uživatele). Dekorativní doplňkové
+   * texty s tlumenou barvou color-mix(... var(--color-slate-text) 70%, white) si drží
+   * vlastní barvu/velikost a toto pravidlo se na ně neuplatňuje (mají vlastní utility). */
+  font-size: 18px;
+  font-weight: 500;
   letter-spacing: -0.02em;
+}
+
+button:not(:disabled),
+input[type='button']:not(:disabled),
+input[type='submit']:not(:disabled),
+input[type='reset']:not(:disabled) {
+  cursor: pointer;
+}
+
+/*
+ * Animace — jemné přechody pro lepší srozumitelnost UI (změna kroku, mazání položky).
+ * Respektují prefers-reduced-motion: uživatelům s omezením pohybu se efekt vypne.
+ */
+@keyframes step-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes row-leave {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 200px;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+    max-height: 0;
+  }
+}
+
+.animate-step-enter {
+  animation: step-enter 260ms ease-out both;
+}
+
+.animate-row-leave {
+  animation: row-leave 240ms ease-in forwards;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-step-enter,
+  .animate-row-leave {
+    animation: none;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 220ms ease-out both;
+}
+
+.animate-toast-out {
+  animation: toast-out 200ms ease-in forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast-in,
+  .animate-toast-out {
+    animation: none;
+  }
 }

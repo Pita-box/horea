@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html lang="cs"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Horea - Service and Pricing Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "cloud-mist": "#f0f3fe",
+                        "outline-variant": "#c9c4da",
+                        "sunset-pink": "#ffaae6",
+                        "soft-gray": "#eeeeee",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#ece5f9",
+                        "surface-container-highest": "#e6dff3",
+                        "on-background": "#1c1a28",
+                        "inverse-on-surface": "#f4eeff",
+                        "secondary-fixed": "#e6deff",
+                        "background": "#fdf8ff",
+                        "on-tertiary-fixed-variant": "#880068",
+                        "tertiary-fixed-dim": "#ffaedc",
+                        "on-surface": "#1c1a28",
+                        "aqua-blue": "#2ed6ff",
+                        "primary-container": "#592eff",
+                        "electric-green": "#a2ea13",
+                        "secondary-container": "#cabeff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#c8bfff",
+                        "on-tertiary-fixed": "#3c002c",
+                        "surface": "#fdf8ff",
+                        "primary-fixed-dim": "#c8bfff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#4100db",
+                        "on-tertiary-container": "#ffcae5",
+                        "tertiary-fixed": "#ffd8eb",
+                        "surface-bright": "#fdf8ff",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#592eff",
+                        "tertiary": "#880068",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e6dff3",
+                        "on-primary-container": "#dbd4ff",
+                        "lush-green": "#dfff9d",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary-container": "#b20089",
+                        "primary": "#4100dc",
+                        "surface-container": "#f1ebff",
+                        "surface-container-low": "#f7f1ff",
+                        "canvas-white": "#ffffff",
+                        "air-blue": "#bcf2ff",
+                        "outline": "#787589",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#312e3d",
+                        "primary-fixed": "#e5deff",
+                        "on-secondary-container": "#554b82",
+                        "input-border": "#d8ddef",
+                        "on-surface-variant": "#474557",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#190064",
+                        "secondary": "#61568f",
+                        "surface-dim": "#ddd7eb",
+                        "on-secondary-fixed-variant": "#493f76",
+                        "on-secondary-fixed": "#1d1148",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-8": "8px",
+                        "gap-element": "5px",
+                        "base": "4px",
+                        "stack-4": "4px",
+                        "padding-input-v": "12px",
+                        "padding-input-h": "10px",
+                        "stack-48": "48px",
+                        "stack-24": "24px",
+                        "gap-section": "30px",
+                        "stack-16": "16px",
+                        "stack-100": "100px",
+                        "padding-card": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "display-lg": ["Montserrat"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-md": ["Montserrat"],
+                        "display-sm": ["Montserrat"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Montserrat"],
+                        "body-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "caption": ["14px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "display-lg": ["68px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-md": ["58px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-sm": ["38px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["18px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-lg": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-sm": ["16px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        [data-weight="fill"] .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #592eff;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #592eff;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .toggle-label {
+            width: 3rem;
+            height: 1.5rem;
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(1.5rem);
+        }
+    </style>
+</head>
+<body class="bg-cloud-mist min-h-screen font-body-md text-on-surface">
+<!-- TopNavBar -->
+<header class="bg-canvas-white dark:bg-inverse-surface border-b border-cloud-mist dark:border-outline-variant w-full z-50 sticky top-0">
+<div class="flex justify-between items-center w-full px-10 h-20 max-w-full mx-auto">
+<div class="flex items-center gap-section">
+<a class="font-display-sm text-display-sm font-bold text-primary dark:text-inverse-primary" href="#">Horea</a>
+</div>
+<nav class="hidden md:flex items-center gap-section h-full">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary font-body-md text-body-md h-full flex items-center hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-4" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary font-body-md text-body-md h-full flex items-center hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-4" href="#">Reservations</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary font-body-md text-body-md h-full flex items-center hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-4" href="#">Businesses</a>
+<a class="text-primary dark:text-inverse-primary font-bold border-b-2 border-primary dark:border-inverse-primary font-body-md text-body-md h-full flex items-center bg-cloud-mist dark:bg-on-surface-variant transition-colors duration-200 px-4 opacity-80" href="#">Services</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary font-body-md text-body-md h-full flex items-center hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-4" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-stack-16">
+<button class="bg-primary-container text-on-primary font-body-sm text-body-sm py-2 px-5 rounded-[12px] hover:opacity-90 transition-opacity">Novob rezervace</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-cloud-mist transition-colors" data-icon="notifications">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-cloud-mist transition-colors" data-icon="account_circle">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-[1400px] mx-auto px-10 py-stack-48 flex gap-gap-section">
+<!-- Sidebar - Categories -->
+<aside class="w-64 shrink-0 hidden lg:block">
+<div class="bg-canvas-white rounded-[26px] p-padding-card sticky top-32">
+<h3 class="font-headline-sm text-headline-sm mb-stack-24 text-on-surface">Kategorie</h3>
+<nav class="flex flex-col gap-stack-8">
+<a class="flex items-center justify-between p-3 rounded-lg bg-cloud-mist text-primary font-caption text-caption" href="#">
+<span>Všechny služby</span>
+<span class="bg-canvas-white px-2 py-1 rounded-full text-xs">12</span>
+</a>
+<a class="flex items-center justify-between p-3 rounded-lg text-on-surface-variant hover:bg-soft-gray transition-colors font-caption text-caption" href="#">
+<span>Střihy</span>
+<span class="bg-cloud-mist px-2 py-1 rounded-full text-xs text-outline">5</span>
+</a>
+<a class="flex items-center justify-between p-3 rounded-lg text-on-surface-variant hover:bg-soft-gray transition-colors font-caption text-caption" href="#">
+<span>Barvení</span>
+<span class="bg-cloud-mist px-2 py-1 rounded-full text-xs text-outline">4</span>
+</a>
+<a class="flex items-center justify-between p-3 rounded-lg text-on-surface-variant hover:bg-soft-gray transition-colors font-caption text-caption" href="#">
+<span>Péče</span>
+<span class="bg-cloud-mist px-2 py-1 rounded-full text-xs text-outline">3</span>
+</a>
+</nav>
+<button class="mt-stack-24 w-full flex items-center justify-center gap-2 py-2 text-primary font-caption text-caption hover:bg-cloud-mist rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    Nová kategorie
+                </button>
+</div>
+</aside>
+<!-- Services Content -->
+<div class="flex-1">
+<!-- Header -->
+<div class="flex justify-between items-center mb-stack-24">
+<div>
+<h1 class="font-display-sm text-display-sm text-on-surface mb-stack-8">Vaše služby</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Spravujte nabídku služeb, ceny a viditelnost pro klienty.</p>
+</div>
+<button class="bg-primary-container text-on-primary font-body-sm text-body-sm py-3 px-6 rounded-[12px] flex items-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+                    Přidat novou službu
+                </button>
+</div>
+<!-- Bento Grid of Services -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gap-section">
+<!-- Card 1 -->
+<div class="bg-canvas-white rounded-[26px] p-[30px] border border-cloud-mist hover:border-input-border transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-surface-container-high rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-110"></div>
+<div class="flex justify-between items-start mb-stack-16 relative z-10">
+<span class="bg-surface-container-high text-primary px-3 py-1 rounded-full font-caption text-caption text-sm border border-outline-variant">Střihy</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-outline hover:text-primary hover:bg-cloud-mist transition-colors" title="Upravit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-outline hover:text-error hover:bg-error-container transition-colors" title="Smazat">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-8 relative z-10">Dámský střih</h3>
+<div class="flex gap-stack-16 mb-stack-24 relative z-10">
+<div class="flex items-center gap-1 text-on-surface-variant font-caption text-caption">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                            60 min
+                        </div>
+<div class="flex items-center gap-1 text-primary font-caption text-caption font-bold">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+                            850 Kč
+                        </div>
+</div>
+<div class="pt-stack-16 border-t border-soft-gray flex justify-between items-center relative z-10">
+<span class="font-caption text-caption text-on-surface-variant text-sm">Zobrazit na veřejném profilu</span>
+<div class="relative inline-block w-12 mr-2 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle1" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="toggle1"></label>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-canvas-white rounded-[26px] p-[30px] border border-cloud-mist hover:border-input-border transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-surface-container-high rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-110"></div>
+<div class="flex justify-between items-start mb-stack-16 relative z-10">
+<span class="bg-surface-container-high text-primary px-3 py-1 rounded-full font-caption text-caption text-sm border border-outline-variant">Střihy</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-outline hover:text-primary hover:bg-cloud-mist transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-outline hover:text-error hover:bg-error-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-8 relative z-10">Pánský střih</h3>
+<div class="flex gap-stack-16 mb-stack-24 relative z-10">
+<div class="flex items-center gap-1 text-on-surface-variant font-caption text-caption">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                            45 min
+                        </div>
+<div class="flex items-center gap-1 text-primary font-caption text-caption font-bold">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+                            550 Kč
+                        </div>
+</div>
+<div class="pt-stack-16 border-t border-soft-gray flex justify-between items-center relative z-10">
+<span class="font-caption text-caption text-on-surface-variant text-sm">Zobrazit na veřejném profilu</span>
+<div class="relative inline-block w-12 mr-2 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle2" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="toggle2"></label>
+</div>
+</div>
+</div>
+<!-- Card 3 - Accent Background -->
+<div class="bg-surface-container-high rounded-[26px] p-[30px] border border-outline-variant transition-colors group relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiM1OTJlZmYiLz48L3N2Zz4=')]"></div>
+<div class="flex justify-between items-start mb-stack-16 relative z-10">
+<span class="bg-canvas-white text-primary px-3 py-1 rounded-full font-caption text-caption text-sm border border-outline-variant">Barvení</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-primary bg-canvas-white hover:bg-cloud-mist transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-stack-8 relative z-10">Kompletní barvení (dlouhé vlasy)</h3>
+<div class="flex gap-stack-16 mb-stack-24 relative z-10">
+<div class="flex items-center gap-1 text-on-surface-variant font-caption text-caption bg-canvas-white px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                            120 min
+                        </div>
+<div class="flex items-center gap-1 text-primary font-caption text-caption font-bold bg-canvas-white px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+                            1 800 Kč
+                        </div>
+</div>
+<div class="pt-stack-16 border-t border-outline-variant flex justify-between items-center relative z-10">
+<span class="font-caption text-caption text-on-surface-variant text-sm">Zobrazit na veřejném profilu</span>
+<div class="relative inline-block w-12 mr-2 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle3" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="toggle3"></label>
+</div>
+</div>
+</div>
+<!-- Add New Quick Action Card -->
+<button class="bg-transparent border-2 border-dashed border-outline-variant rounded-[26px] p-[30px] hover:border-primary hover:bg-surface-container-low transition-all group flex flex-col items-center justify-center min-h-[250px]">
+<div class="w-16 h-16 rounded-full bg-cloud-mist group-hover:bg-primary-container flex items-center justify-center text-outline group-hover:text-on-primary mb-stack-16 transition-colors">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface-variant group-hover:text-primary transition-colors">Nová služba</h3>
+<p class="font-caption text-caption text-outline mt-2 text-center">Klikněte pro přidání<br/>další položky do ceníku</p>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-cloud-mist dark:bg-on-surface w-full py-8 px-10 flex flex-col md:flex-row justify-between items-center gap-section mt-stack-48">
+<div class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright">Horea</div>
+<div class="flex gap-stack-24 font-caption text-caption">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Podpora</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Obchodní podmínky</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Ochrana údajů</a>
+</div>
+<div class="font-caption text-caption text-secondary dark:text-secondary-fixed">
+            © 2024 Horea SaaS. Všechna práva vyhrazena.
+        </div>
+</footer>
+</body></html>

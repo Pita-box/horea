@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Horea Admin - Users</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#474557",
+                    "on-secondary-container": "#554b82",
+                    "primary-container": "#592eff",
+                    "inverse-on-surface": "#f4eeff",
+                    "surface-variant": "#e6dff3",
+                    "inverse-primary": "#c8bfff",
+                    "on-secondary-fixed": "#1d1148",
+                    "soft-gray": "#eeeeee",
+                    "tertiary-fixed": "#ffd8eb",
+                    "electric-green": "#a2ea13",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#ffcae5",
+                    "on-primary-fixed-variant": "#4100db",
+                    "on-background": "#1c1a28",
+                    "primary": "#4100dc",
+                    "on-primary-container": "#dbd4ff",
+                    "background": "#fdf8ff",
+                    "surface-container": "#f1ebff",
+                    "on-primary-fixed": "#190064",
+                    "inverse-surface": "#312e3d",
+                    "secondary-fixed": "#e6deff",
+                    "sunset-pink": "#ffaae6",
+                    "surface-container-highest": "#e6dff3",
+                    "surface": "#fdf8ff",
+                    "tertiary-container": "#b20089",
+                    "on-surface": "#1c1a28",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#3c002c",
+                    "secondary": "#61568f",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#592eff",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c9c4da",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#cabeff",
+                    "primary-fixed": "#e5deff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#493f76",
+                    "tertiary-fixed-dim": "#ffaedc",
+                    "canvas-white": "#ffffff",
+                    "primary-fixed-dim": "#c8bfff",
+                    "aqua-blue": "#2ed6ff",
+                    "on-error": "#ffffff",
+                    "cloud-mist": "#f0f3fe",
+                    "air-blue": "#bcf2ff",
+                    "secondary-container": "#cabeff",
+                    "surface-container-low": "#f7f1ff",
+                    "outline": "#787589",
+                    "surface-dim": "#ddd7eb",
+                    "surface-container-high": "#ece5f9",
+                    "surface-bright": "#fdf8ff",
+                    "lush-green": "#dfff9d",
+                    "on-tertiary-fixed-variant": "#880068",
+                    "input-border": "#d8ddef",
+                    "tertiary": "#880068"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gap-section": "30px",
+                    "stack-24": "24px",
+                    "stack-8": "8px",
+                    "stack-100": "100px",
+                    "stack-16": "16px",
+                    "padding-input-v": "12px",
+                    "gap-element": "5px",
+                    "stack-4": "4px",
+                    "padding-card": "40px",
+                    "base": "4px",
+                    "stack-48": "48px",
+                    "padding-input-h": "10px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Montserrat"],
+                    "display-sm": ["Montserrat"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "caption": ["Plus Jakarta Sans"],
+                    "body-sm": ["Plus Jakarta Sans"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "display-md": ["Montserrat"],
+                    "display-lg": ["Montserrat"]
+            },
+            "fontSize": {
+                    "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom scrollbar for a cleaner canvas feel */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c9c4da; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #787589; }
+    </style>
+</head>
+<body class="bg-cloud-mist text-on-surface font-body-md antialiased overflow-hidden flex selection:bg-primary-container selection:text-white">
+<!-- SideNavBar (From JSON) -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-cloud-mist border-r border-cloud-mist flex flex-col py-stack-24 px-stack-16 z-20">
+<!-- Header -->
+<div class="flex items-center gap-stack-8 mb-stack-24 px-stack-8">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-white shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary">Horea Admin</h1>
+<p class="font-caption text-caption text-secondary">Platform Control</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto pt-stack-8 flex flex-col gap-element">
+<!-- Inactive -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-sm text-body-sm">Overview</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">storefront</span>
+<span class="font-body-sm text-body-sm">Businesses</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-sm text-body-sm">Subscriptions</span>
+</a>
+<!-- Active (Semantic Match for "User Management") -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer bg-primary text-on-primary rounded-lg font-semibold transition-all shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-body-sm text-body-sm">Users</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</a>
+<!-- Inactive -->
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v mb-stack-4 cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+</div>
+<!-- Footer / CTA -->
+<div class="mt-auto pt-stack-16 border-t border-outline-variant flex flex-col gap-stack-16">
+<button class="w-full py-padding-input-v px-5 rounded-lg bg-primary-container text-white font-caption text-caption hover:bg-primary transition-colors shadow-sm flex items-center justify-center gap-stack-8">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Create Tenant
+            </button>
+<a class="flex items-center gap-stack-8 px-stack-16 py-padding-input-v cursor-pointer text-secondary hover:text-primary hover:bg-soft-gray rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-sm text-body-sm">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col h-screen relative">
+<!-- TopNavBar (From JSON) -->
+<header class="w-full h-16 bg-canvas-white border-b border-cloud-mist flex justify-between items-center px-stack-24 z-10 shrink-0">
+<div class="flex items-center">
+<!-- Search Bar Placeholder left -->
+<div class="relative hidden md:block w-64 text-on-surface-variant">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px]">search</span>
+<input class="w-full bg-soft-gray border-none rounded-full py-2 pl-10 pr-4 font-body-sm text-body-sm focus:ring-2 focus:ring-primary-container outline-none transition-all placeholder:text-outline" placeholder="Global search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-16">
+<!-- Trailing Icons -->
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-soft-gray transition-colors cursor-pointer active:scale-95 duration-200 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-canvas-white"></span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-soft-gray transition-colors cursor-pointer active:scale-95 duration-200">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-px h-8 bg-outline-variant mx-stack-8"></div>
+<!-- Profile -->
+<div class="flex items-center gap-stack-8 cursor-pointer hover:opacity-80 transition-opacity">
+<div class="w-9 h-9 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img alt="Administrator Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a corporate administrator, wearing a crisp white shirt, softly lit in a modern, bright office environment. The mood is confident and welcoming, fitting perfectly within a clean, high-clarity minimalist UI design. The color palette features pristine whites and soft neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqwOiTwxvuMhU6j9PQXcvapd1HzrsrtiZoIl82rVVXu_B8_sJYcXOQ_SDHM6MWy6IxO2l1dL-a61XwH11EnJiwnL8EZ1k7G9_-o9R3c1ODrZnJjyTaNp3BlysrQbbaWPNJjlrmlosTq9A5-nNCHlm0RW0UE49X0k6z8un3r-aSzFQG9NGrtHmb7hxJD_65lhwGD8nnwZXeWsxQ3gMXRuPz_YQgghIcaxmVajUh_xCU3mXoimprs1TYiZouZ_UZFske7v5ZcgxbhJ0"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Scrollable Page Content -->
+<div class="flex-1 overflow-auto p-stack-24 lg:p-stack-48 flex flex-col gap-section">
+<!-- Page Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-stack-16">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-stack-4">User Management</h2>
+<p class="font-body-md text-body-md text-secondary">Manage access, roles, and security policies for all accounts.</p>
+</div>
+<div class="flex items-center gap-stack-8">
+<button class="px-5 py-3 rounded-xl border border-cloud-mist bg-transparent text-secondary font-caption text-caption hover:bg-surface-container-low transition-colors flex items-center gap-element">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Export
+                    </button>
+<button class="px-5 py-3 rounded-xl bg-primary-container text-white font-caption text-caption hover:opacity-90 transition-opacity shadow-sm flex items-center gap-element">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                        Invite User
+                    </button>
+</div>
+</div>
+<!-- Toolbar & Bulk Actions (Glass/Card style) -->
+<div class="bg-canvas-white rounded-xl p-stack-16 flex flex-col sm:flex-row justify-between items-center gap-stack-16 border border-cloud-mist shadow-sm relative z-10">
+<!-- Left: Search & Filter -->
+<div class="flex items-center gap-stack-8 w-full sm:w-auto">
+<div class="relative w-full sm:w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full bg-cloud-mist border border-input-border rounded-lg py-padding-input-v pl-10 pr-4 font-body-sm text-body-sm focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-all placeholder:text-outline" placeholder="Search by name, email or business..." type="text"/>
+</div>
+<button class="w-11 h-11 rounded-lg border border-input-border flex items-center justify-center text-secondary hover:bg-soft-gray transition-colors shrink-0 tooltip-trigger" title="Filter options">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<!-- Right: Bulk Actions (Visually distinguished state) -->
+<div class="flex items-center gap-stack-16 w-full sm:w-auto justify-end border-t sm:border-t-0 sm:border-l border-outline-variant pt-stack-16 sm:pt-0 sm:pl-stack-16">
+<span class="font-caption text-caption text-secondary whitespace-nowrap"><strong class="text-on-surface">2</strong> selected</span>
+<div class="flex items-center gap-element">
+<button class="px-4 py-2 rounded-lg bg-surface-container text-on-surface-variant font-caption text-caption hover:bg-surface-variant transition-colors flex items-center gap-element">
+<span class="material-symbols-outlined text-[16px]">lock_reset</span>
+                            Reset Pwd
+                        </button>
+<button class="px-4 py-2 rounded-lg bg-surface-container text-on-surface-variant font-caption text-caption hover:bg-surface-variant transition-colors flex items-center gap-element">
+<span class="material-symbols-outlined text-[16px]">manage_accounts</span>
+                            Role
+                        </button>
+<button class="px-4 py-2 rounded-lg bg-error-container text-on-error-container font-caption text-caption hover:bg-[#ffc2bc] transition-colors flex items-center gap-element">
+<span class="material-symbols-outlined text-[16px]">block</span>
+                            Lock
+                        </button>
+</div>
+</div>
+</div>
+<!-- Bento Card Data Table -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist shadow-sm flex-1 flex flex-col min-h-[500px]">
+<div class="overflow-x-auto w-full flex-1">
+<table class="w-full text-left border-collapse min-w-[900px]">
+<thead>
+<tr class="border-b border-soft-gray">
+<th class="py-stack-16 px-stack-8 w-12">
+<input checked="" class="w-5 h-5 rounded border-input-border text-primary-container focus:ring-primary-container cursor-pointer" type="checkbox"/>
+</th>
+<th class="py-stack-16 px-stack-16 font-caption text-caption text-outline uppercase tracking-wider">User</th>
+<th class="py-stack-16 px-stack-16 font-caption text-caption text-outline uppercase tracking-wider">Linked Business</th>
+<th class="py-stack-16 px-stack-16 font-caption text-caption text-outline uppercase tracking-wider">Role</th>
+<th class="py-stack-16 px-stack-16 font-caption text-caption text-outline uppercase tracking-wider">Last Login</th>
+<th class="py-stack-16 px-stack-16 text-right font-caption text-caption text-outline uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<!-- Row 1 -->
+<tr class="border-b border-soft-gray hover:bg-cloud-mist transition-colors group">
+<td class="py-stack-16 px-stack-8">
+<input checked="" class="w-5 h-5 rounded border-input-border text-primary-container focus:ring-primary-container cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-stack-16">
+<div class="w-10 h-10 rounded-full bg-air-blue flex items-center justify-center text-secondary font-bold text-sm shrink-0">
+                                            SA
+                                        </div>
+<div>
+<p class="font-semibold text-on-background">Sarah Anderson</p>
+<p class="text-secondary text-sm">sarah@vertexcorp.com</p>
+</div>
+</div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-element text-secondary">
+<span class="material-symbols-outlined text-[18px]">store</span>
+                                        Vertex Corporation
+                                    </div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<span class="inline-flex items-center px-3 py-1 rounded-full border border-primary text-primary font-caption text-xs bg-surface-container-low">
+                                        Owner
+                                    </span>
+</td>
+<td class="py-stack-16 px-stack-16 text-secondary">
+                                    Today, 09:41 AM
+                                </td>
+<td class="py-stack-16 px-stack-16 text-right">
+<button class="p-2 text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full hover:bg-soft-gray">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-soft-gray hover:bg-cloud-mist transition-colors group">
+<td class="py-stack-16 px-stack-8">
+<input checked="" class="w-5 h-5 rounded border-input-border text-primary-container focus:ring-primary-container cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-stack-16">
+<div class="w-10 h-10 rounded-full bg-sunset-pink flex items-center justify-center text-on-tertiary-fixed-variant font-bold text-sm shrink-0">
+                                            MR
+                                        </div>
+<div>
+<p class="font-semibold text-on-background">Marcus Reid</p>
+<p class="text-secondary text-sm">m.reid@vertexcorp.com</p>
+</div>
+</div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-element text-secondary">
+<span class="material-symbols-outlined text-[18px]">store</span>
+                                        Vertex Corporation
+                                    </div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<span class="inline-flex items-center px-3 py-1 rounded-full border border-tertiary text-tertiary font-caption text-xs bg-tertiary-fixed">
+                                        Admin
+                                    </span>
+</td>
+<td class="py-stack-16 px-stack-16 text-secondary">
+                                    Yesterday, 14:20 PM
+                                </td>
+<td class="py-stack-16 px-stack-16 text-right">
+<button class="p-2 text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full hover:bg-soft-gray">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-soft-gray hover:bg-cloud-mist transition-colors group">
+<td class="py-stack-16 px-stack-8">
+<input class="w-5 h-5 rounded border-input-border text-primary-container focus:ring-primary-container cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-stack-16">
+<div class="w-10 h-10 rounded-full bg-lush-green flex items-center justify-center text-on-surface font-bold text-sm shrink-0">
+                                            EL
+                                        </div>
+<div>
+<p class="font-semibold text-on-background">Elena Lin</p>
+<p class="text-secondary text-sm">elena@bloomstudios.io</p>
+</div>
+</div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-element text-secondary">
+<span class="material-symbols-outlined text-[18px]">store</span>
+                                        Bloom Studios
+                                    </div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<span class="inline-flex items-center px-3 py-1 rounded-full border border-secondary text-secondary font-caption text-xs bg-secondary-fixed">
+                                        Employee
+                                    </span>
+</td>
+<td class="py-stack-16 px-stack-16 text-secondary">
+                                    Oct 12, 2023
+                                </td>
+<td class="py-stack-16 px-stack-16 text-right">
+<button class="p-2 text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full hover:bg-soft-gray">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="border-b border-soft-gray hover:bg-cloud-mist transition-colors group">
+<td class="py-stack-16 px-stack-8">
+<input class="w-5 h-5 rounded border-input-border text-primary-container focus:ring-primary-container cursor-pointer" type="checkbox"/>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-stack-16">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-secondary font-bold text-sm shrink-0">
+                                            JD
+                                        </div>
+<div>
+<p class="font-semibold text-on-background">James Donovan</p>
+<p class="text-secondary text-sm">j.donovan@nexus.net</p>
+</div>
+</div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<div class="flex items-center gap-element text-secondary">
+<span class="material-symbols-outlined text-[18px]">store</span>
+                                        Nexus Networks
+                                    </div>
+</td>
+<td class="py-stack-16 px-stack-16">
+<span class="inline-flex items-center px-3 py-1 rounded-full border border-primary text-primary font-caption text-xs bg-surface-container-low">
+                                        Owner
+                                    </span>
+</td>
+<td class="py-stack-16 px-stack-16 text-secondary">
+                                    Oct 10, 2023
+                                </td>
+<td class="py-stack-16 px-stack-16 text-right">
+<button class="p-2 text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full hover:bg-soft-gray">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="mt-auto pt-stack-24 flex items-center justify-between border-t border-soft-gray">
+<p class="font-body-sm text-body-sm text-secondary">Showing 1 to 4 of 248 users</p>
+<div class="flex items-center gap-element">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-input-border text-secondary hover:bg-soft-gray disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary-container text-white font-caption text-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-input-border text-secondary hover:bg-soft-gray font-caption text-sm">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-input-border text-secondary hover:bg-soft-gray font-caption text-sm">3</button>
+<span class="text-outline mx-1">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-input-border text-secondary hover:bg-soft-gray">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom spacing buffer -->
+<div class="h-8"></div>
+</div>
+</main>
+</body></html>

@@ -22,6 +22,8 @@ Tato specifikace popisuje **první kontakt podnikatele s platformou** — od kli
 
 Spec **nepokrývá** placení předplatného, veřejnou stránku, správu rezervací ani dashboard po onboardingu (kromě nutného re-akceptace DPA a Free_User_Guard, které mají platformový dosah).
 
+Routing kontrakt mimo tuto feature: `/` zůstává veřejná landing page. Všichni uživatelé se přihlašují přes `/login`; po přihlášení je jednotný vstup `/dashboard`, kde se serverově vykreslí admin nebo podnikatelská varianta podle `users.is_admin`. Podnikatel bez podniku se směruje na `/onboarding/{step}`. Veřejný profil podniku běží na `/{slug}` (např. `/barber-abc`) a patří do specu `public-business-page`; auth/onboarding nesmí tento slug prostor zachytit kromě rezervovaných systémových cest a citlivých názvů v `RESERVED_SLUGS`.
+
 ### Návaznost na architekturu
 
 Dokument se opírá o `architecture/design.md`:
@@ -88,15 +90,18 @@ flowchart TB
 
 | Cesta | Typ | Účel | Veřejná? |
 |---|---|---|---|
+| `/` | Page | Landing page produktu, ne dashboard | Ano |
 | `/register` | Page | Registrační formulář (email, heslo, ToS, DPA) | Ano |
 | `/login` | Page | Přihlašovací formulář (email, heslo, remember-me) | Ano |
 | `/verify-email` | Page | Stránka „Ověřte si email" + handler verifikačního tokenu | Ano |
 | `/forgot-password` | Page | Formulář pro zaslání odkazu na reset | Ano |
 | `/reset-password` | Page | Formulář pro nastavení nového hesla (s tokenem v URL) | Ano |
 | `/onboarding/[step]` | Page | Šestikrokový wizard, `step` ∈ `1..6` | Autentizovaný + neonboardovaný |
+| `/dashboard` | Page | Role-aware dashboard; admin varianta pro `users.is_admin = true`, podnikatelská varianta pro běžné uživatele | Autentizovaný uživatel |
 | `/logout` | Server Action / handler | Zneplatnění relace, redirect na landing page | Autentizovaný |
+| `/{slug}` | Page | Veřejný profil podniku, implementuje `public-business-page` | Ano |
 
-Všechny tyto cesty jsou **bez sidebaru / dashboard chrome** — minimální layout zaměřený na jednu úlohu.
+Auth cesty (`/register`, `/login`, `/verify-email`, `/forgot-password`, `/reset-password`, `/onboarding/[step]`) jsou **bez sidebaru / dashboard chrome** — minimální layout zaměřený na jednu úlohu. Role-aware dashboard, landing page a veřejné profily řeší vlastní specy/layouty.
 
 ### Middleware vrstva
 
@@ -176,6 +181,7 @@ Tato feature pracuje s šesti komponentami. Každá má jasně vymezenou odpově
 - Veškerá hesla validuje serverově (R1.3, R5.6).
 - Při registraci ověří souhlas s ToS i DPA před voláním Supabase Auth (R1.5).
 - Při forgot-password vrací stejnou hlášku bez ohledu na existenci účtu (R5.2).
+- Po přihlášení směruje `users.is_admin = true` na `/dashboard` s admin variantou; běžného podnikatele bez podniku na první nedokončený onboarding krok; běžného podnikatele s podnikem na `/dashboard` s podnikatelskou variantou.
 - Po reset-password zneplatní **všechny** existující relace daného účtu (R5.5).
 
 ### Slug_Validator
@@ -263,8 +269,9 @@ Tato feature pracuje s šesti komponentami. Každá má jasně vymezenou odpově
 
 | Podmínka | Cílová cesta |
 |---|---|
+| Autentizovaný + `users.is_admin = true` | `/dashboard` s admin variantou |
 | Autentizovaný + bez `businesses` + bez nedokončeného `onboarding_drafts` | `/onboarding/1` |
-| Autentizovaný + bez `businesses` + s `onboarding_drafts.current_step = N` | `/onboarding/N` (R14.1) |
+| Autentizovaný + bez `businesses` + s `onboarding_drafts.current_step = N` | `/onboarding/{N+1}` (max 6, R14.1) |
 | Autentizovaný + s `businesses` + `subscriptions.status = free` | Dashboard se zámkem (R13.1, R13.2) |
 | Autentizovaný + s `businesses` + `subscriptions.status = active` | Plný dashboard |
 | Autentizovaný + uživatel přistupuje na `/onboarding/*`, ale již má založený podnik | Redirect na dashboard (R13.4) |
@@ -368,7 +375,7 @@ Tato feature používá existující sloupce `dpa_version_accepted` (string) a `
 
 Statické pole řetězců v aplikačním kódu, např.:
 
-`["admin", "api", "login", "register", "logout", "dashboard", "app", "www", "mail", "verify-email", "forgot-password", "reset-password", "onboarding", "settings", "billing", "support", "help"]`
+`["admin", "api", "login", "register", "logout", "dashboard", "app", "www", "mail", "verify-email", "forgot-password", "reset-password", "onboarding", "settings", "billing", "components", "support", "help"]`
 
 Konkrétní finální seznam je předmětem implementace; klíčové je, že je **udržován v kódu**, ne v DB. Porovnání proti seznamu probíhá **po normalizaci** vstupního slugu.
 
@@ -406,6 +413,7 @@ sequenceDiagram
         SA->>R: Odešli verifikační email (CZ varianta)
         R-->>U: Email s odkazem
         SA-->>W: user (neověřený) + session
+        W->>DB: INSERT users (id, email) přes service role
         W->>DB: UPDATE users SET dpa_version_accepted, dpa_accepted_at
         W-->>U: Redirect /verify-email (info stránka)
     end

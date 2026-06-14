@@ -1,0 +1,532 @@
+<!DOCTYPE html><html lang="cs"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Horea.cz | Rezervační systém pro malé podniky</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#b20089",
+                        "secondary-container": "#cabeff",
+                        "tertiary": "#880068",
+                        "secondary-fixed": "#e6deff",
+                        "soft-gray": "#eeeeee",
+                        "on-secondary-fixed": "#1d1148",
+                        "on-secondary-container": "#554b82",
+                        "inverse-surface": "#312e3d",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#190064",
+                        "on-tertiary-container": "#ffcae5",
+                        "inverse-primary": "#c8bfff",
+                        "on-primary-fixed-variant": "#4100db",
+                        "on-primary": "#ffffff",
+                        "outline": "#787589",
+                        "primary-fixed": "#e5deff",
+                        "secondary": "#61568f",
+                        "surface-bright": "#fdf8ff",
+                        "on-secondary-fixed-variant": "#493f76",
+                        "tertiary-fixed-dim": "#ffaedc",
+                        "surface-container-low": "#f7f1ff",
+                        "surface": "#fdf8ff",
+                        "on-surface-variant": "#474557",
+                        "surface-tint": "#592eff",
+                        "sunset-pink": "#ffaae6",
+                        "air-blue": "#bcf2ff",
+                        "on-surface": "#1c1a28",
+                        "tertiary-fixed": "#ffd8eb",
+                        "surface-variant": "#e6dff3",
+                        "canvas-white": "#ffffff",
+                        "primary": "#4100dc",
+                        "on-tertiary-fixed": "#3c002c",
+                        "surface-container-highest": "#e6dff3",
+                        "on-error": "#ffffff",
+                        "primary-container": "#592eff",
+                        "error": "#ba1a1a",
+                        "lush-green": "#dfff9d",
+                        "surface-dim": "#ddd7eb",
+                        "primary-fixed-dim": "#c8bfff",
+                        "input-border": "#d8ddef",
+                        "error-container": "#ffdad6",
+                        "aqua-blue": "#2ed6ff",
+                        "secondary-fixed-dim": "#cabeff",
+                        "on-tertiary-fixed-variant": "#880068",
+                        "background": "#fdf8ff",
+                        "on-background": "#1c1a28",
+                        "inverse-on-surface": "#f4eeff",
+                        "electric-green": "#a2ea13",
+                        "outline-variant": "#c9c4da",
+                        "on-primary-container": "#dbd4ff",
+                        "surface-container": "#f1ebff",
+                        "cloud-mist": "#f0f3fe",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#ece5f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "btn": "12px",
+                        "card": "26px",
+                        "card-lg": "64px"
+                    },
+                    "spacing": {
+                        "padding-input-h": "10px",
+                        "stack-4": "4px",
+                        "gap-element": "5px",
+                        "stack-16": "16px",
+                        "base": "4px",
+                        "stack-48": "48px",
+                        "padding-input-v": "12px",
+                        "gap-section": "30px",
+                        "stack-24": "24px",
+                        "stack-100": "100px",
+                        "padding-card": "40px",
+                        "stack-8": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "display-sm": ["Montserrat"],
+                        "caption": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "display-md": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["18px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg": ["28px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "display-lg": ["68px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "display-sm": ["38px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "caption": ["14px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                        "body-lg": ["20px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["16px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "display-md": ["58px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f0f3fe; /* Cloud Mist */
+            color: #1c1a28; /* on-background */
+        }
+    </style>
+<script>
+    function switchTab(index) {
+        document.querySelectorAll('.tab-content').forEach((el, i) => {
+            if (i === index) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        });
+        document.querySelectorAll('.tab-button').forEach((el, i) => {
+            if (i === index) {
+                el.classList.add('bg-canvas-white', 'shadow-sm', 'border-cloud-mist');
+                el.classList.remove('border-transparent', 'hover:bg-surface-container-high');
+            } else {
+                el.classList.remove('bg-canvas-white', 'shadow-sm', 'border-cloud-mist');
+                el.classList.add('border-transparent', 'hover:bg-surface-container-high');
+            }
+        });
+    }
+
+    function toggleFaq(index) {
+        const content = document.getElementById(`faq-content-${index}`);
+        const icon = document.getElementById(`faq-icon-${index}`);
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            icon.innerText = 'remove';
+        } else {
+            content.classList.add('hidden');
+            icon.innerText = 'add';
+        }
+    }
+</script>
+</head>
+<body class="font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar Component -->
+<header class="bg-canvas-white dark:bg-inverse-surface text-primary dark:text-inverse-primary font-body-md text-body-md border-b border-cloud-mist dark:border-outline-variant flat no shadows docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center w-full px-10 h-20 max-w-full mx-auto">
+<!-- Brand -->
+<a class="font-display-sm text-display-sm font-bold text-primary dark:text-inverse-primary hover:opacity-80 transition-opacity" href="/">
+                Horea
+            </a>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex items-center gap-stack-24"><a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Domů</a><a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Výhody</a><a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Funkce</a><a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Druh podniků</a><a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Ceník</a><a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary hover:bg-cloud-mist dark:hover:bg-on-surface-variant transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Často kladené otázky</a></nav>
+<!-- Actions -->
+<div class="flex items-center gap-stack-16"><a class="text-on-surface-variant hover:text-primary transition-colors px-4 py-2 font-body-sm" href="#">Přihlásit se</a><a class="bg-primary-container text-on-primary font-body-sm text-body-sm px-5 py-3 rounded-btn hover:opacity-90 transition-opacity" href="#">Vytvořit účet</a></div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col gap-stack-100 py-stack-48 md:py-stack-100 px-4 md:px-10 max-w-[1440px] mx-auto w-full">
+<!-- 1. Hero Section -->
+<section class="flex flex-col items-center text-center gap-stack-24 max-w-4xl mx-auto">
+<h1 class="font-display-lg text-display-lg text-on-surface">Rezervační systém, který pracuje za vás</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                Vytvořte si profesionální rezervační profil během několika minut. Ideální pro kadeřnictví, kosmetické salony a malá bistra. Začněte přijímat rezervace online a získejte více času na svou práci.
+            </p>
+<div class="flex flex-wrap justify-center gap-stack-16 mt-stack-8">
+<a class="bg-primary-container text-on-primary font-headline-sm text-headline-sm px-8 py-4 rounded-btn hover:opacity-90 transition-opacity flex items-center gap-gap-element shadow-sm" href="#">
+                    Vyzkoušet zdarma
+                    <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<a class="bg-transparent text-on-surface-variant border border-cloud-mist font-headline-sm text-headline-sm px-8 py-4 rounded-btn hover:bg-canvas-white transition-colors" href="#">
+                    Jak to funguje
+                </a>
+</div>
+<div class="mt-stack-48 w-full max-w-5xl aspect-video rounded-card-lg overflow-hidden bg-surface-container relative shadow-sm border border-cloud-mist">
+<img alt="Modern salon interior" class="w-full h-full object-cover opacity-90" data-alt="A bright, modern beauty salon interior featuring clean lines, minimalist white furniture, and subtle violet accent lighting. The space feels open and inviting, illuminated by soft natural light pouring through large windows. The aesthetic is professional yet friendly, aligning with a light-mode digital canvas style. Plants add a touch of lush green, while the overall atmosphere communicates efficiency and premium service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChvN23BsuOZ0Upy5JRPo7z5ZkxZCNBOdeyE53Q4Io9QHTYt-fZNgIL-KVPCHMSuEJ4l7IUQl4Cg8EttGO_uUtXIfpOOBASjBVz7lzLxkloIIRBqypq1ZA1rdR_kwGRENLbCbGBBqkGhWU3roUpf4rvqaDBRSqi_LVhjAaK4SejOLzIiHiOanbUZxmv9bI4_CWThPLC-Gt8sx2Jfa66stsotCRIRCY9Q7ViQjt7Q_X2zdLq7GbZ8dNNBlBz3x_6KCZZrOoDlEyVE2k">
+</div>
+</section>
+<!-- 2. Value Proposition -->
+<section class="flex flex-col gap-stack-48">
+<div class="text-center">
+<h2 class="font-display-sm text-display-sm text-on-surface">Proč si vybrat Horea?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-8">Jednoduchost a efektivita pro váš podnik.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gap-section">
+<!-- Feature Card 1 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex flex-col gap-stack-16 border border-cloud-mist">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="timer">timer</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Online profil za pár minut</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                        Nastavení vašeho rezervačního profilu je otázkou chvilky. Nepotřebujete žádné IT znalosti, stačí vyplnit základní údaje a můžete přijímat první klienty.
+                    </p>
+</div>
+<!-- Feature Card 2 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex flex-col gap-stack-16 border border-cloud-mist">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="no_accounts">no_accounts</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Bez registrace pro klienty</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                        Vaši zákazníci si mohou zarezervovat termín ihned, bez zdlouhavého vytváření účtu. Zvyšuje to konverzi a spokojenost s rezervačním procesem.
+                    </p>
+</div>
+<!-- Feature Card 3 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex flex-col gap-stack-16 border border-cloud-mist">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="dashboard">dashboard</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Přehledný dashboard</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                        Mějte všechny rezervace, klienty a tržby pod kontrolou na jednom místě. Intuitivní rozhraní vám usnadní každodenní správu podniku.
+                    </p>
+</div>
+</div>
+</section>
+<!-- NEW: Interactive Features Section (Tabs) -->
+<section class="flex flex-col gap-stack-48 bg-canvas-white rounded-card-lg p-padding-card md:p-stack-48 border border-cloud-mist shadow-sm">
+<div class="text-center max-w-2xl mx-auto">
+<h2 class="font-display-sm text-display-sm text-on-surface">Ušetřete čas díky chytré správě podnikání</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-8">Všechny nástroje, které potřebujete k růstu, na jednom místě.</p>
+</div>
+<div class="flex flex-col lg:flex-row gap-gap-section items-start">
+<!-- Tabs List -->
+<div class="w-full lg:w-1/3 flex flex-col gap-stack-8">
+<button class="tab-button text-left p-4 rounded-xl border bg-canvas-white shadow-sm border-cloud-mist transition-all duration-200 hover:bg-surface-container-high" onclick="switchTab(0)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="language">language</span>
+                            Veřejná webová stránka
+                        </h4>
+</button>
+<button class="tab-button text-left p-4 rounded-xl border border-transparent transition-all duration-200 hover:bg-surface-container-high" onclick="switchTab(1)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-sunset-pink" data-icon="calendar_month">calendar_month</span>
+                            Správa rezervací
+                        </h4>
+</button>
+<button class="tab-button text-left p-4 rounded-xl border border-transparent transition-all duration-200 hover:bg-surface-container-high" onclick="switchTab(2)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-air-blue" data-icon="group">group</span>
+                            Správa klientů
+                        </h4>
+</button>
+<button class="tab-button text-left p-4 rounded-xl border border-transparent transition-all duration-200 hover:bg-surface-container-high" onclick="switchTab(3)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-lush-green" data-icon="badge">badge</span>
+                            Správa zaměstnanců
+                        </h4>
+</button>
+<button class="tab-button text-left p-4 rounded-xl border border-transparent transition-all duration-200 hover:bg-surface-container-high" onclick="switchTab(4)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="bar_chart">bar_chart</span>
+                            Statistika uskutečněných návštěv
+                        </h4>
+</button>
+</div>
+<!-- Tab Content -->
+<div class="w-full lg:w-2/3 bg-surface-container rounded-card aspect-[4/3] lg:aspect-auto lg:h-[500px] flex items-center justify-center p-8 border border-cloud-mist overflow-hidden relative">
+<div class="tab-content w-full h-full flex flex-col items-center justify-center text-center gap-4">
+<span class="material-symbols-outlined text-6xl text-primary-container mb-4" data-icon="web">web</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Vaše vizitka online</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Krásný, responzivní profil, který reprezentuje váš podnik a přijímá rezervace nonstop.</p>
+</div>
+<div class="tab-content hidden w-full h-full flex flex-col items-center justify-center text-center gap-4 bg-sunset-pink/10 rounded-xl">
+<span class="material-symbols-outlined text-6xl text-sunset-pink mb-4" data-icon="edit_calendar">edit_calendar</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Převezměte kontrolu nad kalendářem</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Snadno spravujte, přesouvejte a potvrzujte rezervace v intuitivním rozhraní.</p>
+</div>
+<div class="tab-content hidden w-full h-full flex flex-col items-center justify-center text-center gap-4 bg-air-blue/10 rounded-xl">
+<span class="material-symbols-outlined text-6xl text-air-blue mb-4" data-icon="contact_page">contact_page</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Poznejte své zákazníky</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Uchovávejte historii návštěv, poznámky a preference pro personalizovaný přístup ke každému klientovi.</p>
+</div>
+<div class="tab-content hidden w-full h-full flex flex-col items-center justify-center text-center gap-4 bg-lush-green/20 rounded-xl">
+<span class="material-symbols-outlined text-6xl text-lush-green mb-4" data-icon="manage_accounts">manage_accounts</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Tým v dokonalé harmonii</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Přiřaďte služby konkrétním zaměstnancům a spravujte jejich individuální pracovní dobu.</p>
+</div>
+<div class="tab-content hidden w-full h-full flex flex-col items-center justify-center text-center gap-4 bg-primary-container/10 rounded-xl">
+<span class="material-symbols-outlined text-6xl text-primary-container mb-4" data-icon="monitoring">monitoring</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Sledujte svůj růst</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Získejte přehled o svých nejlepších službách, vytíženosti a finančních výsledcích v reálném čase.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- NEW: Business Types Section -->
+<section class="flex flex-col gap-stack-48">
+<div class="text-center">
+<h2 class="font-display-sm text-display-sm text-on-surface">Pro jaké obory?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-8">Horea se přizpůsobí potřebám vašeho podnikání.</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-stack-16">
+<div class="bg-canvas-white rounded-card p-6 flex flex-col items-center text-center gap-4 border border-cloud-mist hover:shadow-md transition-shadow">
+<div class="w-16 h-16 rounded-full bg-air-blue/20 flex items-center justify-center text-air-blue">
+<span class="material-symbols-outlined text-3xl" data-icon="content_cut">content_cut</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Kadeřnictví</span>
+</div>
+<div class="bg-canvas-white rounded-card p-6 flex flex-col items-center text-center gap-4 border border-cloud-mist hover:shadow-md transition-shadow">
+<div class="w-16 h-16 rounded-full bg-sunset-pink/20 flex items-center justify-center text-sunset-pink">
+<span class="material-symbols-outlined text-3xl" data-icon="back_hand">back_hand</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Nehtová studia</span>
+</div>
+<div class="bg-canvas-white rounded-card p-6 flex flex-col items-center text-center gap-4 border border-cloud-mist hover:shadow-md transition-shadow">
+<div class="w-16 h-16 rounded-full bg-lush-green/30 flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-3xl" data-icon="spa">spa</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Masážní salóny</span>
+</div>
+<div class="bg-canvas-white rounded-card p-6 flex flex-col items-center text-center gap-4 border border-cloud-mist hover:shadow-md transition-shadow">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="restaurant">restaurant</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Bistra</span>
+</div>
+<div class="bg-canvas-white rounded-card p-6 flex flex-col items-center text-center gap-4 border border-cloud-mist hover:shadow-md transition-shadow">
+<div class="w-16 h-16 rounded-full bg-air-blue/20 flex items-center justify-center text-air-blue">
+<span class="material-symbols-outlined text-3xl" data-icon="water_drop">water_drop</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Spa</span>
+</div>
+<div class="bg-canvas-white rounded-card p-6 flex flex-col items-center text-center gap-4 border border-cloud-mist hover:shadow-md transition-shadow">
+<div class="w-16 h-16 rounded-full bg-sunset-pink/20 flex items-center justify-center text-sunset-pink">
+<span class="material-symbols-outlined text-3xl" data-icon="face_retouching_natural">face_retouching_natural</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Beauty</span>
+</div>
+</div>
+</section>
+<!-- 3. Social Proof/Stats -->
+<section class="bg-surface-container rounded-card-lg p-padding-card md:p-stack-48 flex flex-col md:flex-row items-center justify-between gap-stack-24 border border-cloud-mist">
+<div class="flex-1 space-y-stack-16">
+<h2 class="font-display-sm text-display-sm text-on-surface">Soustřeďte se na to důležité</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Nechte administrativu na nás. S Horea získáte zpět čas, který můžete věnovat svým klientům nebo rozvoji podnikání.
+                </p>
+</div>
+<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-stack-16">
+<div class="bg-canvas-white p-stack-24 rounded-card border border-cloud-mist flex flex-col gap-stack-8">
+<span class="material-symbols-outlined text-primary-container text-4xl" data-icon="hourglass_empty">hourglass_empty</span>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Více času na práci</h4>
+<p class="font-caption text-caption text-on-surface-variant">Automatizace šetří hodiny týdně.</p>
+</div>
+<div class="bg-canvas-white p-stack-24 rounded-card border border-cloud-mist flex flex-col gap-stack-8">
+<span class="material-symbols-outlined text-primary-container text-4xl" data-icon="event_available">event_available</span>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Žádné ztracené rezervace</h4>
+<p class="font-caption text-caption text-on-surface-variant">Přijímejte objednávky 24/7.</p>
+</div>
+</div>
+</section>
+<!-- NEW: Pricing Section -->
+<section class="flex flex-col gap-stack-48">
+<div class="text-center">
+<h2 class="font-display-sm text-display-sm text-on-surface">Ceník</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-stack-8">Jednoduché a transparentní ceny pro každý podnik.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-stack-24 max-w-6xl mx-auto w-full">
+<!-- Tier 1 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex flex-col gap-stack-24 border-2 border-cloud-mist hover:border-air-blue transition-colors">
+<div class="flex flex-col gap-2">
+<span class="font-headline-sm text-headline-sm text-air-blue">Start</span>
+<div class="flex items-baseline gap-1">
+<span class="font-display-sm text-display-sm text-on-surface">Zdarma</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pro jednotlivce a začínající podniky.</p>
+</div>
+<ul class="flex flex-col gap-4 flex-grow">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-air-blue" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">1 uživatel</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-air-blue" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Základní rezervační stránka</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-air-blue" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Omezený počet rezervací</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-btn border-2 border-air-blue text-air-blue font-headline-sm text-headline-sm hover:bg-air-blue hover:text-on-surface transition-colors">Zvolit Start</button>
+</div>
+<!-- Tier 2 -->
+<div class="bg-primary-container rounded-card p-padding-card flex flex-col gap-stack-24 border-2 border-primary-container shadow-lg relative transform md:-translate-y-4">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-lush-green text-on-surface font-caption text-caption px-4 py-1 rounded-full whitespace-nowrap font-bold">
+                    Nejoblíbenější
+                </div>
+<div class="flex flex-col gap-2 text-on-primary">
+<span class="font-headline-sm text-headline-sm text-lush-green">Pokročilý</span>
+<div class="flex items-baseline gap-1">
+<span class="font-display-sm text-display-sm">490 Kč</span>
+<span class="font-body-sm text-body-sm opacity-80">/ měsíc</span>
+</div>
+<p class="font-body-sm text-body-sm opacity-90">Ideální pro rostoucí salony a studia.</p>
+</div>
+<ul class="flex flex-col gap-4 flex-grow text-on-primary">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lush-green" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm">Až 3 uživatelé</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lush-green" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm">Neomezené rezervace</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lush-green" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm">Vlastní doména</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lush-green" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm">SMS upozornění</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-btn bg-lush-green text-on-surface font-headline-sm text-headline-sm hover:opacity-90 transition-opacity">Zvolit Pokročilý</button>
+</div>
+<!-- Tier 3 -->
+<div class="bg-canvas-white rounded-card p-padding-card flex flex-col gap-stack-24 border-2 border-cloud-mist hover:border-sunset-pink transition-colors">
+<div class="flex flex-col gap-2">
+<span class="font-headline-sm text-headline-sm text-sunset-pink">Max</span>
+<div class="flex items-baseline gap-1">
+<span class="font-display-sm text-display-sm text-on-surface">990 Kč</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ měsíc</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pro větší týmy a náročné provozy.</p>
+</div>
+<ul class="flex flex-col gap-4 flex-grow">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sunset-pink" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Neomezeně uživatelů</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sunset-pink" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Pokročilé statistiky</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sunset-pink" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">API přístup</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sunset-pink" data-icon="check_circle">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Prioritní podpora</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-btn border-2 border-sunset-pink text-sunset-pink font-headline-sm text-headline-sm hover:bg-sunset-pink hover:text-on-surface transition-colors">Zvolit Max</button>
+</div>
+</div>
+</section>
+<!-- NEW: FAQ Section -->
+<section class="flex flex-col gap-stack-48 max-w-3xl mx-auto w-full">
+<div class="text-center">
+<h2 class="font-display-sm text-display-sm text-on-surface">Často kladené otázky</h2>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-canvas-white border border-cloud-mist rounded-xl overflow-hidden">
+<button class="w-full p-6 text-left flex justify-between items-center hover:bg-surface-container-high transition-colors" onclick="toggleFaq(1)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Je potřeba instalovat nějaký program?</h4>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="add" id="faq-icon-1">add</span>
+</button>
+<div class="p-6 pt-0 hidden" id="faq-content-1">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ne, Horea běží kompletně ve webovém prohlížeči. Stačí se přihlásit z jakéhokoliv zařízení s připojením k internetu.</p>
+</div>
+</div>
+<div class="bg-canvas-white border border-cloud-mist rounded-xl overflow-hidden">
+<button class="w-full p-6 text-left flex justify-between items-center hover:bg-surface-container-high transition-colors" onclick="toggleFaq(2)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Mohu si Horea vyzkoušet zdarma?</h4>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="add" id="faq-icon-2">add</span>
+</button>
+<div class="p-6 pt-0 hidden" id="faq-content-2">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ano, náš tarif Start je zcela zdarma a nabízíme 14denní zkušební dobu pro prémiové tarify, abyste si mohli vyzkoušet všechny funkce.</p>
+</div>
+</div>
+<div class="bg-canvas-white border border-cloud-mist rounded-xl overflow-hidden">
+<button class="w-full p-6 text-left flex justify-between items-center hover:bg-surface-container-high transition-colors" onclick="toggleFaq(3)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Jak klienti platí za rezervace?</h4>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="add" id="faq-icon-3">add</span>
+</button>
+<div class="p-6 pt-0 hidden" id="faq-content-3">
+<p class="font-body-sm text-body-sm text-on-surface-variant">V současné době klienti platí standardně až na místě u vás. V budoucnu plánujeme integraci online platebních bran.</p>
+</div>
+</div>
+<div class="bg-canvas-white border border-cloud-mist rounded-xl overflow-hidden">
+<button class="w-full p-6 text-left flex justify-between items-center hover:bg-surface-container-high transition-colors" onclick="toggleFaq(4)">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Lze propojit Horea s mým stávajícím webem?</h4>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="add" id="faq-icon-4">add</span>
+</button>
+<div class="p-6 pt-0 hidden" id="faq-content-4">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ano, můžete snadno vložit odkaz na rezervační stránku Horea na váš web nebo sociální sítě jako tlačítko "Rezervovat".</p>
+</div>
+</div>
+</div>
+</section>
+<!-- NEW: Final CTA -->
+<section class="bg-gradient-to-r from-primary-container to-sunset-pink rounded-card-lg p-padding-card md:p-stack-100 flex flex-col items-center text-center gap-stack-24 shadow-md">
+<h2 class="font-display-sm text-display-sm text-on-primary">Jste připraveni posunout svůj podnik dál?</h2>
+<p class="font-body-lg text-body-lg text-on-primary/90 max-w-2xl">
+                Připojte se ke stovkám spokojených podnikatelů, kteří již šetří čas a získávají více klientů díky Horea.
+            </p>
+<div class="mt-stack-8">
+<a class="bg-canvas-white text-primary-container font-headline-sm text-headline-sm px-10 py-5 rounded-btn hover:bg-cloud-mist transition-colors inline-flex items-center gap-gap-element shadow-sm" href="#">
+                Založit účet zdarma
+                <span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+</a>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-cloud-mist dark:bg-on-surface text-secondary dark:text-secondary-fixed font-caption text-caption full-width flat no shadows mt-auto"><div class="w-full py-stack-48 px-10 max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-gap-section"><div class="flex flex-col gap-stack-16"><div class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright">Horea</div><div class="flex flex-col gap-2 text-on-surface-variant dark:text-outline-variant"><p class="">Náměstí Svobody 123<br>602 00 Brno</p><p class="">+420 704 344 177</p><p class="">info@horea.cz</p></div></div><div class="flex flex-col gap-stack-16"><h5 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright">O nás</h5><nav class="flex flex-col gap-2"><a class="hover:text-primary transition-colors" href="#">O nás</a><a class="hover:text-primary transition-colors" href="#">Kariéra</a><a class="hover:text-primary transition-colors" href="#">Blog</a><a class="hover:text-primary transition-colors" href="#">Kontakt</a></nav></div><div class="flex flex-col gap-stack-16"><h5 class="font-headline-sm text-headline-sm text-on-surface dark:text-surface-bright">Podpora</h5><nav class="flex flex-col gap-2"><a class="hover:text-primary transition-colors" href="#">Podpora</a><a class="hover:text-primary transition-colors" href="#">Obchodní podmínky</a><a class="hover:text-primary transition-colors" href="#">Ochrana údajů</a><a class="hover:text-primary transition-colors" href="#">Cookies</a></nav></div><div class="flex flex-col justify-end md:items-end"><div class="text-on-surface-variant dark:text-outline-variant">© 2024 Horea SaaS.<br>Všechna práva vyhrazena.</div></div></div></footer>
+
+
+</body></html>

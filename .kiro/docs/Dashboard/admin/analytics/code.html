@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analytics - Studio Elegance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary-container": "#b20089",
+                        "primary": "#4100dc",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#880068",
+                        "surface-variant": "#e6dff3",
+                        "on-primary-container": "#dbd4ff",
+                        "lush-green": "#dfff9d",
+                        "on-surface-variant": "#474557",
+                        "input-border": "#d8ddef",
+                        "on-primary-fixed": "#190064",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#61568f",
+                        "on-secondary-fixed-variant": "#493f76",
+                        "surface-dim": "#ddd7eb",
+                        "on-secondary-fixed": "#1d1148",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#f1ebff",
+                        "outline": "#787589",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f7f1ff",
+                        "canvas-white": "#ffffff",
+                        "air-blue": "#bcf2ff",
+                        "primary-fixed": "#e5deff",
+                        "inverse-surface": "#312e3d",
+                        "on-secondary-container": "#554b82",
+                        "on-background": "#1c1a28",
+                        "inverse-on-surface": "#f4eeff",
+                        "background": "#fdf8ff",
+                        "secondary-fixed": "#e6deff",
+                        "on-tertiary-fixed-variant": "#880068",
+                        "tertiary-fixed-dim": "#ffaedc",
+                        "on-surface": "#1c1a28",
+                        "aqua-blue": "#2ed6ff",
+                        "primary-container": "#592eff",
+                        "secondary-container": "#cabeff",
+                        "electric-green": "#a2ea13",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#c8bfff",
+                        "cloud-mist": "#f0f3fe",
+                        "outline-variant": "#c9c4da",
+                        "soft-gray": "#eeeeee",
+                        "on-error": "#ffffff",
+                        "sunset-pink": "#ffaae6",
+                        "surface-container-high": "#ece5f9",
+                        "surface-container-highest": "#e6dff3",
+                        "on-primary-fixed-variant": "#4100db",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#ffcae5",
+                        "tertiary-fixed": "#ffd8eb",
+                        "surface-bright": "#fdf8ff",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#592eff",
+                        "on-tertiary-fixed": "#3c002c",
+                        "surface": "#fdf8ff",
+                        "primary-fixed-dim": "#c8bfff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-100": "100px",
+                        "padding-card": "40px",
+                        "stack-24": "24px",
+                        "stack-48": "48px",
+                        "stack-16": "16px",
+                        "gap-section": "30px",
+                        "stack-4": "4px",
+                        "padding-input-v": "12px",
+                        "padding-input-h": "10px",
+                        "stack-8": "8px",
+                        "gap-element": "5px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Montserrat"],
+                        "display-md": ["Montserrat"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-sm": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "caption": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "display-lg": ["68px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-md": ["58px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-sm": ["38px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-lg": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-sm": ["16px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "body-md": ["18px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "caption": ["14px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #c9c4da;
+            border-radius: 10px;
+        }
+        
+        /* Simple CSS Donut Chart */
+        .donut-chart {
+            background: conic-gradient(
+                #592eff 0% 65%, 
+                #dfff9d 65% 85%, 
+                #ffaae6 85% 100%
+            );
+            border-radius: 50%;
+            position: relative;
+        }
+        .donut-hole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background-color: #ffffff;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-cloud-mist font-body-md text-on-surface antialiased overflow-x-hidden">
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full w-64 py-8 px-4 flex flex-col gap-6 bg-cloud-mist z-20">
+<!-- Brand Header -->
+<div class="flex items-center gap-4 px-4 mb-4">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-white font-bold text-xl">
+                A
+            </div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Adora</h1>
+<p class="font-caption text-caption text-outline">Service Management</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-2">
+<a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Reservations
+            </a>
+<a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">home_repair_service</span>
+                Services
+            </a>
+<a class="text-on-surface-variant flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-soft-gray transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">group</span>
+                Clients
+            </a>
+<!-- Active Tab -->
+<a class="text-primary font-semibold flex items-center gap-3 px-4 py-3 rounded-lg bg-canvas-white shadow-sm transition-all scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined fill-icon text-primary-container">trending_up</span>
+                Analytics
+            </a>
+</div>
+<!-- Footer Links -->
+<div class="flex flex-col gap-2 mt-auto border-t border-outline-variant pt-4">
+<button class="w-full bg-surface-container text-primary-container font-headline-sm text-sm font-semibold py-3 rounded-xl mb-4 hover:bg-surface-variant transition-colors">
+                Upgrade Plan
+            </button>
+<a class="text-on-surface-variant flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-soft-gray transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+                Help Center
+            </a>
+<a class="text-on-surface-variant flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-soft-gray transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component Context) -->
+<header class="sticky top-0 z-10 w-full h-16 bg-canvas-white flex justify-between items-center px-8 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-cloud-mist border-none rounded-xl text-body-sm focus:ring-2 focus:ring-primary-container w-64 transition-all" placeholder="Search analytics..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-outline hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-sunset-pink rounded-full"></span>
+</button>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden flex items-center justify-center border border-outline-variant cursor-pointer">
+<img alt="Business Owner Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a female business owner in a bright, modern studio setting, wearing a tailored blazer. The lighting is soft and flattering, creating a welcoming and competent mood suitable for a corporate dashboard profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8fiLB5geQ88Jt94V9UY8f7PRINfctAGtErlOA3j2W7JOT7myxPmo5yrFFE2Vr3CIbidUxp3VEtX0_hwQm52ZO3Fd9yj_z9c8UD8jf3fzBiJw9e-qcYa22lvzdXPU_Cj0Qjo4TBeZIXPYcv80zbfkZVtRaIaC-eJ6kbLB0Oz4quH728I92ub7xcKD8AqoFZKqPxVIvm9jUQ1zwGhR-InxPiuDrzLEKAKDnLMC42V0iTZrbJ6UO5AwtmFpZNxmXhZ5gXnPjQMaUEnQ"/>
+</div>
+</div>
+</header>
+<!-- Analytics Content -->
+<main class="flex-1 p-8 space-y-gap-section max-w-7xl mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Studio Performance</h2>
+<p class="font-body-sm text-body-sm text-outline mt-1">Track your growth, revenue, and team productivity.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-canvas-white border border-cloud-mist rounded-xl font-body-sm text-on-surface-variant hover:bg-soft-gray transition-colors">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+                        Last 30 Days
+                        <span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2 bg-primary-container text-white rounded-xl font-body-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-lg">download</span>
+                        Export Report
+                    </button>
+</div>
+</div>
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gap-section">
+<!-- Card 1 -->
+<div class="bg-canvas-white rounded-[26px] p-6 flex flex-col gap-4 border border-cloud-mist">
+<div class="flex items-center justify-between">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="flex items-center gap-1 text-sm font-semibold text-electric-green bg-surface-bright px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-sm">arrow_upward</span> 12.5%
+                        </span>
+</div>
+<div>
+<p class="font-caption text-caption text-outline mb-1">Total Revenue</p>
+<h3 class="font-display-sm text-display-sm text-on-surface">$45,230</h3>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-canvas-white rounded-[26px] p-6 flex flex-col gap-4 border border-cloud-mist">
+<div class="flex items-center justify-between">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<span class="flex items-center gap-1 text-sm font-semibold text-electric-green bg-surface-bright px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-sm">arrow_upward</span> 4.2%
+                        </span>
+</div>
+<div>
+<p class="font-caption text-caption text-outline mb-1">Avg. Order Value</p>
+<h3 class="font-display-sm text-display-sm text-on-surface">$125.50</h3>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-canvas-white rounded-[26px] p-6 flex flex-col gap-4 border border-cloud-mist">
+<div class="flex items-center justify-between">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+<span class="flex items-center gap-1 text-sm font-semibold text-outline bg-surface-bright px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-sm">horizontal_rule</span> 0.0%
+                        </span>
+</div>
+<div>
+<p class="font-caption text-caption text-outline mb-1">Retention Rate</p>
+<h3 class="font-display-sm text-display-sm text-on-surface">78%</h3>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-canvas-white rounded-[26px] p-6 flex flex-col gap-4 border border-cloud-mist">
+<div class="flex items-center justify-between">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<span class="flex items-center gap-1 text-sm font-semibold text-error bg-error-container px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-sm">arrow_downward</span> 2.1%
+                        </span>
+</div>
+<div>
+<p class="font-caption text-caption text-outline mb-1">New Leads</p>
+<h3 class="font-display-sm text-display-sm text-on-surface">142</h3>
+</div>
+</div>
+</div>
+<!-- Charts Row 1 -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gap-section">
+<!-- Main Line Chart (Revenue vs Expenses) -->
+<div class="lg:col-span-2 bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Revenue vs. Expenses</h3>
+<div class="flex items-center gap-4 text-sm">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-primary-container"></span> Revenue</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-sunset-pink"></span> Expenses</div>
+</div>
+</div>
+<!-- Abstract representation of a line chart using borders and flex -->
+<div class="flex-1 relative min-h-[250px] border-l border-b border-soft-gray flex items-end pt-4 pb-2">
+<!-- Y-Axis labels -->
+<div class="absolute -left-10 h-full flex flex-col justify-between text-caption text-outline pb-2">
+<span>$15k</span><span>$10k</span><span>$5k</span><span>0</span>
+</div>
+<!-- Chart Area (Faux lines using SVG paths for visual only) -->
+<div class="w-full h-full relative overflow-hidden">
+<svg class="w-full h-full absolute inset-0" preserveaspectratio="none" viewbox="0 0 100 100">
+<!-- Grid lines -->
+<line stroke="#f0f3fe" stroke-width="0.5" x1="0" x2="100" y1="25" y2="25"></line>
+<line stroke="#f0f3fe" stroke-width="0.5" x1="0" x2="100" y1="50" y2="50"></line>
+<line stroke="#f0f3fe" stroke-width="0.5" x1="0" x2="100" y1="75" y2="75"></line>
+<!-- Expenses Line (Sunset Pink) -->
+<path d="M0,80 Q10,70 20,75 T40,60 T60,65 T80,50 T100,55" fill="none" stroke="#ffaae6" stroke-linecap="round" stroke-width="3"></path>
+<!-- Revenue Line (Primary) -->
+<path d="M0,60 Q10,40 20,45 T40,20 T60,30 T80,10 T100,15" fill="none" stroke="#592eff" stroke-linecap="round" stroke-width="3"></path>
+<!-- Gradient fill under Revenue -->
+<path d="M0,60 Q10,40 20,45 T40,20 T60,30 T80,10 T100,15 L100,100 L0,100 Z" fill="url(#revGrad)" opacity="0.1"></path>
+<defs>
+<lineargradient id="revGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#592eff"></stop>
+<stop offset="100%" stop-color="#ffffff"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<!-- X-Axis labels -->
+<div class="absolute -bottom-6 left-0 w-full flex justify-between text-caption text-outline px-2">
+<span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span>
+</div>
+</div>
+</div>
+<!-- Client Insights -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-6">Client Insights</h3>
+<!-- Donut Chart -->
+<div class="flex justify-center items-center py-4">
+<div class="w-40 h-40 donut-chart">
+<div class="donut-hole flex flex-col items-center justify-center">
+<span class="font-display-sm text-2xl text-on-surface">65%</span>
+<span class="font-caption text-xs text-outline">Female</span>
+</div>
+</div>
+</div>
+<div class="flex justify-center gap-4 text-sm mt-4 mb-8">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-primary-container"></span> Female (65%)</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-lush-green"></span> Male (20%)</div>
+</div>
+<!-- Top Spenders List -->
+<div class="mt-auto">
+<h4 class="font-body-sm text-sm font-semibold text-on-surface mb-3 uppercase tracking-wider">Top Spenders</h4>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary text-xs font-bold">EM</div>
+<span class="font-body-sm text-sm">Emma Miller</span>
+</div>
+<span class="font-semibold text-sm">$1,240</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary text-xs font-bold">SJ</div>
+<span class="font-body-sm text-sm">Sarah Jones</span>
+</div>
+<span class="font-semibold text-sm">$980</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary text-xs font-bold">MW</div>
+<span class="font-body-sm text-sm">Mike Wilson</span>
+</div>
+<span class="font-semibold text-sm">$850</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Charts Row 2 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gap-section">
+<!-- Service Performance -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-6">Service Performance</h3>
+<div class="space-y-5">
+<!-- Bar 1 -->
+<div>
+<div class="flex justify-between text-sm mb-2">
+<span class="font-medium text-on-surface">Signature Haircut</span>
+<span class="font-bold text-on-surface">$12,450</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2.5">
+<div class="bg-primary-container h-2.5 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<!-- Bar 2 -->
+<div>
+<div class="flex justify-between text-sm mb-2">
+<span class="font-medium text-on-surface">Deep Tissue Massage</span>
+<span class="font-bold text-on-surface">$8,320</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2.5">
+<div class="bg-secondary h-2.5 rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<!-- Bar 3 -->
+<div>
+<div class="flex justify-between text-sm mb-2">
+<span class="font-medium text-on-surface">Gel Manicure</span>
+<span class="font-bold text-on-surface">$5,100</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2.5">
+<div class="bg-tertiary-container h-2.5 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<!-- Bar 4 -->
+<div>
+<div class="flex justify-between text-sm mb-2">
+<span class="font-medium text-on-surface">Facial Treatment</span>
+<span class="font-bold text-on-surface">$3,800</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2.5">
+<div class="bg-sunset-pink h-2.5 rounded-full" style="width: 30%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Booking Sources -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-6">Booking Sources</h3>
+<div class="flex h-[200px] items-end gap-6 justify-center mt-8">
+<!-- Vertical Bar 1 -->
+<div class="flex flex-col items-center gap-3 w-16">
+<span class="font-caption text-xs font-semibold text-primary">45%</span>
+<div class="w-12 bg-primary-container rounded-t-xl" style="height: 140px;"></div>
+<span class="text-sm font-medium text-on-surface-variant">Web</span>
+</div>
+<!-- Vertical Bar 2 -->
+<div class="flex flex-col items-center gap-3 w-16">
+<span class="font-caption text-xs font-semibold text-lush-green">30%</span>
+<div class="w-12 bg-lush-green rounded-t-xl" style="height: 90px;"></div>
+<span class="text-sm font-medium text-on-surface-variant">Insta</span>
+</div>
+<!-- Vertical Bar 3 -->
+<div class="flex flex-col items-center gap-3 w-16">
+<span class="font-caption text-xs font-semibold text-sunset-pink">15%</span>
+<div class="w-12 bg-sunset-pink rounded-t-xl" style="height: 45px;"></div>
+<span class="text-sm font-medium text-on-surface-variant">Phone</span>
+</div>
+<!-- Vertical Bar 4 -->
+<div class="flex flex-col items-center gap-3 w-16">
+<span class="font-caption text-xs font-semibold text-outline">10%</span>
+<div class="w-12 bg-soft-gray rounded-t-xl" style="height: 30px;"></div>
+<span class="text-sm font-medium text-on-surface-variant">Walk-in</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Team Productivity Table -->
+<div class="bg-canvas-white rounded-[26px] p-padding-card border border-cloud-mist">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Team Productivity</h3>
+<button class="text-primary font-medium text-sm hover:underline">View All Staff</button>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-soft-gray">
+<th class="pb-3 pt-2 px-4 font-body-sm text-sm font-semibold text-outline uppercase tracking-wider">Staff Member</th>
+<th class="pb-3 pt-2 px-4 font-body-sm text-sm font-semibold text-outline uppercase tracking-wider">Role</th>
+<th class="pb-3 pt-2 px-4 font-body-sm text-sm font-semibold text-outline uppercase tracking-wider">Hours Worked</th>
+<th class="pb-3 pt-2 px-4 font-body-sm text-sm font-semibold text-outline uppercase tracking-wider">Revenue Generated</th>
+<th class="pb-3 pt-2 px-4 font-body-sm text-sm font-semibold text-outline uppercase tracking-wider text-right">Customer Rating</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-cloud-mist hover:bg-surface-bright transition-colors">
+<td class="py-4 px-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden">
+<img alt="Anna" class="w-full h-full object-cover" data-alt="A smiling female salon professional looking confident. Soft, bright studio lighting, neutral background, modern corporate portrait style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA45R_MIWt8Id6BcSBxDp0fe9sELG1_uD7JtrnmWNDkymXziG68ZlGs_zFJhTIkgRiYGRc5EV9BJW_7FPq-foW0Ukg_zA-w0F4gKayGnl-q0dhnfKFw-2qe2JA9jaAXuw3lVTamHzU5OY1yzuRPDEcxzuCO5I8tA0Scu1xwrk7fA48RtJss4TYDkYUUCCJze3_EJ2xqV5SfDGa5Rv_1PODRk5hqoEwE4wIhvLIB19GXL5gxEejzZmHkmM6XArt5BHT8wrUSJDWbW8A"/>
+</div>
+<span class="font-medium text-on-surface">Anna</span>
+</td>
+<td class="py-4 px-4 text-on-surface-variant">Senior Stylist</td>
+<td class="py-4 px-4 text-on-surface-variant">142h</td>
+<td class="py-4 px-4 font-semibold text-on-surface">$8,450</td>
+<td class="py-4 px-4 text-right flex items-center justify-end gap-1 text-on-surface">
+                                    4.9 <span class="material-symbols-outlined text-sm text-sunset-pink fill-icon">star</span>
+</td>
+</tr>
+<tr class="border-b border-cloud-mist hover:bg-surface-bright transition-colors">
+<td class="py-4 px-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden">
+<img alt="Petr" class="w-full h-full object-cover" data-alt="A professional male massage therapist with a calm expression. Bright, airy lighting, modern minimalist aesthetic, soft focus background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHIDabw2sjU86MpzdQ87z6SKgHaiQ14coaJselDdUdFp94aDYEpdG8use2NSv3ykDV-TSvc7GUINFlgiLdhe896JIkb2pbl0PHJLJd8nd-bPMmQEDNj8NiHQq5xFYQqJGeft2eWvNVp5CkXCckB3kTktsg53P_IzWBRGQurG1idkGs7Bk2qVrShTQMsx0bnBVOGz3SMsg_z1srxSgCWss8WyHg106eSyOCJyxmiAQxalHuYeglek_C2VSLssS5TyNGIl8hkNsl7K4"/>
+</div>
+<span class="font-medium text-on-surface">Petr</span>
+</td>
+<td class="py-4 px-4 text-on-surface-variant">Massage Therapist</td>
+<td class="py-4 px-4 text-on-surface-variant">110h</td>
+<td class="py-4 px-4 font-semibold text-on-surface">$6,120</td>
+<td class="py-4 px-4 text-right flex items-center justify-end gap-1 text-on-surface">
+                                    4.8 <span class="material-symbols-outlined text-sm text-sunset-pink fill-icon">star</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="py-4 px-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden">
+<img alt="Klára" class="w-full h-full object-cover" data-alt="A cheerful female nail technician in a modern studio environment. High-key lighting, clean white and violet tones, professional yet friendly vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvew7Th5opOiH0K7Jbdj-7BQNA2yFpeUUW6ukSULvjJ6Yf7ET_Y3LQhnXmQ1UZnKNir3AU0O0UjEORC2RzNU8QwIVmmHtc74oji_KkQrHsfr9tLPtl-k9f0zXZTnqacm31BpSEqHRScFUCtedwjquV7OnMlemkjtJkkDB9rMw8ErCp7aqJP0USWuxnoFXrc3Ps7eYI_mUE7NEbt1xoEUdh_wVkeCfeYadMCBv_tgyyQsvak4AG5Q8w8H_c3XzdGyN50PmPp4C93lg"/>
+</div>
+<span class="font-medium text-on-surface">Klára</span>
+</td>
+<td class="py-4 px-4 text-on-surface-variant">Nail Technician</td>
+<td class="py-4 px-4 text-on-surface-variant">95h</td>
+<td class="py-4 px-4 font-semibold text-on-surface">$4,300</td>
+<td class="py-4 px-4 text-right flex items-center justify-end gap-1 text-on-surface">
+                                    5.0 <span class="material-symbols-outlined text-sm text-sunset-pink fill-icon">star</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+</body></html>

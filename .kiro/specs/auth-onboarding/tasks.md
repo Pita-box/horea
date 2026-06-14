@@ -4,6 +4,8 @@
 
 Implementační plán pro feature `auth-onboarding` — autentizační vrstva (registrace, ověření emailu, přihlášení, reset hesla, odhlášení, DPA verzování) a šestikrokový onboarding wizard zakončený atomickým commitem profilu podniku ve stavu `free`.
 
+Routing kontrakt: `/` je veřejná landing page, `/login` je jediný login pro všechny účty, `/dashboard` je role-aware dashboard (admin varianta pro `users.is_admin = true`, podnikatelská varianta pro běžné uživatele) a `/{slug}` je veřejný profil podniku řešený ve specu `public-business-page`. Auth/onboarding nesmí vytvářet samostatnou veřejně známou admin login/dashboard cestu ani zachytit veřejný slug prostor mimo rezervované systémové cesty a citlivé názvy.
+
 **Implementační jazyk:** TypeScript (Next.js App Router) — odvozeno z `architecture/tasks.md`.
 
 **Foundation prerekvizity** (musí být hotové z `architecture/tasks.md` před zahájením této spec):
@@ -21,31 +23,31 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
 
 ## Tasks
 
-- [ ] 1. Databázové schéma pro onboarding draft
-  - [ ] 1.1 Vytvořit migraci `0010_init_onboarding_drafts.sql`
+- [x] 1. Databázové schéma pro onboarding draft
+  - [x] 1.1 Vytvořit migraci `0010_init_onboarding_drafts.sql`
     - Tabulka `onboarding_drafts`: `user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE`, `current_step SMALLINT NOT NULL DEFAULT 0 CHECK (current_step BETWEEN 0 AND 5)`, `type_data JSONB`, `slug_data JSONB`, `profile_data JSONB`, `services_data JSONB`, `hours_data JSONB`, `updated_at TIMESTAMPTZ NOT NULL DEFAULT now()`
     - Trigger pro automatickou aktualizaci `updated_at` při UPDATE
     - Pouze DDL, žádná business logika
     - _Requirements: 14.1_
 
-  - [ ] 1.2 Vytvořit migraci `0011_rls_onboarding_drafts.sql`
+  - [x] 1.2 Vytvořit migraci `0011_rls_onboarding_drafts.sql`
     - `ALTER TABLE onboarding_drafts ENABLE ROW LEVEL SECURITY`
     - Policy `own_draft_only`: SELECT/INSERT/UPDATE/DELETE povoleno pouze pokud `user_id = auth.uid()`
     - Žádný admin override v této tabulce (interní rozpracovaný stav)
     - _Requirements: 14.1_
 
-  - [ ] 1.3 Spustit migrace a manuálně ověřit RLS izolaci
+  - [x] 1.3 Spustit migrace a manuálně ověřit RLS izolaci
     - `pnpm dlx supabase db push`
     - V Supabase SQL editoru: jako uživatel A vložit draft, jako uživatel B ověřit, že SELECT vrací 0 řádků
     - _Requirements: 14.1_
 
-- [ ] 2. Slug normalization library + RESERVED_SLUGS konstanta
-  - [ ] 2.1 Vytvořit `src/lib/slug/reserved.ts` s konstantou `RESERVED_SLUGS`
-    - Export `const RESERVED_SLUGS: readonly string[]` obsahující: `admin`, `api`, `login`, `register`, `logout`, `dashboard`, `app`, `www`, `mail`, `verify-email`, `forgot-password`, `reset-password`, `onboarding`, `settings`, `billing`, `support`, `help`
+- [x] 2. Slug normalization library + RESERVED_SLUGS konstanta
+  - [x] 2.1 Vytvořit `src/lib/slug/reserved.ts` s konstantou `RESERVED_SLUGS`
+    - Export `const RESERVED_SLUGS: readonly string[]` obsahující: `admin`, `api`, `login`, `register`, `logout`, `dashboard`, `app`, `www`, `mail`, `verify-email`, `forgot-password`, `reset-password`, `onboarding`, `settings`, `billing`, `components`, `support`, `help`
     - Hodnoty jsou již v normalizovaném tvaru (lowercase, ASCII, bez whitespace)
     - _Requirements: 8.5_
 
-  - [ ] 2.2 Implementovat `src/lib/slug/normalize.ts` — čistá normalizace + validace
+  - [x] 2.2 Implementovat `src/lib/slug/normalize.ts` — čistá normalizace + validace
     - Export typu `SlugResult = { kind: 'ok'; value: string } | { kind: 'invalid_format'; reason: 'charset' | 'length' | 'hyphens' | 'empty' } | { kind: 'reserved' }`
     - Funkce `normalizeSlug(input: string): SlugResult`:
       1. Trim whitespace
@@ -57,165 +59,165 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
     - Funkce **nikdy nesmí vyhodit výjimku** (totalita)
     - _Requirements: 8.3, 8.4, 8.5_
 
-  - [ ]* 2.3 Property test: totalita slug normalizace
+  - [x]* 2.3 Property test: totalita slug normalizace
     - **Property 1: Totalita**
     - **Validates: Requirements 8.3, 8.4**
     - V `src/lib/slug/__tests__/normalize.property.test.ts` použít `@fast-check/vitest`: `fc.string()` + `fc.unicodeString()` libovolné délky → `normalizeSlug(x)` vrací validní `SlugResult` (jeden ze čtyř variantů), nikdy neházel výjimku
     - _Requirements: 8.3, 8.4_
 
-  - [ ]* 2.4 Property test: idempotence slug normalizace
+  - [x]* 2.4 Property test: idempotence slug normalizace
     - **Property 2: Idempotence**
     - **Validates: Requirements 8.3**
     - Pro libovolný `x`, pokud `normalizeSlug(x).kind === 'ok'` s hodnotou `y`, pak `normalizeSlug(y).kind === 'ok'` a vrácená hodnota se rovná `y`
     - _Requirements: 8.3_
 
-  - [ ]* 2.5 Property test: reserved slug detekce je case-insensitive
+  - [x]* 2.5 Property test: reserved slug detekce je case-insensitive
     - **Property 3: Reserved case-insensitive**
     - **Validates: Requirements 8.5**
     - Pro libovolný `s` z `RESERVED_SLUGS` a libovolnou permutaci velikosti písmen / přidání diakritiky (např. `Ádmīn`) → `normalizeSlug` vrací `{ kind: 'reserved' }` (ne `ok`, ne `invalid_format`)
     - _Requirements: 8.5_
 
-  - [ ]* 2.6 Unit testy pro konkrétní edge cases
+  - [x]* 2.6 Unit testy pro konkrétní edge cases
     - V `src/lib/slug/__tests__/normalize.test.ts`: prázdný string, jen whitespace, samé hyphens (`---`), samá diakritika (`ÁÉÍÓÚ`), 51 znaků, `--foo`, `foo--bar`, `-foo`, `foo-`, `Salón Růženka` → `salon-ruzenka` (pokud implementace mapuje mezeru na hyphen) nebo `invalid_format` (pokud ne — záleží na rozhodnutí v 2.2)
     - _Requirements: 8.3, 8.4_
 
-- [ ] 3. DPA versioning konstanta + DPA_Manager utility
-  - [ ] 3.1 Vytvořit `src/lib/dpa/version.ts` s konstantou `CURRENT_DPA_VERSION`
+- [x] 3. DPA versioning konstanta + DPA_Manager utility
+  - [x] 3.1 Vytvořit `src/lib/dpa/version.ts` s konstantou `CURRENT_DPA_VERSION`
     - Export `const CURRENT_DPA_VERSION = '2025-01-15'` (datum vydání první verze)
     - Komentář v souboru: změna verze = úprava této konstanty + deploy → middleware automaticky vynutí re-akceptaci
     - _Requirements: 6.1, 6.4_
 
-  - [ ] 3.2 Vytvořit `src/lib/dpa/text.ts` s aktuálním textem DPA v češtině
+  - [x] 3.2 Vytvořit `src/lib/dpa/text.ts` s aktuálním textem DPA v češtině
     - Export `const DPA_TEXT: string` — plný text smlouvy (placeholder pro MVP, finální právní text doplní právník)
     - Žádné Markdown rendering, prostý text / minimální HTML
     - _Requirements: 15.4_
 
-  - [ ] 3.3 Implementovat `src/lib/dpa/manager.ts` — DPA_Manager utility
+  - [x] 3.3 Implementovat `src/lib/dpa/manager.ts` — DPA_Manager utility
     - Funkce `recordAcceptance(userId: string)`: idempotentní upsert `users.dpa_version_accepted = CURRENT_DPA_VERSION`, `users.dpa_accepted_at = now()`. Pokud uživatel již má aktuální verzi, žádný zápis (no-op).
     - Funkce `needsReacceptance(userDpaVersion: string | null): boolean`: `true` pokud `userDpaVersion !== CURRENT_DPA_VERSION`
-    - Závisí na Supabase server klientu z `src/lib/supabase/server.ts` (foundation 9.1)
+    - Závisí na server-only Supabase admin klientu z `src/lib/supabase/admin.ts`, protože `users` RLS povoluje zápis pouze admin kontextu
     - _Requirements: 1.6, 6.1, 6.4_
 
-  - [ ]* 3.4 Property test: idempotence DPA akceptace
+  - [x]* 3.4 Property test: idempotence DPA akceptace
     - **Property 5: Idempotence DPA akceptace**
     - **Validates: Requirements 6.4**
     - V `src/lib/dpa/__tests__/manager.property.test.ts`: pro libovolný timestamp `t0`, pokud uživatel má `dpa_version_accepted = CURRENT_DPA_VERSION` a `dpa_accepted_at = t0`, pak po volání `recordAcceptance(userId)` zůstává `dpa_version_accepted = CURRENT_DPA_VERSION` a `dpa_accepted_at = t0` (žádný posun)
     - DB volání mockovat (in-memory user store)
     - _Requirements: 6.4_
 
-- [ ] 4. Auth_Service — registrace
-  - [ ] 4.1 Implementovat server-side validaci hesla `src/lib/auth/password.ts`
+- [x] 4. Auth_Service — registrace
+  - [x] 4.1 Implementovat server-side validaci hesla `src/lib/auth/password.ts`
     - Funkce `validatePassword(password: string): { ok: true } | { ok: false; reason: 'too_short' | 'no_uppercase' | 'no_digit' }`
     - Pravidla: min 8 znaků, alespoň 1 velké písmeno, alespoň 1 číslice
     - České hlášky pro každý důvod v `src/lib/auth/messages.ts`
     - _Requirements: 1.3, 5.6_
 
-  - [ ] 4.2 Implementovat server-side validaci emailu `src/lib/auth/email.ts`
+  - [x] 4.2 Implementovat server-side validaci emailu `src/lib/auth/email.ts`
     - Funkce `validateEmail(email: string): boolean` — kontrola `@` a doménové části (jednoduchý regex, ne RFC 5322 implementace)
     - Česká hláška „Zadejte platný email"
     - _Requirements: 1.2_
 
-  - [ ] 4.3 Vytvořit registrační stránku `src/app/register/page.tsx`
+  - [x] 4.3 Vytvořit registrační stránku `src/app/register/page.tsx`
     - Server Component s formulářem: email, heslo, checkbox ToS, checkbox DPA s odkazem na text (z 3.2)
     - Client Component pro submit (server action z 4.4)
     - Veškerý text v češtině
     - _Requirements: 1.1, 1.5, 15.1_
 
-  - [ ] 4.4 Implementovat server action `src/app/register/actions.ts → registerAction`
+  - [x] 4.4 Implementovat server action `src/app/register/actions.ts → registerAction`
     - Vstup: email, heslo, tosAccepted, dpaAccepted
     - Validace pořadí: souhlasy (1.5), email formát (1.2), heslo strength (1.3)
     - Volání `supabase.auth.signUp({ email, password })` (foundation 9.1)
+    - Po úspěšném `signUp` založit aplikační profil v `public.users` přes service-role/admin klient (`id = auth.users.id`, `email`, `is_admin = false`), protože RLS `users` povoluje zápis pouze admin kontextu a DB trigger pro profil neexistuje
     - Při úspěchu volat `recordAcceptance(user.id)` z DPA_Manager (krok 3.3)
     - Při duplicitě emailu vrátit hlášku „Účet s tímto emailem již existuje" (1.4)
     - Při úspěchu redirect na `/verify-email`
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8_
 
-- [ ] 5. Auth_Service — verifikace emailu
-  - [ ] 5.1 Vytvořit českou e-mailovou šablonu pro ověření emailu
+- [x] 5. Auth_Service — verifikace emailu
+  - [x] 5.1 Vytvořit českou e-mailovou šablonu pro ověření emailu
     - V `src/lib/email/templates/verify-email.ts`: funkce `renderVerifyEmail({ verifyUrl })` vracející `{ subject, html, text }`
     - Použít `wrapEmail()` z foundation (10.2) pro patičku
     - Subject: `Ověřte svůj email — Horea`, body česky s tlačítkem/odkazem na `verifyUrl`
     - _Requirements: 1.7, 15.3_
 
-  - [ ] 5.2 Nakonfigurovat Supabase Auth e-mailovou šablonu pro verifikaci
-    - V Supabase dashboardu: Authentication → Email Templates → Confirm signup → vložit HTML z 5.1 (vyrenderované s `{{ .ConfirmationURL }}`)
-    - Subject v češtině
-    - Pozn.: Supabase Auth posílá e-mail interně, naše šablona slouží jako zdroj HTML/textu
+  - [x] 5.2 Doručení verifikačního e-mailu přes Resend (NAHRAZENO oproti původnímu zadání)
+    - **Architektura změněna:** Supabase vestavěné odesílání e-mailů je vypnuté. Verifikační odkaz posílá aplikace sama přes `adminClient.auth.admin.generateLink({ type: 'magiclink' })` + Resend (`renderVerifyEmail`), nikoli přes Supabase dashboard šablonu.
+    - Implementováno ve sdíleném helperu `src/lib/auth/verification-email.ts` (volá registrace i znovuzaslání). Viz `docs/auth-email-delivery.md`.
     - _Requirements: 1.7, 15.3_
 
-  - [ ] 5.3 Vytvořit stránku `src/app/verify-email/page.tsx`
+  - [x] 5.3 Vytvořit stránku `src/app/verify-email/page.tsx`
     - Pokud URL obsahuje `?token_hash=...&type=email`: server-side volat `supabase.auth.verifyOtp({ token_hash, type: 'email' })`
     - Při úspěchu: SELECT z `onboarding_drafts` → redirect na `/onboarding/{current_step+1}` nebo `/onboarding/1`
     - Při neplatném/expirovaném tokenu: zobrazit českou hlášku + tlačítko „Zaslat znovu"
     - Pokud URL bez tokenu: info stránka „Ověřte si email" (instrukce pro uživatele)
     - _Requirements: 2.1, 2.2_
 
-  - [ ] 5.4 Implementovat server action `src/app/verify-email/actions.ts → resendVerificationAction`
+  - [x] 5.4 Implementovat server action `src/app/verify-email/actions.ts → resendVerificationAction`
     - Vstup: email
     - Volání `supabase.auth.resend({ type: 'signup', email })`
     - Generická česká hláška o úspěchu (bez prozrazení existence účtu)
     - _Requirements: 2.3_
 
-- [ ] 6. Auth_Service — přihlášení a Session_Manager
-  - [ ] 6.1 Vytvořit přihlašovací stránku `src/app/login/page.tsx`
+- [x] 6. Auth_Service — přihlášení a Session_Manager
+  - [x] 6.1 Vytvořit přihlašovací stránku `src/app/login/page.tsx`
     - Formulář: email, heslo, checkbox „Zůstat přihlášen"
     - Odkaz na `/forgot-password` a `/register`
     - České texty
     - _Requirements: 3.1, 15.1_
 
-  - [ ] 6.2 Implementovat server action `src/app/login/actions.ts → loginAction`
+  - [x] 6.2 Implementovat server action `src/app/login/actions.ts → loginAction`
     - Vstup: email, heslo, rememberMe
     - Volání `supabase.auth.signInWithPassword({ email, password })`
     - Při neúspěchu: generická hláška „Nesprávný email nebo heslo" (3.2) — žádné rozlišení důvodu
     - Pokud uživatel není ověřený (Supabase vrátí `email_not_confirmed`): hláška „Ověřte si nejdřív email" + tlačítko pro resend (volá 5.4) — _Requirements: 2.4_
     - Při `rememberMe = true`: Supabase Auth defaultně používá long-lived session, žádné dodatečné nastavení (3.3)
-    - Po úspěchu: SELECT `businesses WHERE owner_user_id = uid` → redirect na `/dashboard` (existuje business) nebo `/onboarding/{step}` (neexistuje)
+    - Po úspěchu: SELECT `users.is_admin`; admin → redirect `/dashboard` (dashboard serverově vykreslí admin variantu); běžný podnikatel → SELECT `businesses WHERE owner_user_id = uid` → redirect na `/dashboard` (existuje business) nebo `/onboarding/{current_step + 1}` / `/onboarding/1` (neexistuje)
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-  - [ ] 6.3 Implementovat `src/lib/auth/session.ts` — Session_Manager helpers
+  - [x] 6.3 Implementovat `src/lib/auth/session.ts` — Session_Manager helpers
     - Funkce `logoutCurrent(supabase)`: volá `supabase.auth.signOut()` (zneplatní aktuální session + smaže cookie)
-    - Funkce `logoutAllSessions(userId, adminClient)`: volá `supabase.auth.admin.signOut(userId, 'global')` přes service role klient (foundation `src/lib/supabase/admin.ts`)
+    - Funkce `logoutAllSessions(accessToken, adminClient)`: volá `supabase.auth.admin.signOut(accessToken, 'global')` přes service role klient (foundation `src/lib/supabase/admin.ts`), protože Supabase Admin API vyžaduje JWT aktuální relace, ne `userId`
     - _Requirements: 4.1, 5.5_
 
-  - [ ] 6.4 Implementovat logout endpoint `src/app/logout/route.ts`
+  - [x] 6.4 Implementovat logout endpoint `src/app/logout/route.ts`
     - POST handler: `logoutCurrent` + redirect na `/` (landing page)
     - GET handler stejně (pro fallback bez JS)
     - _Requirements: 4.1, 4.2_
 
-- [ ] 7. Auth_Service — reset hesla
-  - [ ] 7.1 Vytvořit českou e-mailovou šablonu pro reset hesla
+- [x] 7. Auth_Service — reset hesla
+  - [x] 7.1 Vytvořit českou e-mailovou šablonu pro reset hesla
     - V `src/lib/email/templates/password-reset.ts`: funkce `renderPasswordResetEmail({ resetUrl })` vracející `{ subject, html, text }`
     - Použít `wrapEmail()` z foundation (10.2)
     - Subject: `Obnovení hesla — Horea`
     - _Requirements: 5.1, 15.3_
 
-  - [ ] 7.2 Nakonfigurovat Supabase Auth e-mailovou šablonu pro reset
-    - V Supabase dashboardu: Authentication → Email Templates → Reset password → vložit HTML z 7.1 s `{{ .ConfirmationURL }}`
+  - [x] 7.2 Doručení e-mailu pro reset hesla přes Resend (NAHRAZENO oproti původnímu zadání)
+    - **Architektura změněna:** Supabase vestavěné odesílání e-mailů je vypnuté. Odkaz pro obnovení hesla posílá aplikace sama přes `adminClient.auth.admin.generateLink({ type: 'recovery' })` + Resend (`renderPasswordResetEmail`), nikoli přes Supabase dashboard šablonu. `forgotPasswordAction` neprozrazuje existenci účtu. Viz `docs/auth-email-delivery.md`.
     - _Requirements: 5.1, 15.3_
 
-  - [ ] 7.3 Vytvořit stránku `src/app/forgot-password/page.tsx`
+  - [x] 7.3 Vytvořit stránku `src/app/forgot-password/page.tsx`
     - Formulář: email
     - České texty, odkaz zpět na `/login`
     - _Requirements: 5.1, 15.1_
 
-  - [ ] 7.4 Implementovat server action `src/app/forgot-password/actions.ts → forgotPasswordAction`
+  - [x] 7.4 Implementovat server action `src/app/forgot-password/actions.ts → forgotPasswordAction`
     - Vstup: email
     - Volání `supabase.auth.resetPasswordForEmail(email, { redirectTo: '/reset-password' })`
     - Vždy stejná generická česká hláška (5.2): „Pokud existuje účet s tímto emailem, byl odeslán odkaz pro obnovení hesla."
     - Pozn.: rate limit je na Cloudflare (foundation 5.4), žádný aplikační rate limit zde — _Requirements: 5.7_
     - _Requirements: 5.1, 5.2, 5.7_
 
-  - [ ] 7.5 Vytvořit stránku `src/app/reset-password/page.tsx`
+  - [x] 7.5 Vytvořit stránku `src/app/reset-password/page.tsx`
     - Při příchodu z e-mailu Supabase má v URL `code` parametr → `supabase.auth.exchangeCodeForSession(code)` v Server Componentu
     - Při úspěchu: zobrazit formulář s polem nové heslo (+ potvrzení)
     - Při neplatném/expirovaném code: česká hláška + odkaz na `/forgot-password`
     - _Requirements: 5.3, 5.4_
 
-  - [ ] 7.6 Implementovat server action `src/app/reset-password/actions.ts → resetPasswordAction`
+  - [x] 7.6 Implementovat server action `src/app/reset-password/actions.ts → resetPasswordAction`
     - Vstup: nové heslo
     - Validace přes `validatePassword` z 4.1 (5.6)
     - Volání `supabase.auth.updateUser({ password })`
-    - Po úspěchu: volat `logoutAllSessions(user.id, adminClient)` z 6.3 (5.5)
+    - Po úspěchu: volat `logoutAllSessions(session.access_token, adminClient)` z 6.3 (5.5)
     - Redirect na `/login` s flash message „Heslo změněno, přihlaste se"
     - _Requirements: 5.5, 5.6_
 
@@ -224,20 +226,21 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
   - Ensure all tests pass, ask the user if questions arise.
   - _Requirements: 1.x, 2.x, 3.x, 4.x, 5.x_
 
-- [ ] 9. Middleware rozšíření — DPA_Manager + Free_User_Guard
-  - [ ] 9.1 Rozšířit `src/middleware.ts` o matcher pro `/onboarding/:path*`
-    - Foundation matcher (`/dashboard/:path*`, `/admin/:path*`) doplnit o `/onboarding/:path*`
+- [x] 9. Middleware rozšíření — DPA_Manager + Free_User_Guard
+  - [x] 9.1 Rozšířit `src/middleware.ts` o matcher pro `/onboarding/:path*`
+    - Foundation matcher (`/dashboard/:path*`) doplnit o `/onboarding/:path*`; žádný `/admin` matcher ani veřejná admin cesta
     - Pro neautentizované na chráněných cestách: redirect `/login` (4.3, již ve foundation 9.2)
     - _Requirements: 4.3_
 
-  - [ ] 9.2 Implementovat DPA enforcement v middlewaru
+  - [x] 9.2 Implementovat DPA enforcement v middlewaru
     - Po načtení `auth.uid()`: SELECT `users.dpa_version_accepted` → porovnat s `CURRENT_DPA_VERSION` (3.1)
     - Pokud neshoda: nastavit response hlavičku `x-dpa-mismatch: true` (UI vrstva si jí přečte v Server Componentu a zobrazí modal)
     - Cesty `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`, `/logout` z DPA enforce vyloučit
     - _Requirements: 6.1, 6.2_
 
-  - [ ] 9.3 Implementovat Free_User_Guard logic v middlewaru
+  - [x] 9.3 Implementovat Free_User_Guard logic v middlewaru
     - Pro autentizovaného na `/dashboard/*` nebo `/onboarding/*`:
+      - Admin (`users.is_admin = true`) na `/dashboard/*` → pokračovat do admin varianty dashboardu, bez redirectu na samostatnou admin cestu
       - SELECT `businesses` (s `subscriptions`) WHERE `owner_user_id = auth.uid()` LIMIT 1
       - Bez business + bez draftu → redirect `/onboarding/1`
       - Bez business + s draftem → redirect `/onboarding/{current_step + 1}` (max 6) — _Requirements: 14.1_
@@ -247,70 +250,70 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
       - Při DB chybě nebo neočekávaném stavu: redirect na `/error` (fail-secure) — _Requirements: 13.3_
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 14.1, 14.2_
 
-  - [ ]* 9.4 Unit testy pro Free_User_Guard rozhodovací logiku
+  - [x]* 9.4 Unit testy pro Free_User_Guard rozhodovací logiku
     - V `src/__tests__/middleware/free-user-guard.test.ts`: extrahovat čistou rozhodovací funkci `decideRedirect(state)` mimo middleware (testovatelná bez request kontextu)
     - Pokrýt všechny řádky tabulky z design.md (Free_User_Guard sekce)
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 14.1, 14.2_
 
-- [ ] 10. DPA modal komponenta + akceptace flow
-  - [ ] 10.1 Vytvořit DPA modal komponentu `src/components/DpaModal.tsx`
+- [x] 10. DPA modal komponenta + akceptace flow
+  - [x] 10.1 Vytvořit DPA modal komponentu `src/components/DpaModal.tsx`
     - Client Component, blokující overlay s focus trap
     - Zobrazí `DPA_TEXT` z 3.2, tlačítka „Akceptuji" a „Odmítnout"
     - Akceptuji → server action z 10.2
     - Odmítnout / zavření modálu → server action `/logout` (4.1)
     - _Requirements: 6.2, 6.3, 15.4_
 
-  - [ ] 10.2 Implementovat server action `src/app/(dashboard)/actions.ts → acceptDpaAction`
+  - [x] 10.2 Implementovat server action `src/app/(dashboard)/actions.ts → acceptDpaAction`
     - Volá `recordAcceptance(user.id)` z DPA_Manager (3.3) — idempotentní
     - Po úspěchu: refresh stránky (modal zmizí, protože middleware už nehlásí mismatch)
     - _Requirements: 6.4_
 
-  - [ ] 10.3 Integrovat modal v dashboard / onboarding layoutech
+  - [x] 10.3 Integrovat modal v dashboard / onboarding layoutech
     - V `src/app/(dashboard)/layout.tsx` a `src/app/onboarding/layout.tsx`: číst hlavičku `x-dpa-mismatch` (přes `next/headers`) → pokud `true`, vyrenderovat `<DpaModal />`
     - _Requirements: 6.2, 6.3_
 
-- [ ] 11. Onboarding wizard — společná infrastruktura
-  - [ ] 11.1 Vytvořit `src/lib/onboarding/draft.ts` — repository pro `onboarding_drafts`
+- [x] 11. Onboarding wizard — společná infrastruktura
+  - [x] 11.1 Vytvořit `src/lib/onboarding/draft.ts` — repository pro `onboarding_drafts`
     - Funkce `getDraft(userId)`: SELECT jednoho řádku, vrací `null` pokud neexistuje
     - Funkce `upsertStep(userId, step, dataKey, jsonData)`: UPSERT s aktualizací příslušného JSON sloupce a `current_step = max(current_step, step)`
     - Funkce `deleteDraft(userId)`: DELETE
     - Veškerý přístup pod uživatelovým JWT (RLS z 1.2 vynutí izolaci)
     - _Requirements: 14.1_
 
-  - [ ] 11.2 Vytvořit společný layout `src/app/onboarding/layout.tsx`
+  - [x] 11.2 Vytvořit společný layout `src/app/onboarding/layout.tsx`
     - Minimal layout (bez sidebaru), progress indicator 1/6 — 6/6, krokový nadpis
     - Integrace DPA modálu (z 10.3)
     - _Requirements: 7.1, 15.2_
 
-  - [ ] 11.3 Implementovat redirect logiku `src/app/onboarding/[step]/page.tsx` skeleton
+  - [x] 11.3 Implementovat redirect logiku `src/app/onboarding/[step]/page.tsx` skeleton
     - Server Component přijímající param `step ∈ {1..6}`
     - Pokud `step > current_step + 1` v draftu: redirect na `/onboarding/{current_step + 1}` (zabraňuje skoku přes nedokončené kroky)
     - Pokud `step !== 1..6`: 404
     - Skutečné UI delegovat na `step`-specific komponenty (krok 1–6 v dalších úkolech)
     - _Requirements: 14.1_
 
-- [ ] 12. Onboarding wizard — krok 1: výběr typu podniku
-  - [ ] 12.1 Implementovat UI pro krok 1 v `src/app/onboarding/1/page.tsx`
+- [x] 12. Onboarding wizard — krok 1: výběr typu podniku
+  - [x] 12.1 Implementovat UI pro krok 1 v `src/app/onboarding/1/page.tsx`
     - Radio výběr ze sedmi typů: `kadernik`, `nehtove_studio`, `bistro`, `masazni_salon`, `spa`, `beauty`, `ostatni` s českými popisky
     - Předvyplnit z `draft.type_data`, pokud existuje (R14.1)
     - Tlačítko „Pokračovat"
     - _Requirements: 7.1, 14.1, 15.2_
 
-  - [ ] 12.2 Implementovat server action `src/app/onboarding/1/actions.ts → submitTypeAction`
+  - [x] 12.2 Implementovat server action `src/app/onboarding/1/actions.ts → submitTypeAction`
     - Vstup: vybraný typ (string)
     - Validace: musí být v enumu sedmi hodnot, jinak česká hláška „Vyberte typ podniku" (7.2)
     - `upsertStep(userId, 1, 'type_data', { type })`
     - Redirect `/onboarding/2`
     - _Requirements: 7.2, 7.3_
 
-- [ ] 13. Onboarding wizard — krok 2: slug
-  - [ ] 13.1 Implementovat UI pro krok 2 v `src/app/onboarding/2/page.tsx`
+- [x] 13. Onboarding wizard — krok 2: slug
+  - [x] 13.1 Implementovat UI pro krok 2 v `src/app/onboarding/2/page.tsx`
     - Pole pro slug + živý náhled URL `https://www.horea.cz/{slug}`
     - Client Component s debounce 300 ms volajícím server action z 13.2
     - Předvyplnit z `draft.slug_data`
     - _Requirements: 8.1, 8.2, 14.1, 15.2_
 
-  - [ ] 13.2 Implementovat server action `src/app/onboarding/2/actions.ts → checkSlugAction`
+  - [x] 13.2 Implementovat server action `src/app/onboarding/2/actions.ts → checkSlugAction`
     - Vstup: raw slug
     - Volá `normalizeSlug(raw)` z 2.2
     - Pokud `kind === 'invalid_format'`: vrátit hlášku dle `reason` (8.3, 8.4)
@@ -318,58 +321,58 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
     - Pokud `kind === 'ok'`: SELECT `businesses WHERE slug = $1 LIMIT 1` → `TAKEN` (8.6) nebo `OK` + náhled URL
     - _Requirements: 8.2, 8.3, 8.4, 8.5, 8.6_
 
-  - [ ] 13.3 Implementovat server action `submitSlugAction`
+  - [x] 13.3 Implementovat server action `submitSlugAction`
     - Vstup: raw slug
     - Re-validace přes `checkSlugAction` (defense in depth)
     - Při `OK`: `upsertStep(userId, 2, 'slug_data', { slug: normalized })` → redirect `/onboarding/3`
     - Jinak zůstat na kroku 2 s chybou (8.7)
     - _Requirements: 8.7, 8.8_
 
-- [ ] 14. Onboarding wizard — krok 3: profil
-  - [ ] 14.1 Implementovat UI pro krok 3 v `src/app/onboarding/3/page.tsx`
+- [x] 14. Onboarding wizard — krok 3: profil
+  - [x] 14.1 Implementovat UI pro krok 3 v `src/app/onboarding/3/page.tsx`
     - Pole: název (povinné), popis (povinné), telefon (povinné), email (povinné), adresa (volitelné)
     - Klientská validace na blur s českou hláškou (R9.2 — UX warning na prázdné povinné pole)
     - Předvyplnit z `draft.profile_data`
     - _Requirements: 9.1, 9.2, 14.1, 15.2_
 
-  - [ ] 14.2 Implementovat server action `src/app/onboarding/3/actions.ts → submitProfileAction`
+  - [x] 14.2 Implementovat server action `src/app/onboarding/3/actions.ts → submitProfileAction`
     - Validace: povinná pole nesmí být prázdná (9.3), email musí být validní formát přes `validateEmail` z 4.2 (9.4)
     - `upsertStep(userId, 3, 'profile_data', { name, description, phone, email, address? })` → redirect `/onboarding/4`
     - _Requirements: 9.3, 9.4, 9.5_
 
-- [ ] 15. Onboarding wizard — krok 4: první služba
-  - [ ] 15.1 Implementovat UI pro krok 4 v `src/app/onboarding/4/page.tsx`
+- [x] 15. Onboarding wizard — krok 4: první služba
+  - [x] 15.1 Implementovat UI pro krok 4 v `src/app/onboarding/4/page.tsx`
     - Dynamický seznam služeb (min 1), každá má pole: název, doba trvání (min), cena (Kč)
     - Tlačítko „Přidat další službu"
     - Předvyplnit z `draft.services_data`
     - _Requirements: 10.1, 14.1, 15.2_
 
-  - [ ] 15.2 Implementovat server action `src/app/onboarding/4/actions.ts → submitServicesAction`
+  - [x] 15.2 Implementovat server action `src/app/onboarding/4/actions.ts → submitServicesAction`
     - Validace: alespoň jedna služba s vyplněným názvem + dobou + cenou (10.5), název neprázdný (10.2), doba kladné celé číslo (10.3), cena nezáporné desetinné číslo (10.4)
     - České hlášky pro každý druh chyby
     - `upsertStep(userId, 4, 'services_data', services)` → redirect `/onboarding/5`
     - _Requirements: 10.2, 10.3, 10.4, 10.5, 10.6_
 
-- [ ] 16. Onboarding wizard — krok 5: otevírací doba
-  - [ ] 16.1 Implementovat UI pro krok 5 v `src/app/onboarding/5/page.tsx`
+- [x] 16. Onboarding wizard — krok 5: otevírací doba
+  - [x] 16.1 Implementovat UI pro krok 5 v `src/app/onboarding/5/page.tsx`
     - Pro každý den (po–ne): toggle „otevřeno/zavřeno" + time inputy `opens_at` a `closes_at`
     - Předvyplnit z `draft.hours_data`
     - _Requirements: 11.1, 14.1, 15.2_
 
-  - [ ] 16.2 Implementovat server action `src/app/onboarding/5/actions.ts → submitHoursAction`
+  - [x] 16.2 Implementovat server action `src/app/onboarding/5/actions.ts → submitHoursAction`
     - Validace: pro každý otevřený den `closes_at > opens_at` s CZ hláškou identifikující den (11.2)
     - Aspoň jeden den nesmí být zavřený (11.3)
     - `upsertStep(userId, 5, 'hours_data', hours)` → redirect `/onboarding/6`
     - _Requirements: 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 17. Onboarding wizard — krok 6: souhrn + atomický commit
-  - [ ] 17.1 Implementovat UI pro krok 6 v `src/app/onboarding/6/page.tsx`
+- [x] 17. Onboarding wizard — krok 6: souhrn + atomický commit
+  - [x] 17.1 Implementovat UI pro krok 6 v `src/app/onboarding/6/page.tsx`
     - Readonly souhrn všech 5 předchozích kroků z draftu
     - Odkazy „Upravit" vedoucí na `/onboarding/{step}` (R12.2)
     - Tlačítko „Vytvořit podnik"
     - _Requirements: 12.1, 12.2_
 
-  - [ ] 17.2 Implementovat atomic commit transaction `src/lib/onboarding/commit.ts → commitOnboarding(userId)`
+  - [x] 17.2 Implementovat atomic commit transaction `src/lib/onboarding/commit.ts → commitOnboarding(userId)`
     - Vytvořit Postgres funkci `commit_onboarding(uid UUID)` (migrace `0012_commit_onboarding_function.sql`) běžící v jedné transakci:
       1. SELECT draft → exception, pokud chybí
       2. Finální server-side validace (last-line defense)
@@ -384,14 +387,14 @@ Implementační plán pro feature `auth-onboarding` — autentizační vrstva (r
       - Ostatní chyby → `{ error: 'transaction_failed' }` (R12.4)
     - _Requirements: 12.3, 12.4, 12.5_
 
-  - [ ] 17.3 Implementovat server action `src/app/onboarding/6/actions.ts → commitAction`
+  - [x] 17.3 Implementovat server action `src/app/onboarding/6/actions.ts → commitAction`
     - Volá `commitOnboarding(userId)` z 17.2
     - Při `slug_taken`: redirect `/onboarding/2` s českou hláškou „Slug se mezitím obsadil, zvolte jiný"
     - Při `transaction_failed`: zůstat na kroku 6 s hláškou + tlačítko „Zkusit znovu"
     - Při úspěchu: redirect `/dashboard`
     - _Requirements: 12.3, 12.4, 12.5, 12.6_
 
-  - [ ]* 17.4 Property test: atomicita commitu kroku 6
+  - [x]* 17.4 Property test: atomicita commitu kroku 6
     - **Property 4: Atomicita commitu**
     - **Validates: Requirements 12.3, 12.4**
     - V `src/lib/onboarding/__tests__/commit.property.test.ts`: pro libovolný validní draft a libovolnou pozici simulovaného selhání (1–5 z INSERT/DELETE kroků), platí, že po skončení transakce **buď** existují všechny 4 skupiny + draft je smazán, **nebo** žádná z nich + draft zůstává nedotčen

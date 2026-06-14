@@ -162,7 +162,7 @@ Požadavky jsou odvozeny z designových rozhodnutí v `design.md` a slouží jak
 2. THE veřejná stránka podniku SHALL být dostupná na URL `https://www.horea.cz/{slug}`.
 3. WHEN podnikatel registruje slug THEN platforma SHALL ověřit unikátnost a odmítnout již obsazené slugy (first-come, first-served).
 4. THE slug SHALL splňovat URL-bezpečné požadavky (malá písmena, číslice, pomlčky; bez diakritiky a mezer).
-5. WHERE slug koliduje se systémovými routami (např. `/admin`, `/login`, `/api`), THE platforma SHALL slug odmítnout.
+5. WHERE slug koliduje se systémovými routami nebo citlivými názvy (např. `admin`, `login`, `api`), THE platforma SHALL slug odmítnout.
 6. WHEN podnik je ve stavu `free`, `expired` nebo `deleted` THEN veřejná stránka `/{slug}` SHALL zobrazit hlášku „Tento podnik zatím nepublikoval svůj profil" (a nikoliv obsah profilu).
 
 ### Requirement 12: Platby přes GoPay
@@ -236,7 +236,7 @@ Požadavky jsou odvozeny z designových rozhodnutí v `design.md` a slouží jak
 
 1. THE platforma SHALL podporovat právě jednu roli `admin` přes flag `users.is_admin = true`.
 2. WHEN administrátor je přihlášen THEN RLS policies SHALL mu umožnit čtení všech tenant-scoped dat.
-3. THE administrátorský dashboard SHALL být dostupný na samostatné cestě (např. `/admin`) s middleware kontrolou role.
+3. THE administrátorský dashboard SHALL být dostupný jako role-aware varianta `/dashboard` po přihlášení administrátora; platforma SHALL nevystavovat samostatnou veřejně známou admin login/dashboard cestu.
 4. THE administrátor SHALL mít možnost: prohlížet seznam uživatelů, nastavit override předplatného (komp účet, prodloužení), spravovat kupóny, ručně spárovat platbu, prohlížet statistiky.
 5. WHERE administrátor provádí citlivou akci (změna předplatného, mazání businessu, kupóny) THE platforma SHALL akci zalogovat do audit logu (audit log spec definován v `admin-dashboard`).
 

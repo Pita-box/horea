@@ -1,4 +1,4 @@
-# Design System Rules
+# Design System Rules (Adora style)
 
 Canonical source: `.kiro/steering/design-system.md`.
 
@@ -28,6 +28,7 @@ Horea uses a light, precise SaaS interface: white canvas, subtle borders, dark v
 - Display/headlines: PolySans in source design; Montserrat substitute in implementation.
 - Body/UI: Plus Jakarta Sans; Inter fallback.
 - Common sizes: 14, 16, 18, 20, 32, 58, 68px.
+- Global body text default (`body` v `globals.css`): font-size 18px, font-weight 500, color `#353241`. Výjimka: tlumené dekorativní doplňkové texty `color-mix(in srgb, var(--color-slate-text) 70%, white)` se NEmění — drží si vlastní barvu/velikost/váhu.
 - Kiro source uses tight letter spacing. If active Codex runtime instructions conflict, obey higher-priority runtime instructions and mention the conflict.
 
 ## Component Rules
@@ -38,3 +39,4 @@ Horea uses a light, precise SaaS interface: white canvas, subtle borders, dark v
 - Feature card: white background, 26px radius, no heavy shadow.
 - Outline badge: transparent background, accent text, pill radius.
 - Use existing tokens in `src/app/globals.css` when present; do not invent near-match colors.
+- Růžová jako popředí (text/ikona/rámeček) na bílém/skoro-bílém pozadí: vždy `var(--color-neon-pink)` (#f843c2), nikdy `var(--color-sunset-pink)` (#ffaae6 — světlý, nečitelný). Sunset Pink jen jako dekorativní výplň/pozadí.

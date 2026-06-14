@@ -1,0 +1,22 @@
+Rozdělení:
+
+Resend → auth (login/registrace/verify/reset), faktury, kontaktní formulář, admin/cron notifikace.
+SMTP2GO → notifikace rezervací (potvrzení klientovi, upozornění majiteli, schválení/odmítnutí/úprava/zrušení) — vše, co teče přes dispatchTransactionalEmail.
+Co jsem udělal:
+
+smtp-client.ts
+ — odesílání přes SMTP2GO HTTP API (fetch, žádná nová závislost), isSmtp2goConfigured().
+dispatcher.ts — dispatchTransactionalEmail teď posílá přes SMTP2GO, když je nakonfigurované; jinak fallback na Resend (kvůli dev/testu a hladkému rolloutu). Best-effort kontrakt beze změny (nikdy nevyhazuje, loguje provider + error kód, žádné PII).
+.env.example → SMTP2GO_API_KEY, SMTP2GO_FROM_EMAIL.
+auth-email-delivery.md
+ → nová sekce o rozdělení odesílatelů.
+Proč je to čisté: notifikace rezervací už šly jedinou cestou (dispatchTransactionalEmail), takže stačilo přepnout vnitřek. Všechny testy tuhle funkci mockují celou → změna je transparentní, nic se nerozbilo.
+
+Ověření: pnpm lint čistý, pnpm test:run 415 passed / 49 skipped, pnpm build OK.
+
+Co ještě potřebuješ udělat ručně (mimo kód):
+
+V SMTP2GO ověřit doménu horea.cz (přidat jejich SPF/DKIM DNS záznamy) a vytvořit API klíč.
+Nastavit SMTP2GO_API_KEY a SMTP2GO_FROM_EMAIL (např. Horea <noreply@horea.cz>) v .env.local / na produkci.
+Dokud klíč nenastavíš, notifikace rezervací jedou přes Resend (nic nepadá).
+Pozn.: tahle architektura řeší izolaci limitů, ale ztracené e-maily při výpadku stále neřeší (best-effort, bez retry). Pokud chceš nulovou ztrátu, pořád platí nabídka přidat outbox + retry. Chceš?

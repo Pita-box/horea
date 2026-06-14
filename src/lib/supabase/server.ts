@@ -3,6 +3,8 @@ import 'server-only';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+import { applyRememberMeToCookieOptions, isRememberEnabled, REMEMBER_COOKIE } from './remember-me';
+
 function requirePublicEnv(
   name: 'NEXT_PUBLIC_SUPABASE_URL' | 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
 ): string {
@@ -28,8 +30,9 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
+            const remember = isRememberEnabled(cookieStore.get(REMEMBER_COOKIE)?.value);
             cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
+              cookieStore.set(name, value, applyRememberMeToCookieOptions(options, remember));
             });
           } catch {
             // Server Components cannot always write cookies; middleware refresh handles auth state.

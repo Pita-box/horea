@@ -1,0 +1,194 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ReservationFormController — krok 1 (výběr služby) > vykreslí seznam služeb a blokuje přechod bez výběru 1`] = `
+<div>
+  <div
+    class="mx-auto flex w-full max-w-[560px] flex-col gap-[16px]"
+  >
+    <ol
+      class="flex items-start justify-between gap-1"
+    >
+      <li
+        class="flex min-w-0 flex-1 flex-col items-center gap-[6px] text-center"
+      >
+        <button
+          aria-current="step"
+          aria-label="Krok 1: Služba"
+          class="flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-semibold transition-colors bg-[var(--color-action-violet)] text-white"
+          disabled=""
+          type="button"
+        >
+          1
+        </button>
+        <span
+          class="text-[12px] leading-tight sm:text-[14px] font-semibold text-[var(--color-action-violet)]"
+        >
+          Služba
+        </span>
+      </li>
+      <li
+        class="flex min-w-0 flex-1 flex-col items-center gap-[6px] text-center"
+      >
+        <button
+          aria-label="Krok 2: Datum"
+          class="flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-semibold transition-colors bg-[var(--color-soft-gray-fill)] text-[color-mix(in_srgb,var(--color-slate-text)_50%,white)]"
+          disabled=""
+          type="button"
+        >
+          2
+        </button>
+        <span
+          class="text-[12px] leading-tight sm:text-[14px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+        >
+          Datum
+        </span>
+      </li>
+      <li
+        class="flex min-w-0 flex-1 flex-col items-center gap-[6px] text-center"
+      >
+        <button
+          aria-label="Krok 3: Čas"
+          class="flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-semibold transition-colors bg-[var(--color-soft-gray-fill)] text-[color-mix(in_srgb,var(--color-slate-text)_50%,white)]"
+          disabled=""
+          type="button"
+        >
+          3
+        </button>
+        <span
+          class="text-[12px] leading-tight sm:text-[14px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+        >
+          Čas
+        </span>
+      </li>
+      <li
+        class="flex min-w-0 flex-1 flex-col items-center gap-[6px] text-center"
+      >
+        <button
+          aria-label="Krok 4: Údaje"
+          class="flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-semibold transition-colors bg-[var(--color-soft-gray-fill)] text-[color-mix(in_srgb,var(--color-slate-text)_50%,white)]"
+          disabled=""
+          type="button"
+        >
+          4
+        </button>
+        <span
+          class="text-[12px] leading-tight sm:text-[14px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+        >
+          Údaje
+        </span>
+      </li>
+      <li
+        class="flex min-w-0 flex-1 flex-col items-center gap-[6px] text-center"
+      >
+        <button
+          aria-label="Krok 5: Souhrn"
+          class="flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-semibold transition-colors bg-[var(--color-soft-gray-fill)] text-[color-mix(in_srgb,var(--color-slate-text)_50%,white)]"
+          disabled=""
+          type="button"
+        >
+          5
+        </button>
+        <span
+          class="text-[12px] leading-tight sm:text-[14px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+        >
+          Souhrn
+        </span>
+      </li>
+    </ol>
+    <div
+      class="animate-step-enter"
+    >
+      <div
+        class="flex w-full flex-col gap-[16px]"
+      >
+        <h2
+          class="text-[20px] font-semibold text-[var(--color-rich-violet)]"
+        >
+          Výběr služby
+        </h2>
+        <ul
+          class="flex flex-col gap-[8px]"
+        >
+          <li>
+            <button
+              aria-pressed="false"
+              class="flex min-h-[44px] w-full items-center justify-between gap-[16px] rounded-[var(--radius-cards)] border px-[16px] py-[12px] text-left transition-colors border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] hover:bg-[var(--color-soft-gray-fill)]"
+              type="button"
+            >
+              <span
+                class="flex min-w-0 flex-col gap-[2px]"
+              >
+                <span
+                  class="text-[16px] font-medium text-[var(--color-slate-text)]"
+                >
+                  Stříhání vlasů
+                </span>
+                <span
+                  class="text-[14px] text-[var(--color-slate-text)] opacity-70"
+                >
+                  30 min
+                </span>
+                <span
+                  class="text-[14px] font-medium text-[var(--color-rich-violet)]"
+                >
+                  500 Kč
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                class="shrink-0 rounded-[var(--radius-buttons)] px-[16px] py-[8px] text-[14px] font-medium transition-colors bg-[var(--color-action-violet)] text-white"
+              >
+                Vybrat
+              </span>
+            </button>
+          </li>
+          <li>
+            <button
+              aria-pressed="false"
+              class="flex min-h-[44px] w-full items-center justify-between gap-[16px] rounded-[var(--radius-cards)] border px-[16px] py-[12px] text-left transition-colors border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] hover:bg-[var(--color-soft-gray-fill)]"
+              type="button"
+            >
+              <span
+                class="flex min-w-0 flex-col gap-[2px]"
+              >
+                <span
+                  class="text-[16px] font-medium text-[var(--color-slate-text)]"
+                >
+                  Barvení
+                </span>
+                <span
+                  class="text-[14px] text-[var(--color-slate-text)] opacity-70"
+                >
+                  90 min
+                </span>
+                <span
+                  class="text-[14px] font-medium text-[var(--color-rich-violet)]"
+                >
+                  1 500 Kč
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                class="shrink-0 rounded-[var(--radius-buttons)] px-[16px] py-[8px] text-[14px] font-medium transition-colors bg-[var(--color-action-violet)] text-white"
+              >
+                Vybrat
+              </span>
+            </button>
+          </li>
+        </ul>
+        <div
+          class="flex justify-end"
+        >
+          <button
+            class="inline-flex h-10 items-center justify-center text-sm font-normal leading-none transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-[var(--radius-buttons)] bg-[var(--color-action-violet)] px-5 py-0 text-[var(--color-canvas-white)] hover:brightness-95 focus-visible:outline-[var(--color-action-violet)] min-h-[44px] w-full sm:w-auto"
+            disabled=""
+            type="button"
+          >
+            Pokračovat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
