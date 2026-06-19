@@ -430,7 +430,7 @@ export function CalendarView({
             </div>
 
             {/* Mřížka: osa hodin + sloupce dní s bloky. */}
-            <div className="flex">
+            <div className="flex pt-3">
               <div className="relative w-14 shrink-0" style={{ height: gridHeight }}>
                 {hourMarks.map(({ hour, top }) => (
                   <span

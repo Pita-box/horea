@@ -715,7 +715,7 @@ exports[`CalendarView (R4.5, R4.6) > vizuálně odliší rejected/cancelled od a
             </div>
           </div>
           <div
-            class="flex"
+            class="flex pt-3"
           >
             <div
               class="relative w-14 shrink-0"
