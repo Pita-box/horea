@@ -1,20 +1,25 @@
 'use client';
 
 import { Button, Notice } from '@/components/ui';
+import { combinedDuration, combinedPrice } from '@/lib/reservation/combine';
 
 import { formatDateCs, formatPriceCzk } from './format';
 import type { ContactValues, ReservationService, SubmitState } from './types';
 
 /**
- * Krok 5 — souhrn a odeslání (R8.1–R8.5, R9.4, R9.9).
+ * Krok 5 — souhrn a odeslání (R8.1–R8.5, R9.4, R9.9, R12.1–R12.4).
  *
- * Zobrazuje souhrn všech polí česky a tlačítko „Odeslat rezervaci". Synchronní
+ * Zobrazuje souhrn všech polí česky a tlačítko „Odeslat rezervaci". Souhrn
+ * vypíše všechny vybrané služby v uloženém pořadí (název + délka, R12.1),
+ * `Combined_Duration` jako celkovou délku (R12.2), `Combined_Price` jen když
+ * je > 0 Kč (R12.3) a jeden časový blok v Europe/Prague (R12.4). Synchronní
  * znepřístupnění tlačítka před odesláním (R8.4) i jeho držení po dobu zpracování
  * (R8.5) řeší controller přes ref guard + `submitState`; tady jen reflektujeme
  * `submitState` v `disabled`. Při úspěchu zobrazíme děkovnou hlášku podle statusu.
  */
 type Step5SummaryProps = {
-  service: ReservationService;
+  /** Vybrané služby v uloženém pořadí (pořadí výběru = position). */
+  services: ReservationService[];
   date: string;
   time: string;
   contact: ContactValues;
@@ -34,7 +39,7 @@ const SUCCESS_MESSAGES = {
 type SummaryRow = { label: string; value: string; step: number };
 
 export function Step5Summary({
-  service,
+  services,
   date,
   time,
   contact,
@@ -59,13 +64,27 @@ export function Step5Summary({
     );
   }
 
-  const rows: SummaryRow[] = [
-    { label: 'Služba', value: service.name, step: 1 },
-    { label: 'Trvání', value: `${service.durationMinutes} min`, step: 1 },
-  ];
+  const rows: SummaryRow[] = [];
 
-  if (service.priceCzk > 0) {
-    rows.push({ label: 'Cena', value: formatPriceCzk(service.priceCzk), step: 1 });
+  // Seznam všech služeb v uloženém pořadí — název + délka (R12.1). Při více
+  // službách se prefixuje pořadovým číslem konzistentně se Step1ServicePicker.
+  const multiple = services.length > 1;
+  services.forEach((service, index) => {
+    const prefix = multiple ? `${index + 1}. ` : '';
+    rows.push({
+      label: 'Služba',
+      value: `${prefix}${service.name} (${service.durationMinutes} min)`,
+      step: 1,
+    });
+  });
+
+  // Combined_Duration jako celková délka rezervace (R12.2).
+  rows.push({ label: 'Trvání celkem', value: `${combinedDuration(services)} min`, step: 1 });
+
+  // Combined_Price jen když je > 0 Kč (R12.3).
+  const totalPrice = combinedPrice(services);
+  if (totalPrice > 0) {
+    rows.push({ label: 'Cena celkem', value: formatPriceCzk(totalPrice), step: 1 });
   }
 
   rows.push(
@@ -95,9 +114,9 @@ export function Step5Summary({
       ) : null}
 
       <dl className="flex flex-col gap-[8px]">
-        {rows.map((row) => (
+        {rows.map((row, index) => (
           <div
-            key={row.label}
+            key={`${row.label}-${index}`}
             className="flex items-start justify-between gap-[16px] border-b border-[var(--color-border-vychozi)] pb-[8px] last:border-b-0 last:pb-0"
           >
             <dt className="text-[14px] text-[var(--color-slate-text)] opacity-70">{row.label}</dt>

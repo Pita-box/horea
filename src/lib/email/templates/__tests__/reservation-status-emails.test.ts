@@ -107,19 +107,30 @@ describe('renderReservationCancelledEmail', () => {
 describe('renderReservationModifiedEmail', () => {
   it('obsahuje povinnou větu o úpravě a hodnoty po úpravě', () => {
     const email = renderReservationModifiedEmail({
-      ...base,
-      serviceName: 'Střih',
+      clientName: base.clientName,
+      businessName: base.businessName,
+      services: [
+        { name: 'Střih', durationMinutes: 45 },
+        { name: 'Foukání', durationMinutes: 30 },
+      ],
+      combinedDurationMinutes: 75,
+      combinedPriceCzk: 500,
       reservationDate: '16.07.2024',
       reservationTime: '10:30',
+      businessUrl: base.businessUrl,
     });
 
     expect(email.subject).toBe('Vaše rezervace byla upravena — Kadeřnictví Květa');
     expect(email.text).toContain('Vaše rezervace byla upravena.');
-    expect(email.text).toContain('Střih');
+    expect(email.text).toContain('- Střih (45 min)');
+    expect(email.text).toContain('- Foukání (30 min)');
+    expect(email.text).toContain('Celková délka: 75 min');
+    expect(email.text).toContain('celková cena: 500 Kč');
     expect(email.text).toContain('16.07.2024');
     expect(email.text).toContain('10:30');
     expect(email.text).toContain(base.businessUrl);
     expect(email.text).toContain(DISCLAIMER);
     expect(email.html).toContain('Vaše rezervace byla upravena.');
+    expect(email.html).toContain('<li>Střih (45 min)</li>');
   });
 });

@@ -12,6 +12,7 @@ This is a Codex index over Kiro feature specs. Detailed requirements, design, ta
 | 4 | `reservation-management` | `.kiro/specs/reservation-management/` | `public-business-page`, `services-and-availability`, active subscription status | DONE 100% — all tasks incl. optional PBT/unit/integration/E2E complete |
 | 5 | `subscription-payments` | `.kiro/specs/subscription-payments/` | `architecture` payment model, auth/business ownership | DONE — all required tasks complete (250 passed, build green, migrations 0024–0030 applied). Deferred: optional `*` PBT/unit/integration/E2E tests |
 | 6 | `admin-dashboard` | `.kiro/specs/admin-dashboard/` | `subscription-payments`, admin role/RLS override | DONE 100% — all tasks incl. optional PBT/unit/integration/E2E complete (415 passed, build OK under Node 20, migrations 0031–0040 applied) |
+| 7 | `multi-service-reservations` | `.kiro/specs/multi-service-reservations/` | `reservation-management` | DONE — kombinované rezervace (více služeb i více zaměstnanců na jednu rezervaci), migrace 0049–0051 nasazené na sdílenou DB |
 
 ## Cross-cutting UI redesign (probíhá, mimo per-feature tasky)
 
@@ -21,6 +22,17 @@ Vizuální sjednocení podle podkladů v `.kiro/docs/` (Adora style). Detailní 
 - **Onboarding** — full-screen gradient + `AuthHeader`/`PublicFooter`; krok 2 slug preview, krok 3 profil (ikony, telefon přesně 9 číslic), krok 5 `TimePicker` + `Switch`, krok 6 souhrn „Souhrn údajů".
 - **Dashboard** — nový shell `DashboardChrome` (znovupoužitelné `DashboardSidebar`/`DashboardHeader`/`DashboardFooter`, role-driven `variant` owner/admin) nahradil horní `DashboardNav`; sdílí ho i admin oblast (`/admin/*` přes `admin/layout.tsx`). **Vyhledávání v headeru** (`DashboardSearch`) — viz „Dashboard search" níže. Fake analytics z reference zatím nestavěny (chybí data). Podstránky (services/reservations/clients/…) čekají na migraci vzhledu.
 - **Marketing** — `(marketing)` route group: homepage, `/kontakt`, `/vseobecne-podminky` (vč. DPA jako sekce 7), `/ochrana-osobnich-udaju`, `/predplatne`; sdílený `PublicHeader`/`PublicFooter`.
+
+## Dashboard rezervace / analytika redesign (probíhá, navazuje na multi-service-reservations)
+
+Detailní chronologie v `plans/build-journal.md`. Souhrn aktuálního stavu:
+
+- **Sidebar** — sbalitelný icon-only rail (`DashboardChrome`/`DashboardSidebar`); na stránce rezervací se sbalí automaticky.
+- **`/dashboard/reservations`** — pohled **„Tabulka" zrušen**, výchozí je **„Obsazenost"** (kalendář měsíce + graf obsazenosti + pill filtry vč. filtru dle služby přes `reservation_services`); druhý pohled **„Kalendář"** přepracován na layout s levým railem (mini-kalendář, karta nejbližší rezervace, filtry) a pravou **časovou mřížkou** (hodiny × dny, proměnná výška hodinového řádku, hover na bloku).
+- **Detail rezervace** — přiřazení **více zaměstnanců** (search + checkbox, `reservation_employees`) a editace **více služeb** (search + multi-select); modal má max-výšku viewportu se scrollem.
+- **Tabulky webu** — jednotné hover chování řádků (bílá → `--color-light-violet`), opt-out `data-no-row-hover` pro tabulky se sloupcem „Akce". `Notice` sjednocen na 3 varianty.
+- **`/dashboard/employees`** — pravý sloupec „TOP zaměstnanci" (obsazenost/efektivita aktuálního měsíce).
+- **`/dashboard/analytics`** (NOVÉ, poslední položka aside) — Analytika podniku: výběr období, 4 KPI s meziobdobním srovnáním, graf vývoje tržeb, heatmapa vytížení, koláč stavů, žebříčky služby/zaměstnanci/klienti, noví vs. vracející se. Info-tooltipy u karet. Čisté agregace v `src/lib/analytics/`.
 
 ## Dashboard search (rozšiřitelná feature, probíhá)
 

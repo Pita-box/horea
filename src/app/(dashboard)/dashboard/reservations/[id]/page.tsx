@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 import { Card } from '@/components/ui/card';
 import { Notice } from '@/components/ui/notice';
@@ -10,6 +11,7 @@ import {
   type AttendanceStatus,
   type ReservationStatus,
 } from '@/lib/reservations/labels';
+import { combinedDuration, combinedPrice } from '@/lib/reservation/combine';
 import type { ReservationDetail, ServiceOption } from '@/lib/reservations/types';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -19,6 +21,13 @@ import { AttendanceActions } from './AttendanceActions';
 import { ReservationActions } from './ReservationActions';
 
 const NOT_FOUND = 'Rezervace nebyla nalezena';
+
+/** Cena v Kč v českém formátu (oddělovač tisíců, desetinná místa jen když jsou). */
+const priceFormatter = new Intl.NumberFormat('cs-CZ', { maximumFractionDigits: 2 });
+
+function formatPriceCzk(value: number): string {
+  return `${priceFormatter.format(value)} Kč`;
+}
 
 // V Next 15 jsou `params` Promise.
 type ReservationDetailPageProps = {
@@ -42,13 +51,34 @@ type DetailRow = {
   services: { name: string } | { name: string }[] | null;
 };
 
+/** Řádek `reservation_services` se snapshotem délky/ceny a názvem služby. */
+type ServiceSetRow = {
+  position: number;
+  service_id: string;
+  duration_minutes_snapshot: number;
+  price_czk_snapshot: number | string;
+  services: { name: string } | { name: string }[] | null;
+};
+
+/** Položka uspořádané množiny služeb rezervace (`Reservation_Service_Set`, R13.1). */
+type ReservationServiceItem = {
+  position: number;
+  serviceId: string;
+  name: string;
+  durationMinutes: number;
+  priceCzk: number;
+};
+
 /** Detail rezervace + kontext potřebný pro editaci (služby podniku, `service_id`). */
 type LoadedReservation = {
   reservation: ReservationDetail;
   serviceId: string | null;
+  /** Uspořádaná množina služeb rezervace dle `position` (R13.1). */
+  serviceSet: ReservationServiceItem[];
   services: ServiceOption[];
   employees: AssignEmployeeOption[];
-  currentEmployeeId: string | null;
+  /** Aktuálně přiřazení zaměstnanci (množina); fallback na denormalizovaný primary. */
+  currentEmployeeIds: string[];
 };
 
 function serviceName(services: DetailRow['services']): string | null {
@@ -85,6 +115,26 @@ async function loadReservation(id: string): Promise<LoadedReservation | null> {
     return null;
   }
 
+  // Uspořádaná množina služeb rezervace se snapshoty (R13.1, R13.2). RLS politika
+  // `reservation_services_owner_read` izoluje řádky na podnik majitele. Pořadí
+  // držíme dle `position`; pro jistotu seřadíme i v JS, kdyby embed přišel jinak.
+  const { data: serviceSetRows } = await supabase
+    .from('reservation_services')
+    .select('position,service_id,duration_minutes_snapshot,price_czk_snapshot,services(name)')
+    .eq('reservation_id', id)
+    .order('position', { ascending: true })
+    .returns<ServiceSetRow[]>();
+
+  const serviceSet: ReservationServiceItem[] = (serviceSetRows ?? [])
+    .map((row) => ({
+      position: row.position,
+      serviceId: row.service_id,
+      name: serviceName(row.services) ?? '—',
+      durationMinutes: row.duration_minutes_snapshot,
+      priceCzk: Number(row.price_czk_snapshot),
+    }))
+    .sort((a, b) => a.position - b.position);
+
   // Služby podniku pro výběr při úpravě (R9.1) — izolováno RLS na podnik majitele.
   const { data: serviceRows } = await supabase
     .from('services')
@@ -103,6 +153,20 @@ async function loadReservation(id: string): Promise<LoadedReservation | null> {
     .order('created_at', { ascending: true })
     .returns<AssignEmployeeOption[]>();
 
+  // Množina přiřazených zaměstnanců (reservation_employees) pod uživatelským JWT
+  // (RLS `reservation_employees_owner_read`). Fallback na denormalizovaný primary
+  // `employee_id` u rezervací bez řádků v join tabulce (např. starší booking).
+  const { data: assignedRows } = await supabase
+    .from('reservation_employees')
+    .select('employee_id')
+    .eq('reservation_id', id)
+    .returns<{ employee_id: string }[]>();
+
+  let currentEmployeeIds = (assignedRows ?? []).map((row) => row.employee_id);
+  if (currentEmployeeIds.length === 0 && data.employee_id) {
+    currentEmployeeIds = [data.employee_id];
+  }
+
   return {
     reservation: {
       id: data.id,
@@ -118,13 +182,14 @@ async function loadReservation(id: string): Promise<LoadedReservation | null> {
       statusReason: data.status_reason,
     },
     serviceId: data.service_id,
+    serviceSet,
     services: serviceRows ?? [],
     employees: employeeRows ?? [],
-    currentEmployeeId: data.employee_id,
+    currentEmployeeIds,
   };
 }
 
-function DetailRowItem({ label, value }: { label: string; value: string }) {
+function DetailRowItem({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[160px_1fr] sm:gap-4">
       <dt className="text-sm font-semibold text-[var(--color-rich-violet)]">{label}</dt>
@@ -158,26 +223,64 @@ export default async function ReservationDetailPage({ params }: ReservationDetai
 }
 
 function ReservationDetailContent({ loaded }: { loaded: LoadedReservation }) {
-  const { reservation, serviceId, services, employees, currentEmployeeId } = loaded;
+  const { reservation, serviceId, serviceSet, services, employees, currentEmployeeIds } = loaded;
   // Časová brána docházky se vyhodnocuje serverově (R5.3, R11.3, R11.4).
   const attendanceAvailable = Date.now() > new Date(reservation.startsAt).getTime();
   const hasTeam = employees.length >= 1;
-  const assignedName = currentEmployeeId
-    ? (employees.find((e) => e.id === currentEmployeeId)?.name ?? null)
-    : null;
+  // Jména přiřazených zaměstnanců v pořadí seznamu podniku.
+  const assignedNames = employees
+    .filter((e) => currentEmployeeIds.includes(e.id))
+    .map((e) => e.name);
+
+  // Combined_Duration / Combined_Price ze snapshotů množiny služeb (R13.2).
+  const hasServiceSet = serviceSet.length > 0;
+  const totalDuration = combinedDuration(serviceSet);
+  const totalPrice = combinedPrice(serviceSet);
 
   return (
     <>
       <Card className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]">
         <dl className="divide-y divide-[var(--color-cloud-mist)]">
-          <DetailRowItem label="Služba" value={reservation.serviceName ?? '—'} />
+          {hasServiceSet ? (
+            <>
+              <DetailRowItem
+                label={serviceSet.length > 1 ? 'Služby' : 'Služba'}
+                value={
+                  <ul className="flex flex-col gap-1">
+                    {serviceSet.map((item) => (
+                      <li key={item.position} className="flex justify-between gap-4">
+                        <span>
+                          {serviceSet.length > 1 ? `${item.position + 1}. ` : ''}
+                          {item.name}
+                        </span>
+                        <span className="shrink-0 text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]">
+                          {item.durationMinutes} min
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                }
+              />
+              <DetailRowItem label="Celková délka" value={`${totalDuration} min`} />
+              {totalPrice > 0 ? (
+                <DetailRowItem label="Celková cena" value={formatPriceCzk(totalPrice)} />
+              ) : null}
+            </>
+          ) : (
+            <DetailRowItem label="Služba" value={reservation.serviceName ?? '—'} />
+          )}
           <DetailRowItem
             label="Čas"
             value={`${toPragueDisplay(reservation.startsAt)} – ${toPragueDisplay(reservation.endsAt)}`}
           />
           <DetailRowItem label="Stav" value={reservationStatusLabel(reservation.status)} />
           <DetailRowItem label="Docházka" value={attendanceLabel(reservation.attendance)} />
-          {hasTeam ? <DetailRowItem label="Zaměstnanec" value={assignedName ?? 'Nepřiřazeno'} /> : null}
+          {hasTeam ? (
+            <DetailRowItem
+              label={assignedNames.length > 1 ? 'Zaměstnanci' : 'Zaměstnanec'}
+              value={assignedNames.length > 0 ? assignedNames.join(', ') : 'Nepřiřazeno'}
+            />
+          ) : null}
           <DetailRowItem label="Jméno klienta" value={reservation.clientName} />
           <DetailRowItem label="Telefon" value={reservation.clientPhone ?? '—'} />
           <DetailRowItem label="E-mail" value={reservation.clientEmail ?? '—'} />
@@ -196,7 +299,13 @@ function ReservationDetailContent({ loaded }: { loaded: LoadedReservation }) {
           reservationId={reservation.id}
           status={reservation.status}
           services={services}
-          currentServiceId={serviceId}
+          currentServiceIds={
+            serviceSet.length > 0
+              ? serviceSet.map((item) => item.serviceId)
+              : serviceId
+                ? [serviceId]
+                : []
+          }
           startsAt={reservation.startsAt}
         />
 
@@ -204,7 +313,7 @@ function ReservationDetailContent({ loaded }: { loaded: LoadedReservation }) {
           <AssignEmployee
             reservationId={reservation.id}
             employees={employees}
-            currentEmployeeId={currentEmployeeId}
+            currentEmployeeIds={currentEmployeeIds}
           />
         ) : null}
 

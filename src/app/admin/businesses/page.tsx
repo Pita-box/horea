@@ -173,7 +173,7 @@ export default async function AdminBusinessesPage({ searchParams }: BusinessesPa
                   {businesses.map((business) => (
                     <tr
                       key={business.id}
-                      className="border-b border-[var(--color-border-vychozi)] last:border-b-0 hover:bg-[var(--color-soft-gray-fill)]"
+                      className="border-b border-[var(--color-border-vychozi)] last:border-b-0"
                     >
                       <td className="px-5 py-3">
                         <Link

@@ -217,7 +217,7 @@ export function CouponsManager({ coupons }: CouponsManagerProps) {
           aria-label="Seznam kupónů"
         >
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-sm">
+            <table data-no-row-hover className="w-full border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--color-border-vychozi)] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
                   <th className="px-4 py-3 font-medium">Kód</th>

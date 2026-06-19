@@ -1,21 +1,35 @@
-import { IconAlertTriangle, IconInfoCircle, type IconProps } from '@tabler/icons-react';
+import { IconAlertCircle, IconBulb, IconCancel, type IconProps } from '@tabler/icons-react';
 import type { ComponentType, HTMLAttributes } from 'react';
 
-type NoticeVariant = 'neutral' | 'error';
+/**
+ * Notice / Alert — sdílená in-page hláška (NE toast notifikace).
+ *
+ * Jediný zdroj pravdy pro vzhled in-page hlášek napříč webem. Tři varianty
+ * (pravidla viz `.kiro/steering/design-system.md` › „Notice / Alert"):
+ *  - `neutral` (general): IconBulb, rámeček i pozadí `--color-dark`, text bílý.
+ *  - `warning`: IconAlertCircle, rámeček `--color-border-yellow`,
+ *    pozadí `--color-bg-yellow`, text `--color-brown`.
+ *  - `error`: IconCancel, rámeček `--color-red`, pozadí bílé, text `--color-red`.
+ *
+ * Pozn.: toto se NETÝKÁ toast notifikací (ty mají vlastní komponentu/styl).
+ */
+type NoticeVariant = 'neutral' | 'warning' | 'error';
 
 type NoticeProps = HTMLAttributes<HTMLDivElement> & {
   variant?: NoticeVariant;
 };
 
 const variants: Record<NoticeVariant, string> = {
-  neutral: 'border-[var(--color-border-vychozi)] bg-[var(--color-dark)] text-[white]',
-  error:
-    'border-[color-mix(in_srgb,var(--color-neon-pink)_35%,white)] bg-[var(--color-canvas-white)] text-[var(--color-neon-pink)]',
+  neutral: 'border-[var(--color-dark)] bg-[var(--color-dark)] text-[white]',
+  warning:
+    'border-[var(--color-border-yellow)] bg-[var(--color-bg-yellow)] text-[var(--color-brown)]',
+  error: 'border-[var(--color-red)] bg-[var(--color-canvas-white)] text-[var(--color-red)]',
 };
 
 const icons: Record<NoticeVariant, ComponentType<IconProps>> = {
-  neutral: IconInfoCircle,
-  error: IconAlertTriangle,
+  neutral: IconBulb,
+  warning: IconAlertCircle,
+  error: IconCancel,
 };
 
 export function Notice({ className, variant = 'neutral', children, ...props }: NoticeProps) {

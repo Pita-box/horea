@@ -4,7 +4,7 @@ import { serverLog } from '@/lib/log-server';
 import { normalizeRouteSlug } from '@/lib/slug/route';
 import { createPublicClient } from '@/lib/supabase/public';
 
-import { loadAvailableSlots } from './slots/loadAvailableSlots';
+import { loadAvailableSlotsDetailed } from './slots/loadAvailableSlots';
 
 /**
  * Server action volaná z kroku 2 rezervačního formuláře. Tenký orchestrátor nad
@@ -19,11 +19,15 @@ export type GetAvailableSlotsInput = {
   slug: string;
   /** Datum v pásmu Europe/Prague ve tvaru `YYYY-MM-DD`. */
   date: string;
-  serviceId: string;
+  /**
+   * Uspořádaná množina vybraných služeb (R6.1). Combined_Duration = součet
+   * trvání. Prázdná množina → `loadAvailableSlots` vrací `[]` (R6.4).
+   */
+  serviceIds: string[];
 };
 
 export type GetAvailableSlotsResult =
-  | { ok: true; slots: string[] }
+  | { ok: true; slots: string[]; durationExceedsDay: boolean }
   | { ok: false; message: string };
 
 const LOAD_ERROR = 'Nepodařilo se načíst termíny, zkuste to prosím znovu.';
@@ -54,16 +58,16 @@ export async function getAvailableSlots(
     }
 
     if (!state || !state.published) {
-      return { ok: true, slots: [] };
+      return { ok: true, slots: [], durationExceedsDay: false };
     }
 
-    const slots = await loadAvailableSlots(supabase, {
+    const { slots, durationExceedsDay } = await loadAvailableSlotsDetailed(supabase, {
       businessId: state.id,
-      serviceId: input.serviceId,
+      serviceIds: input.serviceIds,
       dateISO: input.date,
     });
 
-    return { ok: true, slots };
+    return { ok: true, slots, durationExceedsDay };
   } catch (error) {
     await safeLog('available_slots_failed', { error });
     return { ok: false, message: LOAD_ERROR };

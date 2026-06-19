@@ -37,9 +37,9 @@ const TEST_PASSWORD = 'Integration-Test-Heslo-123';
 const OWNER_RESERVATION_COUNT = RESERVATIONS_PAGE_SIZE + 30;
 const FOREIGN_RESERVATION_COUNT = 5;
 
-/** Shodný select jako CsvExporter (řádek s vnořeným názvem služby). */
+/** Shodný select jako CsvExporter (řádek s vnořenými službami množiny). */
 const SELECT_COLUMNS =
-  'id,starts_at,ends_at,status,attendance,client_name,client_phone,client_email,note,created_at,services(name)';
+  'id,starts_at,ends_at,status,attendance,client_name,client_phone,client_email,note,created_at,reservation_services(position,price_czk_snapshot,duration_minutes_snapshot,services(name))';
 
 const FETCH_BATCH_SIZE = 1000;
 

@@ -175,7 +175,7 @@ export default async function ClientsPage() {
                 {result.clients.map((client) => (
                   <tr
                     key={client.id}
-                    className="border-b border-[var(--color-border-vychozi)] last:border-b-0 hover:bg-[var(--color-soft-gray-fill)]"
+                    className="border-b border-[var(--color-border-vychozi)] last:border-b-0"
                   >
                     <td className="px-4 py-3">
                       <Link

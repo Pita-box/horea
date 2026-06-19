@@ -350,3 +350,35 @@ Example Component Prompts:
   --radius-full-4: 800px;
 }
 ```
+
+
+## Notice / Alert (in-page hlášky)
+
+> Týká se POUZE in-page hlášek (komponenta `Notice`, `src/components/ui/notice.tsx`).
+> NETÝKÁ se toast notifikací — ty mají vlastní komponentu a styl.
+> Pro nové in-page hlášky vždy používej `Notice` s jednou z těchto variant; nevytvářej ad-hoc barevné boxy.
+
+Tři varianty (jediný zdroj pravdy je komponenta `Notice`):
+
+| Varianta | `variant` | Ikona (tabler) | Rámeček | Pozadí | Text |
+|----------|-----------|----------------|---------|--------|------|
+| General (výchozí) | `neutral` | `IconBulb` | `--color-dark` | `--color-dark` | `white` |
+| Warning | `warning` | `IconAlertCircle` | `--color-border-yellow` | `--color-bg-yellow` | `--color-brown` |
+| Error | `error` | `IconCancel` | `--color-red` | `--color-canvas-white` (bílá) | `--color-red` |
+
+Pravidla:
+- Neduplikovat styly — používat komponentu `Notice` (`variant="neutral" | "warning" | "error"`).
+- Ikona, rámeček, pozadí a barva textu jsou pevně dané variantou; nepřepisovat je ad-hoc.
+- General = informační/nápověda; Warning = upozornění vyžadující pozornost (ne chyba); Error = chyba/odmítnutí.
+
+## Tabulky (řádky)
+
+> Platí pro VŠECHNY tabulky na webu. Jednotné chování řádků je v `globals.css`
+> jako globální pravidlo (`tbody tr`), záměrně mimo `@layer`, aby přebilo Tailwind utility.
+
+- Výchozí pozadí datového řádku (`<tbody><tr>`): bílé (`--color-canvas-white`).
+- Na hover: světle fialové (`--color-light-violet`).
+- Hlavička (`<thead>`) se nezvýrazňuje.
+- Nepřidávej na řádky ad-hoc `hover:bg-…` utility — globální pravidlo je jediný zdroj pravdy.
+- Pro grid-list „pseudo-tabulky" (které nejsou `<table>`, např. `TableView` rezervací) použij stejný hover ručně: `hover:bg-[var(--color-light-violet)]`.
+- **Výjimka — tabulky se sloupcem „Akce" (tlačítka akcí v řádku, řádek není klikací):** hover se NEpoužívá. Označ `<table data-no-row-hover …>` — CSS override v `globals.css` hover vypne (např. `/dashboard/services`, admin kupóny, admin platby).

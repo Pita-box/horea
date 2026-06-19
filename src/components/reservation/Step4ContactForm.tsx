@@ -101,6 +101,8 @@ export function Step4ContactForm({
           id="client-phone"
           type="tel"
           inputMode="tel"
+          minLength={9}
+          maxLength={13}
           value={values.clientPhone}
           onChange={(event) => onChange({ clientPhone: event.target.value })}
           aria-invalid={Boolean(errors.clientPhone)}

@@ -2,6 +2,375 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-16 — Nová stránka „Analytika podniku" (`/dashboard/analytics`)
+
+### Nové funkce
+- Nová položka v aside (poslední, owner): „Analytika" (`IconChartHistogram`) + titulek topbaru.
+- `src/lib/analytics/analytics.ts` — čisté funkce: výběr období (`resolvePeriod`/`PERIOD_OPTIONS`: tento/minulý měsíc, 7/30 dní, rok) se srovnávacím předchozím obdobím; agregace `computeKpis` (tržby z uskutečněných, počet, prům. hodnota, no-show rate), `computeStatusBreakdown`, `computeHeatmap` (den×hodina), `computeRevenueSeries`, `topServicesByRevenue`, `employeePerformance`, `topClientsBySpend`, `computeClientMix` (noví vs. vracející se přes historické okno 12 měsíců), `relativeChange`, `formatCzk`/`formatPercent`. Definice: uskutečněná = `attendance='attended'`, propadlá = `no_show`, zrušená = `cancelled/rejected`.
+- `analytics/load.ts` — server loader (admin client), dávkové čtení rezervací okna `[from-12m, to]` s embedy `reservation_services`/`reservation_employees`; identita klienta přes `normalizePhone`→e-mail→jméno; rozdělí na current/previous/historyBefore.
+- Prezentační komponenty (SVG, design tokeny): `AnalyticsKpis` (PeriodTabs, KpiCard s delta vs. minulé období), `AnalyticsCharts` (StatusDonut conic-gradient, UtilizationHeatmap, RevenueTrendChart přes `buildSmoothPath`, RankingList, ClientMixCard).
+- Layout: období nahoře → 4 KPI → široký graf tržeb → heatmapa + koláč → spodní mřížka služby/zaměstnanci/klienti.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK (route `/dashboard/analytics`); `pnpm test:run` → 541 passed / 57 skipped (vč. 9 nových unit testů agregací/období).
+
+## 2026-06-16 — Kalendář: nový layout (levý rail + časová mřížka)
+
+### Nové funkce
+- `CalendarView.tsx` přepsán na dvousloupcový layout (`lg:grid-cols-[280px_1fr]`):
+  - **Levý rail:** mini měsíční kalendář (`MiniMonth`, navigace na týden/měsíc, zvýraznění dnešku a aktivního období), karta nejbližší rezervace (`NextEventCard`, Action Violet) a filtry (`FilterBar` přesunut sem z page).
+  - **Pravý sloup:** hlavička s navigací období + přepínačem Den/Týden a **časová mřížka** (osa hodin × sloupce dní). Bloky rezervací jsou absolutně pozicované dle `starts_at`–`ends_at` (Europe/Prague), rozsah hodin se dopočítá z rezervací (min. okno 8–18). Překryvy se dělí do „lanes" (greedy). Pastelové pozadí bloku z design systému (air-blue/lush-green/light-violet/sunset-pink) s rich-violet textem; `rejected`/`cancelled` ztlumené + přeškrtnuté.
+- `page.tsx`: kalendářní větev předává `services` do `CalendarView` (filtry teď bydlí v railu), odstraněn samostatný `<FilterBar>` i jeho import.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run` → 532 passed / 57 skipped (snapshot `CalendarView` regenerován; do `reservations-views.spec` doplněn mock `next/navigation` kvůli `FilterBar`).
+
+## 2026-06-16 — /dashboard/reservations: zrušen pohled „Tabulka", default = „Obsazenost"
+
+### Nové funkce
+- Pohled „Tabulka" odstraněn z přepínače; výchozí pohled stránky rezervací je nyní „Obsazenost" (přepínač = Obsazenost ↔ Kalendář). `parseCalendarParams` defaultuje na `occupancy` a staré odkazy `?view=table` na něj spadnou. `ReservationsShell` zbaven `tableHref` a tlačítka „Tabulka". Odstraněn loader `loadReservations` + `LoadResult` a nepoužité importy (`TableView`, `RESERVATIONS_PAGE_SIZE`). `TableView` zůstává (používá ho `OccupancyView` pro filtrovaný seznam pod grafem).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run` → 532 passed / 57 skipped.
+
+## 2026-06-16 — Úprava rezervace: multi-service edit (search + select)
+
+### Nové funkce
+- Editační dialog v `ReservationActions.tsx` přepnut z single-select `<select>` na vícenásobný výběr služeb se search ("Hledat službu") + zaškrtávacím seznamem (stejný vzor jako přiřazení zaměstnanců). Limit 10 služeb (shodně s `edit_reservation_multi`), guard na min. 1 (Uložit disabled při 0). Předvyplní se celá aktuální množina služeb rezervace.
+- Detail (`[id]/page.tsx`): `ReservationServiceItem` nově nese `serviceId`; `ReservationActions` dostává `currentServiceIds` (uspořádaná množina, fallback na primary `service_id`). Backend beze změny — `editReservation` už přijímá `serviceIds[]` (RPC `edit_reservation_multi`).
+- e2e `edit-flow.spec.ts` aktualizován: místo `#edit-service` selectu klikne na první nevybranou službu v zaškrtávacím seznamu.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run` → 532 passed / 57 skipped.
+
+## 2026-06-16 — Zaměstnanci: pravý sloupec „TOP zaměstnanci" (obsazenost/efektivita)
+
+### Nové funkce
+- `getTopEmployees()` (`dashboard/settings/employee-actions.ts`) — žebříček zaměstnanců dle obsazenosti v aktuálním měsíci (Europe/Prague). Obsazenost % = součet délek aktivních rezervací (pending/approved) přiřazených zaměstnanci (z `reservation_employees`, fallback `employee_id`) / otevírací doba podniku za měsíc (cap 100). „Počet služeb" = řádky `reservation_services` napříč přiřazenými rezervacemi. Řazeno sestupně. Reuse `buildMonthGrid`/`openMinutesByWeekday`/`pragueWeekdayIndex` z `occupancy.ts`.
+- `TopEmployees.tsx` — prezentační žebříček: pořadí, jméno, tlumený text „N služeb, celkem H:MM h", vpravo % obsazenost (Action Violet). Scroll-y (max-h), sticky na desktopu.
+- Stránka `/dashboard/employees` restrukturalizována na grid 2/3 (správa týmu + zaměstnanci u služeb) + 1/3 (TOP). Bez DB změny.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK.
+
+## 2026-06-16 — Rezervace detail: přiřazení zaměstnanců přes search + checkbox seznam
+
+### Nové funkce
+- `AssignEmployee.tsx` přepsán z chipů na vzor „Zaměstnanci u služeb" (`ServiceEmployeesManager`): vyhledávací pole „Hledat zaměstnance" (diakritiku-tolerantní filtr), scrollovatelný zaškrtávací seznam (checkbox + IconCheck), tlačítka „Vybrat vše" / „Zrušit výběr", souhrn „N z M — náhled jmen". Optimistický zápis celé množiny přes `setReservationEmployees` s revertem při chybě. Bez DB změny (staví na `reservation_employees`).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm exec vitest run reservation-detail` → 7 passed.
+
+## 2026-06-16 — Rezervace detail: přiřazení více zaměstnanců (M:N)
+
+### Nové funkce
+- Migrace `supabase/migrations/0051_reservation_employees.sql` — nová join tabulka `reservation_employees (reservation_id, employee_id)` (M:N), FK cascade, index na `employee_id`, RLS + owner-read policy (mirror `reservation_services_owner_read`), backfill ze stávajícího `reservations.employee_id`. `reservations.employee_id` zůstává jako denormalizovaný „primary" (první přiřazený) kvůli zpětné kompatibilitě. **Pozn.: vyžaduje push na sdílenou DB — viz níže.**
+- Server action `setReservationEmployees(reservationId, employeeIds[])` (`src/server/ReservationEmployeeAssigner.ts`, nahradila `assignReservationEmployee`): owner-scoped (ověření vlastnictví rezervace pod uživatelským JWT), validace příslušnosti všech zaměstnanců k podniku, náhrada celé množiny (delete+insert) přes service-role, synchronizace `employee_id` = první vybraný / NULL.
+- `AssignEmployee.tsx` přepnut ze single `<select>` na vícenásobný výběr přepínacími štítky (chips). Optimistický update s revertem při chybě.
+- Detail rezervace (`[id]/page.tsx`) načítá množinu z `reservation_employees` (fallback na `employee_id`), zobrazuje „Zaměstnanci/Zaměstnanec" jako spojený seznam jmen.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm exec vitest run reservation-detail` → 7 passed.
+- Migrace `0051` nasazena na sdílenou DB přes `pnpm dlx supabase db push` (Applying migration 0051_reservation_employees.sql → Finished). Funkce je živá.
+
+## 2026-06-16 — Historie rezervací klienta: multi-service popis (66 znaků) + badge docházky
+
+### Nové funkce
+- Nový sdílený modul `src/lib/reservations/serviceLabel.ts` (čisté funkce `embeddedServiceName`, `combinedServiceLabel`, `reservationServiceLabel`, konstanta `SERVICE_LABEL_MAX_CHARS=66`) — jediný zdroj pravdy pro popis služeb ve výpisech. Spojuje názvy z `Reservation_Service_Set` v pořadí `position` oddělené `, ` s ořezem na 66 znaků (přebytek „ …"), fallback na primary `services(name)`.
+- `dashboard/reservations/page.tsx` přepnut na tento sdílený helper (odstraněna lokální duplicita).
+- `dashboard/clients/[id]/page.tsx` (Historie rezervací) nově načítá `reservation_services(position,services(name))` a zobrazuje stejný multi-service popis (66 znaků) jako tabulka rezervací. Docházka se zobrazuje jako barevný badge: „Dorazil" zelený (electric-green tint), „Nedorazil" červený (red tint); nevyhodnoceno (null) badge nemá.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm exec vitest run` na `client-detail-empty` + `reservations-views` → 5 passed.
+
+## 2026-06-15 — dashboard/reservations: oprava filtru dle služby (multi-service)
+
+### Bug & fix
+- **Symptom:** Filtr „Služba" na stránce rezervací (zejm. pohled „Obsazenost") nevracel nic — vždy „Žádné rezervace neodpovídají zvoleným filtrům". Filtr „Stav" fungoval.
+- **Root cause:** Loadery `loadReservations`, `loadCalendarReservations` a `loadOccupancyMonth` filtrovaly přes denormalizovaný sloupec `reservations.service_id` (`.in('service_id', …)`). U kombinovaných (multi-service) rezervací tento sloupec neodráží celou množinu služeb (resp. neodpovídá vybrané službě), takže průnik byl prázdný. Stejný problém byl už dříve vyřešen v `CsvExporter`u přes join tabulku.
+- **Fix:** Nový sdílený helper `collectServiceFilterReservationIds(supabase, businessId, serviceIds)` v `page.tsx` — posbírá `reservation_id` z `reservation_services` (inner join na `reservations` kvůli izolaci na `business_id`) s `service_id IN (filtr)` a hlavní dotaz se omezí `.in('id', matchedIds)`. Aplikováno ve všech třech loaderech; chování filtru „Stav" a časových mezí beze změny.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK.
+
+## 2026-06-15 — Dashboard sidebar: sbalitelný icon-only rail + levý filtr column na Obsazenosti
+
+### Nové funkce
+- `DashboardSidebar` má nový režim `collapsed` (+ `onToggleCollapse`): skryje textové popisky, vycentruje ikony a sníží padding (`px-2`/`px-0`). Popisky zůstávají dostupné přes `title` a `sr-only` text. Přepínač (chevron, `IconLayoutSidebarLeftCollapse`/`…Expand`) je jen na desktopu; mobilní drawer zůstává vždy rozbalený.
+- `DashboardChrome` drží `collapsed` stav (useState, persistuje napříč navigací díky layoutu). Aside `w-16` ⇄ `w-64`, content column `lg:ml-16` ⇄ `lg:ml-64`. Na pohledu „Obsazenost" (`/dashboard/reservations?view=occupancy`, detekce přes `useSearchParams`) se sidebar sbalí automaticky (`useEffect`); ruční přepínač zůstává funkční.
+- Pohled „Obsazenost" má nyní dvousloupcový layout `lg:grid-cols-[280px_1fr]` — `ReservationPillFilters` v levém sloupci, `OccupancyView` (kalendář + graf + seznam) vpravo. Sbalení sidebaru uvolní šířku pro tento filtr column.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK.
+
+## 2026-06-15 — Obsazenost: pill filtry (stav/služba) bez checkboxů
+
+### Nové funkce
+- `ReservationPillFilters.tsx` — „fancy" filtr stav + služba jako přepínací pilulky (chips), bez checkboxů. Výběr přepíše URL `searchParams` přes `buildReservationsHref(..., { view:'occupancy', anchor })`, takže zachová pohled i měsíc a přepočítá graf i seznam (konjunktivní průnik řeší server). „Zrušit filtry" vyčistí stav/službu.
+- `loadOccupancyMonth(anchor, filters)` nově aplikuje `statuses`/`serviceIds` na měsíční dotaz (časový rozsah dál řeší výběr v kalendáři). Pohled „Obsazenost" renderuje pill filtry nad kartami; měsíční prev/next odkazy filtry zachovávají.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run src/lib/reservations tests/components` → 35 passed.
+
+## 2026-06-15 — Obsazenost: hover tooltip v grafu + tečky obsazenosti v kalendáři
+
+### Nové funkce
+- `occupancyDotColor(pct)` v `occupancy.ts` (čistá, testovaná): < 40 % zelená `#16a34a`, 40–79 % oranžová `#f59e0b`, ≥ 80 % červená `#e7000b`.
+- `MonthCalendar` zobrazuje pod dnem barevnou tečku obsazenosti (jen dny s rezervacemi); na vybraném dni je tečka bílá kvůli kontrastu. Nový prop `occupancyByDate`; `OccupancyView` ho předává z `points`.
+- `OccupancyChart` je nově klientská komponenta s hover tooltipem: svislé vodítko, zvýrazněný bod na křivce a karta s datem, obsazeností (%) a počtem rezervací daného dne (HTML overlay nad vnitřní plochou grafu).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm test:run src/lib/reservations tests/components src/components/reservation` → 55 passed (vč. nového testu `occupancyDotColor`); `pnpm build` OK (první běh spadl přechodně na nesouvisejícím `/dashboard/opening-hours` — opakovaný build zelený).
+
+## 2026-06-15 — rezervační formulář: kalendář-picker místo `<input type=date>`
+
+### Nové funkce
+- `src/components/reservation/DatePickerCalendar.tsx` — měsíční kalendář pro výběr JEDNOHO data v kroku 2 (bez rozsahu). Klientský stav měsíce, minulé dny i dny mimo měsíc nedostupné (`disabled`), prev/next šipky (prev zakázán pro měsíce ≤ aktuální), den nese `data-date` (testy/e2e). Sdílí čistou logiku mřížky s pohledem „Obsazenost" (`buildMonthGrid`/`addMonths`).
+- `Step2DatePicker` nahrazuje nativní `<input type="date">` tímto kalendářem; auto-advance po výběru data i hlášky (empty/too_long) zůstávají.
+- Aktualizováno: unit test `ReservationFormController` (klik na den `data-date` místo psaní do inputu) a e2e `reservation-happy-path` (klik na `button[data-date]`, příp. „Další měsíc").
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run` → 531 passed / 57 skipped.
+
+## 2026-06-15 — dashboard/reservations: pohled „Obsazenost" (kalendář + graf)
+
+### Nové funkce
+- Nový pohled **„Obsazenost"** (třetí přepínač vedle Tabulka/Kalendář, `?view=occupancy&anchor=YYYY-MM-DD`) na `/dashboard/reservations`.
+- `src/lib/reservations/occupancy.ts` (čisté funkce): `buildMonthGrid` (6×7 Po-first mřížka + cs nadpis + prev/next kotvy), `addMonths`, `pragueWeekdayIndex`, `openMinutesByWeekday`, `computeDailyOccupancy` (denní obsazenost % = rezervovaný čas aktivních rezervací / otevírací doba, cap 100), `buildSmoothPath` (Catmull-Rom→bezier SVG křivka). Pokryto unit testy (10).
+- Komponenty: `MonthCalendar.tsx` (výběr dne/rozsahu, přepínání měsíce přes URL `anchor`), `OccupancyChart.tsx` (SVG plynulý graf 0–100 %, zvýraznění výběru, bez nové závislosti), `OccupancyView.tsx` (drží výběr; vlevo kalendář + `TableView` filtrovaný dle výběru, vpravo graf + průměrná obsazenost).
+- `page.tsx`: loader `loadOccupancyMonth(anchor)` (rezervace měsíce + otevírací doba → body grafu); `ReservationsShell` rozšířen o `occupancyHref` a třetí přepínač; `calendar.ts` `CalendarView`/`buildReservationsHref` rozšířeny o `occupancy`.
+- Design: barvy/typografie z design systému (Action Violet), zelená ze screenshotů byla jen referenční. Filtr v tomto pohledu = výběr v kalendáři (status/služba `FilterBar` se zde neuplatňují).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run src/lib/reservations tests/components` → 34 passed (vč. nových 10 occupancy testů).
+
+## 2026-06-15 — dashboard/reservations: výpis více služeb v tabulce
+
+### Nové funkce
+- Seznam rezervací (`src/app/(dashboard)/dashboard/reservations/page.tsx`) zobrazuje u multi-service rezervací VŠECHNY služby spojené `, ` (dříve jen primary `services(name)`). Oba dotazy (tabulka i kalendář) nově embedují `reservation_services(position,services(name))`; popis se skládá v pořadí `position`. Délka je omezená na 66 znaků po celých názvech (`combinedServiceLabel`), přebytek → „ …". Fallback na denormalizovaný `services(name)` u starších jednoslužbových rezervací bez navázaných řádků. RLS `reservation_services_owner_read` čtení pod JWT majitele umožňuje.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run tests/components/reservations-views.spec.tsx tests/components/reservation-detail.spec.tsx` → 11 passed.
+
+## 2026-06-15 — Notice/Alert standardizace (3 varianty)
+
+### Nové funkce
+- `Notice` (`src/components/ui/notice.tsx`) sjednocen na tři in-page varianty (NEtýká se toastů):
+  - `neutral` (general): `IconBulb`, rámeček i pozadí `--color-dark`, text bílý.
+  - `warning`: `IconAlertCircle`, rámeček `--color-border-yellow`, pozadí `--color-bg-yellow`, text `--color-brown`.
+  - `error`: `IconCancel`, rámeček `--color-red`, pozadí bílé, text `--color-red`.
+  Barvy berou tokeny z `globals.css` (`--color-dark/-red/-border-yellow/-bg-yellow/-brown`). Názvy variant `neutral`/`error` zachovány (zpětně kompatibilní), přidán `warning`.
+- Hláška „blok se do dne nevejde" v `Step2DatePicker` přepnuta z `error` na `warning` (je to korektivní upozornění, ne chyba).
+- Pravidlo zdokumentováno v `.kiro/steering/design-system.md` i `RULES/design-system.md` (sekce „Notice / Alert") — pro nové hlášky používat komponentu, nevytvářet ad-hoc barevné boxy.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm test:run` → 521 passed / 57 skipped; `pnpm build` OK. Aktualizovány 2 snapshoty (PublicProfileRenderer empty-state — změna ikony neutral notice; ReservationFormController dříve).
+
+## 2026-06-15 — multi-service-reservations / notice „blok se do dne nevejde"
+
+### Nové funkce
+- `loadAvailableSlotsDetailed` (`src/server/slots/loadAvailableSlots.ts`) — vedle seznamu termínů vrací `durationExceedsDay: boolean`. Je `true`, jen když je seznam prázdný kvůli DÉLCE kombinovaného bloku: po jednom běhu DB dotazů se čistě (bez další I/O) přepočítají sloty i pro nejkratší jednotlivou službu; vejde-li se kratší blok, ale kombinovaný ne, je limitem délka. `loadAvailableSlots` je teď tenký obal vracející jen `.slots` (5 volajících beze změny).
+- `getAvailableSlots` (`AvailableSlotsService.ts`) vrací `durationExceedsDay` do klienta.
+- Nový stav `SlotsState = 'too_long'` + specifická hláška v `Step2DatePicker`: „Vybrané služby (celkem X min) se do tohoto dne nevejdou. Odeberte prosím některé služby, nebo zvolte jiný termín." s tlačítkem „Upravit výběr služeb" (návrat na krok 1). Při jedné službě hláška jen vyzve ke změně termínu. `ReservationFormController` rozlišuje `too_long` vs `empty` podle `durationExceedsDay` a počítá Combined_Duration pro hlášku.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm test:run src/components/reservation src/lib/slots` → 32 passed; `pnpm build` OK.
+
+## 2026-06-15 — multi-service-reservations / UX a oprava minulých slotů
+
+### Nové funkce
+- Auto-přechod po výběru data (`src/components/reservation/ReservationFormController.tsx`): jakmile `loadAvailableSlots` vrátí neprázdný seznam termínů, formulář klienta automaticky posune z kroku 2 (datum) na krok 3 (výběr času). Prázdný/chybový výsledek auto-skok nespustí — krok 2 zůstane s příslušnou hláškou. Návrat zpět na krok 2 nerefetchuje (klíč `serviceIds|date` sedí), takže klient může datum v klidu změnit bez zacyklení.
+- Telefonní input v kroku 4 (`Step4ContactForm.tsx`) má `maxLength={13}` (odpovídá `+420` + 9 číslic).
+
+### Bug & fix
+- **Symptom:** Šlo vybrat a odeslat čas v minulosti pro dnešní den (např. ve 13:29 vybrat 09:00).
+- **Root cause:** `loadAvailableSlots` generoval sloty z otevírací doby bez ohledu na aktuální čas; pro dnešek tak nabízel i minulé časy. Žádný filtr „now".
+- **Fix:** `src/server/slots/loadAvailableSlots.ts` po `calculateSlots` odfiltruje pro dnešní den (Europe/Prague) počáteční časy < aktuální čas. Gate platí i serverově — pre-lock grid re-check v `atomicSlotWrite` čte tentýž seznam, takže minulý čas neprojde ani přímým odesláním (skončí jako nedostupný slot). Pro budoucí dny se nefiltruje nic.
+- **Pozn.:** Aktualizován test `ReservationFormController.test.tsx` (krok 2→3 je nyní auto) a regenerován jeho snapshot (Step1ServicePicker měl mezitím změněnou hover barvu na `--color-cloud-mist`).
+
+## 2026-06-15 — multi-service-reservations / oprava nasazení RPC (migrace 0050)
+
+### Bug & fix
+- **Symptom:** Odeslání multi-service rezervace z veřejné stránky končilo chybou „Rezervaci se nepodařilo odeslat, zkuste to prosím znovu" (server 500). Přímý probe přes service-role klienta vrátil `PGRST202 — Could not find the function public.create_reservation_multi … in the schema cache` pro všechny tři funkce (`create_reservation_multi`, `create_manual_reservation_multi`, `edit_reservation_multi`).
+- **Root cause:** Migrace `0049` se na sdílenou DB dostala jen částečně (tabulka `reservation_services` + backfill, které jsou v souboru první), ale tři RPC funkce definované dál v témže souboru na remote DB nevznikly. `supabase migration list` navíc ukázal, že `0049` ani nebyla zaznamenaná v remote migrační historii (tabulka byla zřejmě vytvořena ručně mimo migrační systém). Mezera unikla testům, protože všechny DB integrační property testy pro tyto RPC se bez integračního prostředí přeskakují.
+- **Fix:** Nová idempotentní migrace `supabase/migrations/0050_reservation_multi_functions.sql` — `create or replace` všech tří funkcí (1:1 z 0049) + `revoke/grant` + `notify pgrst, 'reload schema'`. Nasazeno přes `pnpm dlx supabase db push` (aplikovalo 0049 i 0050; vše v 0049 je idempotentní). Po nasazení probe vrací korektní rozlišovací příznaky (`not_published`/`invalid`) místo PGRST202 — funkce jsou volatelné přes REST.
+- **Pozn.:** Tělo funkcí nikdy předtím neběželo proti reálnému Postgresu (0049 je nenasadila), takže `db push` byl zároveň jejich prvním ostrým spuštěním — proběhlo bez chyby.
+
+## 2026-06-15 — multi-service-reservations / e2e editace + ruční vytvoření (task 8.2)
+
+### Nové funkce
+- `e2e/manual-creation.spec.ts` rozšířen na KOMBINOVANOU rezervaci (R15.1, R15.2): místo zaniklého `#create-service` `<select>` nově vybírá z uspořádaného toggle seznamu (`button[aria-pressed]` v dialogu), vybere až 2 služby (fallback na 1, je-li seedovaná jen jedna), ověří počet vybraných přepínačů (`aria-pressed="true"`), a po vytvoření otevře detail a ověří „Celková délka" + počet položek množiny služeb (`dd ul > li`). Zachováno původní pokrytí: stav „Schváleno" v seznamu (R12.4) a podmíněná absence potvrzovacího e-mailu (R12.5).
+- `e2e/edit-flow.spec.ts` rozšířen o volitelnou změnu služby (R9.1) přes single-select `#edit-service` (vybere jinou než aktuální, je-li víc možností) → změna množiny služeb a tím přepočet Combined_Duration/`ends_at` (R9.2) → vynucená revalidace slotu časem `02:00` (R9.3) a uložení. Editační UI zůstává single-select; ukládá přes `*_multi` RPC se `serviceIds`.
+
+### Verifikace
+- `pnpm exec eslint e2e/manual-creation.spec.ts e2e/edit-flow.spec.ts` → 0 chyb; get_diagnostics bez nálezů.
+- `pnpm exec playwright test e2e/manual-creation.spec.ts e2e/edit-flow.spec.ts` → 2 skipped (guard `hasOwnerCreds` bez seedovaných `E2E_OWNER_*` v sandboxu; specy se korektně sesbíraly, zkompilovaly a proběhly přes Playwright). Plný běh vyžaduje seedovaného majitele + dostupné Chromium/dev server.
+
+## 2026-06-15 — multi-service-reservations / property test obsahu transakčního e-mailu (task 7.5)
+
+### Nové funkce
+- `src/lib/email/templates/__tests__/transactional-email-content.property.test.ts` — čistý property test Property 15 (R16.1, R16.2). Pro náhodný uspořádaný seznam 1..10 služeb (unikátní názvy z bezpečné abecedy) + Combined_Duration a Combined_Price ověřuje, že textová varianta `renderReservationConfirmationEmail` i `renderReservationNotificationEmail` obsahuje: všechny názvy služeb, zachované pořadí (indexOf vyrenderovaných řádků `- name (dur min)` striktně rostoucí), Combined_Duration a Combined_Price (jen je-li > 0 Kč; při 0 Kč skryta). Cena se porovnává přes shodný `Intl.NumberFormat('cs-CZ')` jako šablona (oddělovač tisíců). Asserce na TEXT variantě → bez interakce s HTML-escapováním. fast-check `numRuns: 200`.
+
+### Verifikace
+- `pnpm test:run src/lib/email/templates/__tests__/transactional-email-content.property.test.ts` → 1 passed. `pnpm lint` green.
+
+## 2026-06-15 — multi-service-reservations / property test CSV filtru služby (task 7.6)
+
+### Nové funkce
+- `tests/properties/csv-service-filter.spec.ts` — čistý property test Property 14 (R14.2, R14.3, R14.4). Extrahuje predikát zahrnutí CSV exportu (`includedInExport`) zrcadlící logiku `CsvExporter`u (business scope přes `.eq('business_id')` + sběr `reservation_id` s neprázdným průnikem `Reservation_Service_Set` × filtr) a ověřuje ho proti nezávislému množinovému orákulu napříč náhodnými vstupy (fast-check, `numRuns: 200`). Pokrývá podpřípady: filtr neaktivní → zahrnuta iff business odpovídá; cizí podnik → vždy vyloučena; neprázdný průnik → zahrnuta; disjunktní průnik s aktivním filtrem → vyloučena. Čistý (bez DB) — doplňuje integrační `tests/integration/csv-scope.test.ts` (R17.4/R17.5).
+
+### Verifikace
+- `pnpm test:run tests/properties/csv-service-filter.spec.ts` → 5 passed. `pnpm lint` green.
+
+## 2026-06-15 — multi-service-reservations / klientský controller multi-select (task 6.1)
+
+### Nové funkce
+- `ReservationFormController` (`src/components/reservation/ReservationFormController.tsx`) přepnut z jedné služby na uspořádanou množinu (R1.5, R2.3, R3.2, R6.1, R8.1, R8.3, R8.4): stav `selectedServiceId: string | null` → `selectedServiceIds: string[]` (pořadí výběru) řízený čistým reducerem `toggleService` + pojistka horního limitu `MAX_SERVICES_PER_RESERVATION`. `selectedServices` (uspořádané `ReservationService[]`) přes `useMemo`. Fetch slotů nově klíčován `serviceIds.join(',')|date` a předává `serviceIds` do `getAvailableSlots`; změna MNOŽINY služeb zneplatní sloty/čas a vrací `maxStep` na 1. Přechod z kroku 1 jen při `length ≥ 1`. Submit posílá `serviceIds: selectedServiceIds` do `createReservation`. `Step5Summary` dostává `services={selectedServices}`, `Step1ServicePicker` `selectedServiceIds`/`onToggle`.
+- **Průnik zaměstnanců (R8.2, R8.3):** prop `serviceEmployees` (`Record<serviceId, {id,name,photoUrl}[]>`) se adaptuje na tvar helperu (`Record<serviceId, employeeId[]>`); nabídnutelní zaměstnanci = `employeesForSelection(mapping, selectedServiceIds)` namapovaní zpět na objekty pro carousel. Při změně výběru, kdy dříve zvolený zaměstnanec vypadne z průniku, se zruší přes `clearEmployeeIfOutsideSelection`.
+- Pozn.: Combined_Duration/Combined_Price se na úrovni controlleru samostatně nepočítají — průběžný souhrn vlastní `Step1ServicePicker` (task 6.2) a souhrn `Step5Summary` (task 7.1), oba přes sdílené helpery `combinedDuration`/`combinedPrice`. Přidávat duplicitní memo na controlleru by bylo mrtvé `no-unused-vars` (build by spadl) — vynecháno záměrně.
+
+### Migrace volajících
+- `CreateReservationDialog` (`src/app/(dashboard)/dashboard/reservations/CreateReservationDialog.tsx`) převeden na multi-select (R15.1): single `<select>` → uspořádaný seznam přepínacích řádků (pořadové číslo u vybraných, „Vybráno/Vybrat", `toggleService`), stav `serviceId` → `serviceIds: string[]`, předává `serviceIds` do `createManualReservation`. Lehká klientská kontrola „vyberte alespoň jednu službu".
+- `ReservationFormController.test.tsx` aktualizován na multi-select API (nadpis „Výběr služeb"); zastaralý snapshot smazán a regenerován.
+
+### Verifikace
+- `pnpm lint` green; `pnpm test:run` → 505 passed / 57 skipped (vč. 3 dříve červených `ReservationFormController` testů, nyní zelené); `pnpm build` green (CSS warning `bg-[var(...)]` je předchozí, nesouvisí).
+
+## 2026-06-15 — multi-service-reservations / CSV export kombinovaných rezervací (task 7.4)
+
+### Nové funkce
+- `CsvExporter` (`src/server/CsvExporter.ts`) rozšířen na kombinované rezervace (R14.1–R14.4). SELECT nově čte `reservation_services(position, price_czk_snapshot, duration_minutes_snapshot, services(name))` místo single `services(name)`. Sloupec `service_name` = názvy všech služeb v `Reservation_Service_Set` spojené ` + ` v pořadí `position` (přes sdílený `joinServiceNames`, řazení dle position řeší helper — embed může přijít nesetříděný). Pro single-service rezervace (backfill position-0) přirozeně vrací jeden název.
+- **Pořadí sloupců:** dva nové sloupce `combined_duration_minutes` a `combined_price_czk` (součty snapshotů přes `combinedDuration`/`combinedPrice`) umístěny hned ZA `service_name`, aby zůstaly všechny údaje o službách pohromadě. Nová hlavička: `id, starts_at, ends_at, service_name, combined_duration_minutes, combined_price_czk, client_name, …, created_at`.
+- **Filtr služby = test neprázdného průniku (R14.3, R14.4):** místo `.in('service_id', …)` na denormalizovaném sloupci se při aktivním filtru nejdřív posbírají `reservation_id` z `reservation_services` (inner join na `reservations` kvůli izolaci na `business_id`), jejichž `service_id` je ve filtru; hlavní dotaz se pak omezí `.in('id', matchedIds)`. Bez aktivního filtru chování beze změny. Zachováno dávkové čtení/streaming a log bez PII.
+
+### Verifikace
+- `pnpm test:run tests/unit/csv-format.spec.ts tests/properties/csv-escaping.spec.ts` → 9 passed. `pnpm lint` green. Diagnostics dotčených souborů čisté.
+- Pozn.: `pnpm test:run` (celá sada) hlásí 3 NESOUVISEJÍCÍ faily v `ReservationFormController.test.tsx` (`Step1ServicePicker` čte `services.map` z undefined) — klientská multi-select vrstva z jiného rozpracovaného tasku, mimo rozsah 7.4. CSV testy i lint zelené.
+
+## 2026-06-15 — multi-service-reservations / detail rezervace v dashboardu (task 7.2)
+
+### Nové funkce
+- Detail rezervace `src/app/(dashboard)/dashboard/reservations/[id]/page.tsx` rozšířen na kombinovanou rezervaci (R13.1–R13.4): `loadReservation` nově načte `reservation_services(position, service_id, duration_minutes_snapshot, price_czk_snapshot, services(name))` přes uživatelský JWT (RLS `reservation_services_owner_read`), seřazené dle `position` (+ pojistné JS řazení). Zobrazení vypíše všechny služby v uloženém pořadí (číslo + název + délka), `Celková délka` a `Celková cena` ze snapshotů přes čisté helpery `combinedDuration`/`combinedPrice` (cena 0 Kč skrytá, konzistentně se souhrnem), jeden časový blok `starts_at`–`ends_at` v Europe/Prague (`toPragueDisplay`) a jméno přiřazeného zaměstnance. `DetailRowItem` value rozšířen na `ReactNode` kvůli seznamu služeb. Fallback na jednu službu při prázdné množině (defenzivní). Lokální `formatPriceCzk` (cs-CZ, max 2 desetinná) dle konvence `ServicesList`.
+- `tests/components/reservation-detail.spec.tsx` rozšířen o render kombinovaného detailu (seznam služeb v pořadí, součty 90 min / 700 Kč, blok 10:00–11:30 CEST, zaměstnanec) a o skrytí ceny při 0 Kč; mock harness doplněn o `reservation_services`, `services`, admin `employees`.
+
+### Bug & fix
+- **Symptom:** build type-check: `ReservationActions.tsx` volal `editReservation({ serviceId })`, ale `EditReservationInput` má nově `serviceIds: string[]` (task 4.5).
+- **Fix:** minimální wiring — `handleEdit` posílá `serviceIds: [editServiceId]` (single-select edit UI beze změny). 
+- **Pozn.:** `pnpm build` type-check stále blokuje NESOUVISEJÍCÍ pending task — `src/app/(dashboard)/dashboard/reservations/CreateReservationDialog.tsx` volá `createManualReservation({ serviceId })`, zatímco `CreateManualReservationInput` má `serviceIds[]` (task 4.4). Mimo rozsah 7.2 (ruční vytvoření, klientská vrstva). Ověřeno pro 7.2: `pnpm lint` green, `pnpm test:run tests/components/reservation-detail.spec.tsx` (7 passed), diagnostics edited souborů čisté.
+
+
+## 2026-06-15 — multi-service-reservations / integrační property test stability snapshotu (task 4.12)
+
+### Nové funkce
+- `tests/properties/snapshot-stability.spec.ts` — Property 10 (Stabilita snapshotu délky a ceny, R7.5): fast-check, 100 iterací, DB-backed integrační test proti reálnému Postgresu. Seed user→business (`is_published=true`, aktivní předplatné, `auto_approve_reservations=true`, `allow_parallel_slots=true` → overlap re-check vypnutý, žádný šum z kolizí)→služby. Per běh: vytvoří rezervaci přes RPC `create_reservation_multi` s vygenerovanou uspořádanou podmnožinou služeb a vlastním budoucím `starts_at` (dayOffset); načte write-time snapshoty z `reservation_services`; UPDATE podkladových `services.duration_minutes`/`price_czk` na jiné hodnoty (+5 / +111); re-read `reservation_services` a ověří, že `duration_minutes_snapshot`/`price_czk_snapshot` zůstaly NEZMĚNĚNÉ + sanity check, že update služeb opravdu zabral. Restore ceníku služeb + smazání rezervace v `finally` (cascade odstraní reservation_services). Tag `// Feature: multi-service-reservations, Property 10: ...`, anotace `_Requirements: 7.5_`. Skip přes `describe.skipIf(!hasIntegrationEnv)` shodně s ostatními DB integračními testy. Ověřeno: `pnpm lint` green, `pnpm test:run` na souboru (1 skipped — integrační Supabase env není v tomto prostředí nakonfigurované, projektová konvence).
+
+## 2026-06-15 — multi-service-reservations / unit-edge testy server vrstvy + oprava mock harness (task 4.14)
+
+### Nové funkce
+- `tests/unit/reservation-server-edge.spec.ts` — unit/edge testy server vrstvy (task 4.14): `loadAvailableSlots(serviceIds=[]) → []` přes `vi.importActual` (R6.4, ověřeno i že se DB vůbec nedotáže — exploding klient); `validateServiceCount` hraniční hlášky `n=0`/`n=11` + přijetí `n=1`/`n=10` (R5.2, R5.3); `createReservation` rozsah → 400 s českými hláškami; status dle RPC `approved`/`pending` (R7.6); UTC `p_starts_at` (09:00 Praha v červnu = `2025-06-16T07:00:00.000Z`, R7.4); best-effort — odmítnuté oba e-maily + vyhazující `serverLog.info` nezruší rezervaci (R16.4, R16.5); `createManualReservation` vždy approved-only RPC bez potvrzovacího e-mailu klientovi (R15.4). 12 testů.
+
+### Bug & fix
+- **Symptom:** `pnpm test:run` padal v 6 mock property specs s `TypeError: Cannot read properties of undefined (reading 'length')` na `ReservationCreator.ts:204`, `ReservationEditor.ts:175`, `ManualReservationCreator.ts:149`.
+- **Root cause:** Server vrstva přešla na multi-service signatury (`serviceId` → `serviceIds`, RPC `create_reservation`/`edit_reservation`/`create_manual_reservation` → `*_multi`, služby se čtou přes `.in(...).returns()` jako POLE), ale sdílený harness `tests/properties/_support/reservation-harness.ts` + `mutation-harness.ts` a mock specs stále posílaly starý jednoslužbový `serviceId`, takže `input.serviceIds` bylo `undefined`.
+- **Fix:** Harness aktualizován pro multi-service — `buildInput` → `serviceIds: ['svc-1']`; fake `from('services')` podporuje `select().in().eq().returns()` vracející POLE řádků (`maybeSingle` zachováno pro businesses/users/reservations); RPC mocky přejmenovány na `*_multi`; `CreateReservationRpcRow`/`EditRpcRow`/`ManualRpcRow` rozšířeny o `invalid` (+ `rpcInvalid()` builder, `__rpcArgs` pro ověření UTC). Specs `status-assignment`, `reservation-atomicity`, `email-best-effort`, `sensitive-data-logs`, `edit-atomicity`, `manual-creation-status` přepsány na `serviceIds` a `*_multi` názvy RPC při zachování původního záměru property.
+- **Pozn.:** `pnpm build` type-check zatím selhává jen v PENDING klientských taskech (`ReservationFormController.tsx` → task 6.1, `ReservationActions.tsx` → task 7.2), které stále volají server actions se starým `serviceId`. Mimo rozsah 4.14. Ověřeno: `pnpm test:run` (491 passed, 56 skipped, 0 failed) + `pnpm lint` green.
+
+## 2026-06-15 — multi-service-reservations / integrační property test atomicity editace (task 4.11)
+
+### Nové funkce
+- `tests/properties/edit-atomicity-multi.spec.ts` — Property 9 (Atomicita editace s vyloučením sebe sama, RPC `edit_reservation_multi` z migrace `0049`): fast-check, 100 iterací, DB-backed integrační test. Nasadí upravovanou rezervaci přes `create_reservation_multi` (zatím bez kolizí), naseeduje generovanou sadu OSTATNÍCH rezervací přímo do `reservations` (i neaktivní rejected/cancelled) a zavolá `edit_reservation_multi` s novou množinou služeb + novým časem (volitelně `sameTime` = ponechání původního času → překryv se sebou samou). Očekávaný výsledek se v TS počítá DETERMINISTICKY jen nad OSTATNÍMI aktivními rezervacemi (vlastní interval se nezahrnuje) → přímý test vyloučení sebe sama (R9.5): (a) překryv s vlastním původním intervalem bez kolize s jinou aktivní ⇒ `updated=true`, `conflict=false`; (b) úspěch ⇒ nový interval bez překryvu s jinou aktivní rezervací; (c) `reservation_services` obsahuje přesně novou množinu (pozice 0..n-1, `service_id` v pořadí) bez zbytků + `ends_at = starts_at + Combined_Duration`; konflikt ⇒ `updated=false` a stará množina/čas beze změny (žádný částečný zápis). Tag `// Feature: multi-service-reservations, Property 9: ...`. Validates Requirements 9.3, 9.5. Skip přes `describe.skipIf(!hasIntegrationEnv)` shodně s ostatními DB integračními testy. Ověřeno: `pnpm lint` green, `pnpm test:run` na souboru (1 skipped — integrační Supabase env není v tomto prostředí ani CI nakonfigurované).
+
+## 2026-06-15 — multi-service-reservations / integrační property test cascade delete (task 4.13)
+
+### Nové funkce
+- `tests/properties/reservation-services-cascade.spec.ts` — Property 12 (Hard delete kaskáduje na množinu služeb, FK `reservation_services.reservation_id` → `reservations(id) ON DELETE CASCADE` z migrace `0049`): fast-check, 100 iterací, DB-backed integrační test. Pro libovolnou rezervaci vytvořenou přes RPC `create_reservation_multi` s generovanou bezduplicitní sadou služeb ověřuje, že vznikne přesně `|service set|` řádků `reservation_services`, a po hard delete řádku rezervace (`admin.from('reservations').delete().eq('id', …)`) nezůstane pro dané `reservation_id` žádný řádek `reservation_services`. Každý běh používá vlastní budoucí slot (`dayOffset`) → bez vzájemných překryvů; úklid per iteraci. Tag `// Feature: multi-service-reservations, Property 12: ...`. Validates Requirements 10.3. Skip přes `describe.skipIf(!hasIntegrationEnv)` shodně s ostatními DB integračními testy. Ověřeno: `pnpm lint` green, `pnpm test:run` na souboru (1 skipped — integrační Supabase env není v tomto prostředí ani CI nakonfigurované).
+
+## 2026-06-15 — multi-service-reservations / integrační property test atomicity vytvoření (task 4.10)
+
+### Nové funkce
+- `tests/properties/create-atomicity-multi.spec.ts` — Property 8 (Atomicita a vyloučení překryvu při vytvoření, RPC `create_reservation_multi` z migrace `0049`): fast-check, 100 iterací, DB-backed integrační test. Seeduje generovanou sadu existujících rezervací (i neaktivní rejected/cancelled, které blok neblokují) + kandidátní blok `[starts_at, starts_at + Combined_Duration)` při `allow_parallel_slots = false`. Deterministicky v TS spočítá očekávaný výsledek (konflikt ⇔ překryv s aktivní pending/approved rezervací, half-open `[)`) a ověří: úspěch ⇒ `conflict=false`, blok bez překryvu a přesně `|service set|` řádků `reservation_services`; konflikt ⇒ `conflict=true`, `reservation_id=null`, žádný nový řádek `reservations` ani `reservation_services` (žádný částečný zápis). Volá přímo RPC přes service-role klienta (advisory lock + overlap re-check žijí v DB). Tag `// Feature: multi-service-reservations, Property 8: ...`. Validates Requirements 6.3, 7.2, 7.3, 15.2, 15.5. Skip přes `describe.skipIf(!hasIntegrationEnv)` shodně s ostatními DB integračními testy. Ověřeno: `pnpm lint` green, `pnpm exec vitest run` na souboru (1 skipped — integrační Supabase env není v tomto prostředí ani CI nakonfigurované).
+
+## 2026-06-12 — multi-service-reservations / property test ends_at (task 4.7)
+
+### Nové funkce
+- `src/lib/reservation/__tests__/endsAt.property.test.ts` — Property 3 (`ends_at = starts_at + Combined_Duration`): čistý TS property test (bez DB), fast-check, 200 iterací. Lokální čistý helper `endsAt(startsAt, services) = new Date(startsAt.getTime() + combinedDuration(services) * 60_000)` ověřuje, že pro libovolný `starts_at` a neprázdnou množinu služeb se `ends_at` rovná `starts_at` + `Combined_Duration` (min) a že rozdíl v minutách je přesně `Combined_Duration`. Používá `combinedDuration` z `combine.ts`. Tag `// Feature: multi-service-reservations, Property 3: ...`. Validates Requirements 2.2, 9.2, 15.2. Ověřeno: `pnpm test:run` (2 passed) + `pnpm lint` green.
+
+## 2026-06-12 — multi-service-reservations / integrační property test backfillu (task 2.7)
+
+### Nové funkce
+- `tests/properties/backfill-single-service.spec.ts` — Property 16 (Backfill jednoslužbové rezervace, migrace `0049`): fast-check, 100 iterací, DB-backed integrační test. Pro libovolnou nasazenou jednoslužbovou rezervaci ověřuje, že (idempotentní) backfill vytvoří přesně jeden řádek `reservation_services` s `position = 0`, `service_id` = `reservations.service_id` a snapshotem délky/ceny. Varianta (a) ze zadání: rezervace se nasazují přímo do `reservations` a backfill se znovu spustí (replikace `INSERT ... SELECT reservations JOIN services ... ON CONFLICT DO NOTHING` přes JS klienta s `upsert ignoreDuplicates`, protože syrové SQL/SQL-exec RPC není přes Supabase JS klienta dostupné). Tag `// Feature: multi-service-reservations, Property 16: ...`. Validates Requirements 11.1. Skip přes `describe.skipIf(!hasIntegrationEnv)` shodně s ostatními DB integračními testy. Ověřeno: `pnpm lint` green, `pnpm test:run` (1 skipped — integrační Supabase env není v tomto prostředí ani CI nakonfigurované, takže assertiony se podle konvence projektu nespustí, ale neselžou).
+
+## 2026-06-12 — multi-service-reservations / atomicSlotWrite serviceIds[] (task 4.2)
+
+### Nové funkce
+- `lib/reservations/atomicSlotWrite.ts` — `AtomicSlotWriteParams` přejmenován `serviceId: string` → `serviceIds: string[]`; hodnota se předává do `loadAvailableSlots` (nový tvar `{ businessId, serviceIds, dateISO, excludeReservationId?, requirePublished? }`). Orchestrace (pre-lock grid re-check → delegovaný RPC zápis) beze změny. Ověřeno: `pnpm lint` green, `pnpm test:run src/lib/slots` (16 passed). `tsc --noEmit` na atomicSlotWrite.ts bez chyb; zbývající type chyby jsou jen v dosud neaktualizovaných volajících (ReservationCreator 4.3, ManualReservationCreator 4.4, ReservationEditor 4.5, AvailableSlotsService) — očekávané do dokončení těch tasků.
+
+## 2026-06-12 — multi-service-reservations / property test joinServiceNames (task 1.10)
+
+### Nové funkce
+- `lib/reservation/__tests__/combine.join.property.test.ts` — Property 13 (CSV spojuje názvy služeb oddělovačem " + "): fast-check, 200 iterací. Ověřuje, že spojený řetězec se rovná názvům seřazeným podle `position` (stabilní tie-break přes index) spojeným " + ", a že bez `position` se zachová pořadí vstupu. Samostatný soubor (nesdílí s combine.property.test.ts pro Properties 1 & 2). Tag `// Feature: multi-service-reservations, Property 13: ...`. Validates Requirements 14.1. Ověřeno: `pnpm test:run` (2 passed) + `pnpm lint` green.
+
+## 2026-06-12 — multi-service-reservations / property test toggle reducer (task 1.7)
+
+### Nové funkce
+- `lib/reservation/__tests__/selection.property.test.ts` — Property 5 (Korektnost toggle výběru služeb): fast-check, 100 iterací. Ověřuje bez duplicit po libovolné sekvenci toggle, přidání nevybrané na konec (R1.1/R1.2), odebrání vybrané se zachováním pořadí (R1.2), čistotu (nemutuje vstup) a dvojí toggle. Tag `// Feature: multi-service-reservations, Property 5: ...`. Validates Requirements 1.1, 1.2, 1.3.
+
+### Bug & fix (triage property testu)
+- **Symptom:** invariant „dvojí toggle = identita" selhal, counterexample `[["b","a"],"b"]` (expected `["a","b"]` to equal `["b","a"]`).
+- **Root cause:** test byl over-specified. Sémantika reduceru je append-on-add (R1.2): odebrání vybrané služby a její opětovné přidání ji vrátí na KONEC, ne na původní pozici. Pořadí-identita pod dvojím toggle není v acceptance criteria (1.1–1.3 ji nevyžadují). Implementace je správná.
+- **Fix:** rozdělen na dvě korektní vlastnosti — (a) dvojí toggle zachová stejnou MNOŽINU výběru (`new Set` rovnost), (b) dvojí toggle dosud nevybrané služby je úplná identita (add-then-remove). Acceptance criteria ani implementace se neměnily.
+
+### Ověřeno
+- `pnpm test:run` cílově na `selection.property.test.ts` 6 passed; `pnpm lint` čistý. PBT status: passed.
+
+## 2026-06-12 — multi-service-reservations / property test průnik zaměstnanců (task 1.9)
+
+### Nové funkce
+- `lib/reservation/__tests__/employees.property.test.ts` — Property 11 (Nabídka zaměstnanců je průnik přes vybrané služby): fast-check, 200 iterací. Dva `it` bloky: (1) `employeesForSelection` vrací množinový průnik přes omezující služby, služba bez řádku v mapování = „umí ji všichni" (do průniku nevnáší omezení), výsledek bez duplicit; (2) `clearEmployeeIfOutsideSelection` zachová vybraného zaměstnance uvnitř průniku a zruší (→ `null`) mimo něj nebo při prázdném výběru. Nezávislý referenční výpočet průniku v testu. Tag `// Feature: multi-service-reservations, Property 11: ...`. Validates Requirements 8.2, 8.3.
+
+### Ověřeno
+- `pnpm test:run` cílově na `employees.property.test.ts` 2 passed; `pnpm lint` čistý. PBT status: passed.
+
+## 2026-06-12 — multi-service-reservations / property test combinedPrice (task 1.6)
+
+### Nové funkce
+- `lib/reservation/__tests__/combine.property.test.ts` — Property 2 (Combined_Price je součet cen): fast-check, 200 iterací; ověřuje rovnost `combinedPrice` se součtem `priceCzk` a invarianci vůči pořadí (komutativita). Tag `// Feature: multi-service-reservations, Property 2: ...`. Soubor je sdílený s task 1.5 (Property 1) — přidáno jako samostatný describe blok.
+
+### Ověřeno
+- `pnpm test:run` cílově na `combine.property.test.ts` 2 passed; `pnpm lint` čistý.
+
+## 2026-06-12 — multi-service-reservations / Property test pro combinedDuration (task 1.5)
+
+### Nové funkce
+- `lib/reservation/__tests__/combine.property.test.ts` — property test (fast-check, 200 iterací) ověřující Property 1: `combinedDuration(services)` je rovna součtu `durationMinutes` všech služeb pro libovolnou neprázdnou množinu (velikost 1..10 → pokrývá i mezní jednoslužbový případ). Tag `// Feature: multi-service-reservations, Property 1: ...`, generátor služeb s volitelnou `position`.
+
+### Ověřeno
+- `pnpm lint` čistý; `pnpm test:run` cílově na `combine.property.test.ts` passed. PBT status: passed.
+
+## 2026-06-12 — multi-service-reservations / průnik zaměstnanců přes vybrané služby (task 1.4)
+
+### Nové funkce
+- `lib/reservation/employees.ts` — čisté helpery výběru zaměstnance u kombinované rezervace: `employeesForSelection(mapping, selection)` vrací průnik `service_employees` přes vybrané služby (R8.2); služba bez řádku v mapování = „umí ji všichni" (do průniku nevnáší omezení), žádná omezující služba → celý vesmír zaměstnanců (sjednocení napříč mapováním, deduplikace, pořadí prvního výskytu). `clearEmployeeIfOutsideSelection(mapping, selection, selectedEmployeeId)` zruší dříve vybraného zaměstnance mimo aktuální průnik (R8.3). Exportuje typy `ServiceEmployeeMapping`, `ServiceId`, `EmployeeId`.
+
+### Ověřeno
+- `pnpm lint` čistý; `pnpm test:run` cílově na `employees.test.ts` 9 passed (edge: služba bez řádku, prázdný výběr → vesmír, disjunktní množiny → prázdno, deduplikace/pořadí, zrušení zaměstnance mimo průnik). Property test P11 je samostatný task 1.9.
+
+## 2026-06-12 — multi-service-reservations / čisté helpery součtů a spojení názvů (task 1.2)
+
+### Nové funkce
+- `lib/reservation/combine.ts` — čisté helpery pro kombinovanou rezervaci: `combinedDuration(services)` (součet `durationMinutes`), `combinedPrice(services)` (součet `priceCzk`) a `joinServiceNames(services)` (spojení názvů oddělovačem ` + ` v pořadí `position`, stabilní řazení; bez `position` zachová pořadí vstupu). Exportuje typ `CombinableService = { name; durationMinutes; priceCzk; position? }`. Jediný zdroj pravdy pro průběžný výpočet ve formuláři, pre-lock check, e-maily a CSV.
+
+### Ověřeno
+- `pnpm lint` čistý; `pnpm test:run` cílově na `combine.test.ts` 11 passed (edge: prázdný seznam, n=1, nulová cena, zamíchané/chybějící `position`). Property testy P1/P2/P13 jsou samostatné tasky 1.5/1.6/1.10.
+
+## 2026-06-12 — multi-service-reservations / sdílený modul limitů (task 1.1)
+
+### Nové funkce
+- `lib/reservation/limits.ts` — jediný zdroj pravdy o limitech počtu služeb na rezervaci: `MIN_SERVICES_PER_RESERVATION = 1`, `MAX_SERVICES_PER_RESERVATION = 10`, `validateServiceCount(n)` vracející `{ ok: true } | { ok: false; reason; message }` s českými hláškami „Vyberte alespoň jednu službu" / „Najednou lze vybrat nejvýše 10 služeb". Použije klient (krok 1), server (validace) i komentář SQL migrace 0049.
+
+### Ověřeno
+- `pnpm lint` čistý; `pnpm test:run` cílově na `limits.test.ts` 5 passed (edge: n=0, n=11, hraniční n=1/n=10).
+
 ## 2026-06-12 — veřejná stránka / rezervační formulář UI + nepovinné ceny
 
 ### Nové funkce

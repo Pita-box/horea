@@ -3,6 +3,13 @@
 import 'server-only';
 
 import { revalidatePublicPage } from '@/lib/revalidate';
+import { fromPragueInput } from '@/lib/datetime';
+import { todayPragueDate } from '@/lib/reservations/calendar';
+import {
+  buildMonthGrid,
+  openMinutesByWeekday,
+  pragueWeekdayIndex,
+} from '@/lib/reservations/occupancy';
 import { processImageToWebp } from '@/lib/media/process-image';
 import { r2DeleteObject, r2PublicUrl, r2PutObject } from '@/lib/storage/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -375,4 +382,158 @@ export async function setServiceEmployeesAction(
 
   revalidatePublicPage(owner.business.slug);
   return { ok: true };
+}
+
+/** Položka žebříčku „TOP zaměstnanci" — efektivita dle obsazenosti tento měsíc. */
+export type TopEmployee = {
+  id: string;
+  name: string;
+  /** Počet služeb napříč přiřazenými rezervacemi tohoto měsíce. */
+  serviceCount: number;
+  /** Celkový rezervovaný čas v minutách (součet délek přiřazených rezervací). */
+  totalMinutes: number;
+  /** Obsazenost v procentech = rezervovaný čas / otevírací doba měsíce (cap 100). */
+  occupancyPct: number;
+};
+
+export type TopEmployeesResult =
+  | { ok: true; employees: TopEmployee[] }
+  | { ok: false; message: string };
+
+/**
+ * Žebříček zaměstnanců podle obsazenosti (efektivity) v AKTUÁLNÍM měsíci
+ * (Europe/Prague). Obsazenost = součet délek aktivních rezervací (pending/approved)
+ * přiřazených zaměstnanci / otevírací doba podniku za měsíc, v procentech (cap 100).
+ * Přiřazení se čte z `reservation_employees` (více lidí na rezervaci) s fallbackem
+ * na denormalizovaný `reservations.employee_id`. Řadí sestupně dle obsazenosti.
+ */
+export async function getTopEmployees(): Promise<TopEmployeesResult> {
+  const owner = await getOwnerBusiness();
+  if (!owner.ok) {
+    return owner;
+  }
+
+  const admin = createAdminClient();
+  const grid = buildMonthGrid(todayPragueDate());
+  const firstDay = grid.monthDates[0];
+  const lastDay = grid.monthDates[grid.monthDates.length - 1];
+  const fromIso = fromPragueInput(`${firstDay}T00:00:00`).toISOString();
+  const toIso = fromPragueInput(`${lastDay}T23:59:59`).toISOString();
+
+  const [employeesRes, hoursRes, reservationsRes] = await Promise.all([
+    admin
+      .from('employees')
+      .select('id,name')
+      .eq('business_id', owner.business.id)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
+      .returns<{ id: string; name: string }[]>(),
+    admin
+      .from('opening_hours')
+      .select('day_of_week,opens_at,closes_at')
+      .eq('business_id', owner.business.id)
+      .returns<{ day_of_week: number; opens_at: string; closes_at: string }[]>(),
+    admin
+      .from('reservations')
+      .select('id,starts_at,ends_at,employee_id')
+      .eq('business_id', owner.business.id)
+      .gte('starts_at', fromIso)
+      .lte('starts_at', toIso)
+      .in('status', ['pending', 'approved'])
+      .returns<{ id: string; starts_at: string; ends_at: string; employee_id: string | null }[]>(),
+  ]);
+
+  if (employeesRes.error || reservationsRes.error) {
+    return { ok: false, message: GENERIC_ERROR };
+  }
+
+  const employees = employeesRes.data ?? [];
+  const reservations = reservationsRes.data ?? [];
+
+  // Otevírací doba měsíce = součet otevřených minut přes všechny dny měsíce.
+  const openMin = openMinutesByWeekday(hoursRes.data ?? []);
+  const monthOpenMinutes = grid.monthDates.reduce(
+    (sum, dateISO) => sum + (openMin[pragueWeekdayIndex(dateISO)] ?? 0),
+    0,
+  );
+
+  const reservationIds = reservations.map((r) => r.id);
+
+  // Přiřazení zaměstnanci na rezervaci (více lidí na jednu rezervaci).
+  const assignedByReservation = new Map<string, string[]>();
+  if (reservationIds.length > 0) {
+    const { data: links } = await admin
+      .from('reservation_employees')
+      .select('reservation_id,employee_id')
+      .in('reservation_id', reservationIds)
+      .returns<{ reservation_id: string; employee_id: string }[]>();
+    for (const link of links ?? []) {
+      const list = assignedByReservation.get(link.reservation_id) ?? [];
+      list.push(link.employee_id);
+      assignedByReservation.set(link.reservation_id, list);
+    }
+  }
+
+  // Počet služeb na rezervaci (řádky reservation_services).
+  const serviceCountByReservation = new Map<string, number>();
+  if (reservationIds.length > 0) {
+    const { data: serviceRows } = await admin
+      .from('reservation_services')
+      .select('reservation_id')
+      .in('reservation_id', reservationIds)
+      .returns<{ reservation_id: string }[]>();
+    for (const row of serviceRows ?? []) {
+      serviceCountByReservation.set(
+        row.reservation_id,
+        (serviceCountByReservation.get(row.reservation_id) ?? 0) + 1,
+      );
+    }
+  }
+
+  const aggregate = new Map<string, { minutes: number; services: number }>();
+  for (const reservation of reservations) {
+    let assigned = assignedByReservation.get(reservation.id);
+    if ((!assigned || assigned.length === 0) && reservation.employee_id) {
+      assigned = [reservation.employee_id];
+    }
+    if (!assigned || assigned.length === 0) {
+      continue;
+    }
+    const minutes = Math.max(
+      0,
+      Math.round(
+        (new Date(reservation.ends_at).getTime() - new Date(reservation.starts_at).getTime()) /
+          60_000,
+      ),
+    );
+    const services = serviceCountByReservation.get(reservation.id) ?? 1;
+    for (const employeeId of assigned) {
+      const current = aggregate.get(employeeId) ?? { minutes: 0, services: 0 };
+      current.minutes += minutes;
+      current.services += services;
+      aggregate.set(employeeId, current);
+    }
+  }
+
+  const ranked: TopEmployee[] = employees
+    .map((employee) => {
+      const agg = aggregate.get(employee.id) ?? { minutes: 0, services: 0 };
+      const occupancyPct =
+        monthOpenMinutes > 0 ? Math.min(100, Math.round((agg.minutes / monthOpenMinutes) * 100)) : 0;
+      return {
+        id: employee.id,
+        name: employee.name,
+        serviceCount: agg.services,
+        totalMinutes: agg.minutes,
+        occupancyPct,
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.occupancyPct - a.occupancyPct ||
+        b.totalMinutes - a.totalMinutes ||
+        a.name.localeCompare(b.name, 'cs'),
+    );
+
+  return { ok: true, employees: ranked };
 }

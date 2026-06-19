@@ -9,22 +9,27 @@ import {
 } from './support/dashboard';
 
 /**
- * E2E ruční tvorba rezervace v dashboardu majitele (Playwright).
+ * E2E ruční tvorba KOMBINOVANÉ rezervace v dashboardu majitele (Playwright).
  *
- * Tok: „Vytvořit rezervaci" → vyplnění služby, data, času a kontaktu → Vytvořit
- * → rezervace se stavem „Schváleno" v seznamu (R12.4). Klientovi se neposílá
- * potvrzovací e-mail (R12.5) — když je nakonfigurován inbox
+ * Tok: „Vytvořit rezervaci" → výběr VÍCE služeb (uspořádaný toggle seznam,
+ * R15.1) → datum, čas a kontakt → Vytvořit → rezervace se stavem „Schváleno"
+ * v seznamu (R12.4). V detailu se ověří, že blok odráží kombinované služby
+ * (více položek v množině služeb + „Celková délka", R15.2/R15.3). Klientovi se
+ * neposílá potvrzovací e-mail (R12.5/R15.4) — když je nakonfigurován inbox
  * (`E2E_RESEND_INBOX_URL`), ověří se podmíněně i jeho absence.
  *
  * GUARD: vyžaduje běžící aplikaci, SEEDOVANÉHO přihlášeného majitele a aspoň
  * jednu službu s otevírací dobou/dostupností pro zvolený den. Bez
  * `E2E_OWNER_EMAIL` + `E2E_OWNER_PASSWORD` se test PŘESKOČÍ; bez služby nebo
- * dostupného slotu se rovněž přeskočí. Datum lze předvolit přes
- * `E2E_RESERVATION_DATE` (jinak dnešek + 7 dní v Europe/Prague).
+ * dostupného slotu se rovněž přeskočí. Multi-service část se uplatní, jakmile
+ * jsou seedované aspoň dvě služby (jinak proběhne s jednou). Datum lze předvolit
+ * přes `E2E_RESERVATION_DATE` (jinak dnešek + 7 dní v Europe/Prague).
  *
- * _Requirements: 12.1, 12.4, 12.5_
+ * _Requirements: 12.1, 12.4, 12.5, 15.1, 15.2_
  */
-test('majitel ručně vytvoří rezervaci a ta je v seznamu „Schváleno"', async ({ page }) => {
+test('majitel ručně vytvoří kombinovanou rezervaci a ta je v seznamu „Schváleno"', async ({
+  page,
+}) => {
   test.skip(
     !hasOwnerCreds,
     'Nastav E2E_OWNER_EMAIL a E2E_OWNER_PASSWORD (seedovaný majitel) pro spuštění dashboard E2E.',
@@ -39,11 +44,22 @@ test('majitel ručně vytvoří rezervaci a ta je v seznamu „Schváleno"', asy
 
   // Otevři dialog ruční tvorby (R12.1).
   await page.getByRole('button', { name: 'Vytvořit rezervaci' }).click();
-  await expect(page.getByRole('heading', { name: 'Vytvořit rezervaci' })).toBeVisible();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Vytvořit rezervaci' })).toBeVisible();
 
-  // Bez seedované služby nelze rezervaci vytvořit — přeskoč.
-  const serviceValue = await page.locator('#create-service').inputValue();
-  test.skip(serviceValue === '', 'Podnik nemá žádnou službu — naseeduj službu pro ruční tvorbu.');
+  // Služby jsou uspořádaný toggle seznam (R15.1); každá služba = přepínač
+  // s `aria-pressed`. Bez seedované služby nelze rezervaci vytvořit — přeskoč.
+  const serviceToggles = dialog.locator('button[aria-pressed]');
+  const serviceCount = await serviceToggles.count();
+  test.skip(serviceCount === 0, 'Podnik nemá žádnou službu — naseeduj službu pro ruční tvorbu.');
+
+  // Vyber více služeb, je-li jich víc (kombinovaná rezervace, R15.1); jinak jednu.
+  const selectCount = Math.min(serviceCount, 2);
+  for (let index = 0; index < selectCount; index += 1) {
+    await serviceToggles.nth(index).click();
+  }
+  // Vybrané služby nesou pořadové odznaky „Vybráno" odpovídající pořadí výběru.
+  await expect(dialog.locator('button[aria-pressed="true"]')).toHaveCount(selectCount);
 
   // Vyplň formulář; čas záměrně „02:00" vynutí nabídku dostupných slotů (R12.6).
   await page.locator('#create-date').fill(reservationDate);
@@ -83,6 +99,17 @@ test('majitel ručně vytvoří rezervaci a ta je v seznamu „Schváleno"', asy
     .first();
   await expect(createdRow).toBeVisible({ timeout: 15_000 });
   await expect(createdRow).toContainText('Schváleno');
+
+  // Detail odráží kombinované služby (R15.2/R15.3): množina služeb i celková
+  // délka. Při více službách je v detailu sekce „Služby" s odpovídajícím počtem
+  // položek; vždy je přítomna „Celková délka".
+  await createdRow.click();
+  await expect(page.getByRole('heading', { name: 'Akce' })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText('Celková délka', { exact: false })).toBeVisible();
+  if (selectCount > 1) {
+    const serviceList = page.locator('dd ul > li');
+    await expect(serviceList).toHaveCount(selectCount);
+  }
 
   // Podmíněné ověření, že klientovi NEdorazil potvrzovací e-mail (R12.5) — jen
   // je-li nastaven dedikovaný test inbox.

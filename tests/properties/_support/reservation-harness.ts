@@ -30,12 +30,14 @@ export const TIME_POOL = [
 /** Tvar výsledku Supabase dotazu/RPC, který fake klient vrací. */
 export type SupabaseResult<T> = { data: T | null; error: unknown };
 
-/** Řádek vracený RPC `create_reservation` (zrcadlí `CreateReservationRpcRow`). */
+/** Řádek vracený RPC `create_reservation_multi` (zrcadlí `CreateReservationRpcRow`). */
 export type CreateReservationRpcRow = {
   reservation_id: string | null;
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | null;
   conflict: boolean;
   not_published: boolean;
+  /** Počet služeb mimo [1,10], duplicita nebo služba nepatří podniku (multi-service). */
+  invalid: boolean;
 };
 
 type BusinessRow = {
@@ -55,7 +57,13 @@ type ServiceRow = {
   price_czk: number | string;
 };
 
-/** Konfigurace všech návratů, které fake admin klient poskytuje. */
+/**
+ * Konfigurace všech návratů, které fake admin klient poskytuje.
+ *
+ * `service` je nadále JEDNA výchozí služba (single-row scénář); fake klient z ní
+ * pro multi-service dotaz `from('services').select().in().eq().returns()` sestaví
+ * pole. `data: null` ⇒ prázdné pole (chybějící / cizí služba → odmítnutí).
+ */
 export type AdminScenario = {
   business: SupabaseResult<BusinessRow>;
   published: SupabaseResult<boolean>;
@@ -65,12 +73,16 @@ export type AdminScenario = {
 };
 
 export type FakeAdminClient = {
-  /** Pořadí volaných RPC funkcí — pro ověření, že `create_reservation` (ne)proběhlo. */
+  /** Pořadí volaných RPC funkcí — pro ověření, že `create_reservation_multi` (ne)proběhlo. */
   __rpcCalls: string[];
+  /** Volané RPC i s argumenty — pro ověření např. UTC tvaru `p_starts_at`. */
+  __rpcArgs: Array<{ fn: string; args: unknown }>;
   from: (table: string) => {
     select: () => unknown;
+    in: () => unknown;
     eq: () => unknown;
     maybeSingle: () => Promise<SupabaseResult<unknown>>;
+    returns: () => Promise<SupabaseResult<unknown>>;
   };
   rpc: (fn: string, args?: unknown) => Promise<SupabaseResult<unknown>>;
 };
@@ -103,30 +115,39 @@ export function rpcSuccess(
   status: 'approved' | 'pending' = 'pending',
 ): SupabaseResult<CreateReservationRpcRow> {
   return {
-    data: { reservation_id: 'res-1', status, conflict: false, not_published: false },
+    data: { reservation_id: 'res-1', status, conflict: false, not_published: false, invalid: false },
     error: null,
   };
 }
 
 export function rpcConflict(): SupabaseResult<CreateReservationRpcRow> {
   return {
-    data: { reservation_id: null, status: null, conflict: true, not_published: false },
+    data: { reservation_id: null, status: null, conflict: true, not_published: false, invalid: false },
     error: null,
   };
 }
 
 export function rpcNotPublished(): SupabaseResult<CreateReservationRpcRow> {
   return {
-    data: { reservation_id: null, status: null, conflict: false, not_published: true },
+    data: { reservation_id: null, status: null, conflict: false, not_published: true, invalid: false },
+    error: null,
+  };
+}
+
+export function rpcInvalid(): SupabaseResult<CreateReservationRpcRow> {
+  return {
+    data: { reservation_id: null, status: null, conflict: false, not_published: false, invalid: true },
     error: null,
   };
 }
 
 /**
  * Sestaví fake Supabase admin klienta, jehož chování řídí předaný scénář.
- * Podporuje právě ty volání, která `ReservationCreator` dělá:
- *  - `from('businesses'|'services'|'users').select(...).eq(...).maybeSingle()`,
- *  - `rpc('is_business_published' | 'create_reservation', ...)`.
+ * Podporuje právě ta volání, která `ReservationCreator` dělá:
+ *  - `from('businesses'|'users').select(...).eq(...).maybeSingle()`,
+ *  - `from('services').select(...).in('id', ids).eq('business_id', id).returns()`
+ *    (multi-service: vrací POLE řádků sestavené z výchozí služby scénáře),
+ *  - `rpc('is_business_published' | 'create_reservation_multi', ...)`.
  * (Načtení slotů jde přes `loadAvailableSlots`, který se v testech mockuje zvlášť.)
  */
 export function buildAdminClient(scenario: Partial<AdminScenario> = {}): FakeAdminClient {
@@ -139,13 +160,12 @@ export function buildAdminClient(scenario: Partial<AdminScenario> = {}): FakeAdm
   };
 
   const rpcCalls: string[] = [];
+  const rpcArgs: Array<{ fn: string; args: unknown }> = [];
 
-  function resultForTable(table: string): SupabaseResult<unknown> {
+  function singleResultForTable(table: string): SupabaseResult<unknown> {
     switch (table) {
       case 'businesses':
         return resolved.business;
-      case 'services':
-        return resolved.service;
       case 'users':
         return resolved.users;
       default:
@@ -153,22 +173,37 @@ export function buildAdminClient(scenario: Partial<AdminScenario> = {}): FakeAdm
     }
   }
 
+  /** Multi-service dotaz na služby vrací POLE; `null` ⇒ prázdné pole. */
+  function servicesArrayResult(): SupabaseResult<ServiceRow[]> {
+    return {
+      data: resolved.service.data ? [resolved.service.data] : [],
+      error: resolved.service.error,
+    };
+  }
+
   return {
     __rpcCalls: rpcCalls,
+    __rpcArgs: rpcArgs,
     from(table: string) {
       const builder = {
         select: () => builder,
+        in: () => builder,
         eq: () => builder,
-        maybeSingle: () => Promise.resolve(resultForTable(table)),
+        maybeSingle: () => Promise.resolve(singleResultForTable(table)),
+        returns: () =>
+          table === 'services'
+            ? Promise.resolve(servicesArrayResult())
+            : Promise.resolve(singleResultForTable(table)),
       };
       return builder;
     },
-    rpc(fn: string) {
+    rpc(fn: string, args?: unknown) {
       rpcCalls.push(fn);
+      rpcArgs.push({ fn, args });
       if (fn === 'is_business_published') {
         return Promise.resolve(resolved.published);
       }
-      if (fn === 'create_reservation') {
+      if (fn === 'create_reservation_multi') {
         return Promise.resolve(resolved.createReservation);
       }
       return Promise.resolve({ data: null, error: null });
@@ -244,7 +279,7 @@ export function distinctiveContactArb(): fc.Arbitrary<{
 export function buildInput(overrides: Partial<CreateReservationInput> = {}): CreateReservationInput {
   return {
     slug: 'kavarna',
-    serviceId: 'svc-1',
+    serviceIds: ['svc-1'],
     date: DATE,
     time: '09:00',
     clientName: 'Jan Novak',

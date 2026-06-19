@@ -15,7 +15,12 @@ import type { ReservationStatus } from '@/lib/reservations/labels';
  */
 
 // Konfigurovatelný výsledek načtení rezervace pro test stránky.
-const pageState = vi.hoisted(() => ({ reservation: null as unknown }));
+const pageState = vi.hoisted(() => ({
+  reservation: null as unknown,
+  serviceSet: [] as unknown[],
+  services: [] as unknown[],
+  employees: [] as unknown[],
+}));
 
 const reservationMaybeSingle = vi.hoisted(() =>
   vi.fn(async () => ({ data: pageState.reservation, error: null })),
@@ -26,10 +31,29 @@ const fromMock = vi.hoisted(() =>
     if (table === 'reservations') {
       return { select: () => ({ eq: () => ({ maybeSingle: reservationMaybeSingle }) }) };
     }
+    if (table === 'reservation_services') {
+      return {
+        select: () => ({
+          eq: () => ({
+            order: () => ({ returns: async () => ({ data: pageState.serviceSet, error: null }) }),
+          }),
+        }),
+      };
+    }
+    if (table === 'reservation_employees') {
+      // Množina přiřazených zaměstnanců — pro tyto testy prázdná (fallback na employee_id).
+      return {
+        select: () => ({
+          eq: () => ({ returns: async () => ({ data: [], error: null }) }),
+        }),
+      };
+    }
     // services — pro detail nenalezené rezervace se nevolá, ale držíme bezpečný default.
     return {
       select: () => ({
-        eq: () => ({ order: () => ({ returns: async () => ({ data: [], error: null }) }) }),
+        eq: () => ({
+          order: () => ({ returns: async () => ({ data: pageState.services, error: null }) }),
+        }),
       }),
     };
   }),
@@ -39,6 +63,21 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(async () => ({
     auth: { getUser: async () => ({ data: { user: { id: 'user-1' } }, error: null }) },
     from: fromMock,
+  })),
+}));
+
+// Zaměstnanci se čtou service-role klientem (employees nemá owner-select RLS).
+vi.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: vi.fn(() => ({
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          order: () => ({
+            order: () => ({ returns: async () => ({ data: pageState.employees, error: null }) }),
+          }),
+        }),
+      }),
+    }),
   })),
 }));
 
@@ -58,7 +97,7 @@ function actionLabelsFor(status: ReservationStatus): string[] {
       reservationId="res-1"
       status={status}
       services={[{ id: 'svc-1', name: 'Stříhání' }]}
-      currentServiceId="svc-1"
+      currentServiceIds={['svc-1']}
       startsAt="2024-07-15T08:00:00.000Z"
     />,
   );
@@ -70,6 +109,9 @@ function actionLabelsFor(status: ReservationStatus): string[] {
 
 beforeEach(() => {
   pageState.reservation = null;
+  pageState.serviceSet = [];
+  pageState.services = [];
+  pageState.employees = [];
   reservationMaybeSingle.mockClear();
   fromMock.mockClear();
 });
@@ -107,5 +149,96 @@ describe('Reservation_Detail_View — neexistující rezervace (R5.4)', () => {
     const { container } = render(ui);
 
     expect(container.textContent).toContain('Rezervace nebyla nalezena');
+  });
+});
+
+describe('Reservation_Detail_View — kombinovaná rezervace (R13.1–R13.4)', () => {
+  it('zobrazí všechny služby v pořadí, součty, časový blok a přiřazeného zaměstnance', async () => {
+    pageState.reservation = {
+      id: 'res-1',
+      business_id: 'biz-1',
+      service_id: 'svc-1',
+      starts_at: '2024-07-15T08:00:00.000Z',
+      ends_at: '2024-07-15T09:30:00.000Z',
+      status: 'approved',
+      attendance: 'unknown',
+      client_name: 'Jan Novák',
+      client_phone: null,
+      client_email: null,
+      note: null,
+      status_reason: null,
+      employee_id: 'emp-1',
+      services: { name: 'Dámský střih' },
+    };
+    pageState.serviceSet = [
+      {
+        position: 0,
+        service_id: 'svc-1',
+        duration_minutes_snapshot: 60,
+        price_czk_snapshot: 500,
+        services: { name: 'Dámský střih' },
+      },
+      {
+        position: 1,
+        service_id: 'svc-2',
+        duration_minutes_snapshot: 30,
+        price_czk_snapshot: 200,
+        services: { name: 'Foukání' },
+      },
+    ];
+    pageState.employees = [{ id: 'emp-1', name: 'Petra' }];
+
+    const ui = await ReservationDetailPage({ params: Promise.resolve({ id: 'res-1' }) });
+    const { container } = render(ui);
+    const text = container.textContent ?? '';
+
+    // Všechny služby v uloženém pořadí + délka každé (R13.1).
+    expect(text).toContain('1. Dámský střih');
+    expect(text).toContain('2. Foukání');
+    expect(text).toContain('60 min');
+    expect(text).toContain('30 min');
+    // Combined_Duration a Combined_Price ze snapshotů (R13.2).
+    expect(text).toContain('90 min');
+    expect(text).toContain('700 Kč');
+    // Jeden časový blok v Europe/Prague (R13.3) — 08:00 UTC = 10:00 CEST.
+    expect(text).toContain('15.07.2024 10:00 – 15.07.2024 11:30');
+    // Přiřazený zaměstnanec (R13.4).
+    expect(text).toContain('Petra');
+  });
+
+  it('skryje cenu, když je Combined_Price 0 Kč (R3.3 konvence souhrnu)', async () => {
+    pageState.reservation = {
+      id: 'res-2',
+      business_id: 'biz-1',
+      service_id: 'svc-1',
+      starts_at: '2024-07-15T08:00:00.000Z',
+      ends_at: '2024-07-15T08:45:00.000Z',
+      status: 'pending',
+      attendance: 'unknown',
+      client_name: 'Jan Novák',
+      client_phone: null,
+      client_email: null,
+      note: null,
+      status_reason: null,
+      employee_id: null,
+      services: { name: 'Konzultace' },
+    };
+    pageState.serviceSet = [
+      {
+        position: 0,
+        service_id: 'svc-1',
+        duration_minutes_snapshot: 45,
+        price_czk_snapshot: 0,
+        services: { name: 'Konzultace' },
+      },
+    ];
+
+    const ui = await ReservationDetailPage({ params: Promise.resolve({ id: 'res-2' }) });
+    const { container } = render(ui);
+    const text = container.textContent ?? '';
+
+    expect(text).toContain('Konzultace');
+    expect(text).toContain('45 min');
+    expect(text).not.toContain('Celková cena');
   });
 });

@@ -11,6 +11,11 @@ import {
   type ReservationStatus,
 } from '@/lib/reservations/labels';
 import { normalizePhone } from '@/server/ClientUpsertor';
+import {
+  reservationServiceLabel,
+  type EmbeddedService,
+  type ReservationServiceNameRow,
+} from '@/lib/reservations/serviceLabel';
 import { createClient } from '@/lib/supabase/server';
 
 import { DeleteClientDialog } from './DeleteClientDialog';
@@ -38,7 +43,8 @@ type ReservationRow = {
   attendance: AttendanceStatus;
   client_phone: string | null;
   client_email: string | null;
-  services: { name: string } | { name: string }[] | null;
+  services: EmbeddedService;
+  reservation_services: ReservationServiceNameRow[] | null;
 };
 
 type HistoryItem = {
@@ -60,13 +66,6 @@ type ClientDetail = {
 type LoadResult =
   | { ok: true; client: ClientDetail }
   | { ok: false; kind: 'not-found' | 'error' };
-
-function serviceName(services: ReservationRow['services']): string | null {
-  if (!services) {
-    return null;
-  }
-  return Array.isArray(services) ? (services[0]?.name ?? null) : services.name;
-}
 
 /**
  * Načte klienta podniku majitele a jeho rezervační historii přes PÁROVACÍ
@@ -113,7 +112,9 @@ async function loadClientDetail(id: string): Promise<LoadResult> {
 
   const { data: reservationRows, error: reservationsError } = await supabase
     .from('reservations')
-    .select('id,starts_at,status,attendance,client_phone,client_email,services(name)')
+    .select(
+      'id,starts_at,status,attendance,client_phone,client_email,services(name),reservation_services(position,services(name))',
+    )
     .eq('business_id', business.id)
     .order('starts_at', { ascending: true })
     .returns<ReservationRow[]>();
@@ -140,7 +141,7 @@ async function loadClientDetail(id: string): Promise<LoadResult> {
       startsAt: reservation.starts_at,
       status: reservation.status,
       attendance: reservation.attendance,
-      serviceName: serviceName(reservation.services),
+      serviceName: reservationServiceLabel(reservation.reservation_services, reservation.services),
     }));
 
   return {
@@ -153,6 +154,14 @@ async function loadClientDetail(id: string): Promise<LoadResult> {
       history,
     },
   };
+}
+
+/** Barevný badge docházky: dorazil = zelený, nedorazil = červený (R11.7). */
+function attendanceBadgeClass(attendance: 'attended' | 'no_show'): string {
+  const base = 'rounded-[var(--radius-badges)] px-2 py-0.5 text-xs font-semibold';
+  return attendance === 'attended'
+    ? `${base} bg-[color-mix(in_srgb,var(--color-electric-green)_28%,white)] text-[var(--color-rich-violet)]`
+    : `${base} bg-[color-mix(in_srgb,var(--color-red)_12%,white)] text-[var(--color-red)]`;
 }
 
 function ContactRow({ label, value }: { label: string; value: string }) {
@@ -212,7 +221,7 @@ function ClientDetailContent({ client }: { client: ClientDetail }) {
               <li key={item.id}>
                 <Link
                   href={`/dashboard/reservations/${item.id}`}
-                  className="flex flex-col gap-1 py-3 hover:text-[var(--color-action-violet)] sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-1 py-3 hover:text-[var(--color-action-violet)] sm:grid sm:grid-cols-[150px_1fr_auto] sm:items-center sm:gap-4"
                 >
                   <span className="text-sm font-medium text-[var(--color-rich-violet)]">
                     {toPragueDisplay(item.startsAt)}
@@ -220,8 +229,13 @@ function ClientDetailContent({ client }: { client: ClientDetail }) {
                   <span className="text-sm text-[var(--color-slate-text)]">
                     {item.serviceName ?? '—'}
                   </span>
-                  <span className="text-sm text-[var(--color-slate-text)]">
-                    {reservationStatusLabel(item.status)} · {attendanceLabel(item.attendance)}
+                  <span className="flex items-center gap-2 text-sm text-[var(--color-slate-text)] sm:justify-end">
+                    <span>{reservationStatusLabel(item.status)}</span>
+                    {item.attendance !== null ? (
+                      <span className={attendanceBadgeClass(item.attendance)}>
+                        {attendanceLabel(item.attendance)}
+                      </span>
+                    ) : null}
                   </span>
                 </Link>
               </li>

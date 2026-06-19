@@ -18,8 +18,8 @@ const TIME_ZONE = 'Europe/Prague';
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const DAY_MS = 86_400_000;
 
-/** Pohled seznamu — tabulka (výchozí) nebo kalendář. */
-export type CalendarView = 'table' | 'calendar';
+/** Pohled seznamu — tabulka (výchozí), kalendář, nebo obsazenost. */
+export type CalendarView = 'table' | 'calendar' | 'occupancy';
 /** Režim kalendáře — jeden den nebo týden (Po–Ne). */
 export type CalendarMode = 'day' | 'week';
 
@@ -141,13 +141,15 @@ export function periodBoundsUtc(days: CalendarDay[]): { fromIso: string; toIso: 
 }
 
 /**
- * Parsuje parametry kalendáře z `searchParams`. Výchozí stav: tabulka, týdenní
- * režim, kotva = dnešní pražské datum. Neplatná kotva spadne na dnešek.
+ * Parsuje parametry kalendáře z `searchParams`. Výchozí stav: obsazenost,
+ * týdenní režim, kotva = dnešní pražské datum. Neplatná kotva spadne na dnešek.
+ * (Pohled „tabulka" byl zrušen — staré odkazy `?view=table` spadnou na obsazenost.)
  */
 export function parseCalendarParams(
   searchParams: Record<string, SearchParamValue>,
 ): CalendarParams {
-  const view: CalendarView = first(searchParams.view) === 'calendar' ? 'calendar' : 'table';
+  const viewRaw = first(searchParams.view);
+  const view: CalendarView = viewRaw === 'calendar' ? 'calendar' : 'occupancy';
   const mode: CalendarMode = first(searchParams.mode) === 'day' ? 'day' : 'week';
   const anchorRaw = first(searchParams.anchor);
   const anchor = anchorRaw && DATE_PATTERN.test(anchorRaw) ? anchorRaw : todayPragueDate();
@@ -165,13 +167,17 @@ export function buildReservationsHref(
   filters: ReservationFilters,
   params:
     | { view: 'table' }
-    | { view: 'calendar'; mode: CalendarMode; anchor: string },
+    | { view: 'calendar'; mode: CalendarMode; anchor: string }
+    | { view: 'occupancy'; anchor: string },
 ): string {
   // Stránkování do kalendáře nepatří — pro odkazy začínáme od první strany.
   const search = buildReservationSearchParams({ ...filters, page: 1 });
   if (params.view === 'calendar') {
     search.set('view', 'calendar');
     search.set('mode', params.mode);
+    search.set('anchor', params.anchor);
+  } else if (params.view === 'occupancy') {
+    search.set('view', 'occupancy');
     search.set('anchor', params.anchor);
   }
   const query = search.toString();

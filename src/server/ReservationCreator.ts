@@ -4,6 +4,12 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { fromPragueInput } from '@/lib/datetime';
 import { serverLog } from '@/lib/log-server';
+import {
+  combinedDuration,
+  combinedPrice,
+  type CombinableService,
+} from '@/lib/reservation/combine';
+import { validateServiceCount } from '@/lib/reservation/limits';
 import { reservationContactSchema } from '@/lib/reservation/schema';
 import type { ReservationContactValues } from '@/lib/reservation/schema';
 import { normalizeRouteSlug } from '@/lib/slug/route';
@@ -22,18 +28,24 @@ import { atomicSlotWrite, type AtomicSlotWriteResult } from '@/lib/reservations/
  *  1. Vstupní validace všech polí znovu serverově (R7.7).
  *  2. Server kontext: bez service role klíče operaci ZABLOKUJEME (R15.5),
  *     nikdy nepřepneme na anon zápis.
- *  3. Business existuje a je Published_Business (R9.1); služba k němu patří (R9.2).
- *  4. Výpočet startsAt/endsAt v UTC z Pražského data + času (R17.4).
+ *  3. Business existuje a je Published_Business (R9.1); všechny vybrané služby
+ *     patří podniku (R7.1).
+ *  4. Výpočet startsAt v UTC z Pražského data + času (R17.4); Combined_Duration
+ *     a ends_at počítá autoritativně SQL pod zámkem.
  *  5. Pre-lock grid re-check přes sdílený Slot_Calculator (R9.3); konflikt → 409.
- *  6. Atomický blok: RPC create_reservation drží advisory lock + overlap re-check
- *     pod zámkem a vloží rezervaci (R9.5–R9.7).
+ *  6. Atomický blok: RPC create_reservation_multi drží advisory lock + overlap
+ *     re-check pod zámkem a vloží rezervaci + množinu služeb (R9.5–R9.7).
  *  7. Post-commit best-effort e-maily (selhání nezpůsobí rollback — R10.3, R11.3).
  *  8. Logování bez citlivých polí klienta (R18.1–R18.4).
  *  9. Návrat statusu klientovi (R9.9).
  */
 export type CreateReservationInput = {
   slug: string;
-  serviceId: string;
+  /**
+   * Uspořádaná množina ID vybraných služeb (`Reservation_Service_Set`, R5.1).
+   * Pořadí = pořadí výběru = `position` (první služba = `position 0` = primary).
+   */
+  serviceIds: string[];
   /** Datum v pásmu Europe/Prague ve tvaru `YYYY-MM-DD`. */
   date: string;
   /** Počáteční čas slotu v pásmu Europe/Prague ve tvaru `HH:mm`. */
@@ -87,6 +99,7 @@ type CreateReservationRpcRow = {
   status: ReservationStatus | 'rejected' | 'cancelled' | null;
   conflict: boolean;
   not_published: boolean;
+  invalid: boolean;
 };
 
 async function safeLog(message: string, context: Record<string, unknown>): Promise<void> {
@@ -105,14 +118,16 @@ async function safeLog(message: string, context: Record<string, unknown>): Promi
 async function dispatchEmails(args: {
   admin: SupabaseClient;
   business: BusinessRow;
-  service: ServiceRow;
+  /** Služby v uloženém pořadí (`position`); první = primary (position 0). */
+  services: ServiceRow[];
   reservationId: string;
   status: ReservationStatus;
   startsAt: Date;
   contact: ReservationContactValues;
   employeeName?: string | null;
 }): Promise<void> {
-  const { admin, business, service, reservationId, status, startsAt, contact, employeeName } = args;
+  const { admin, business, services, reservationId, status, startsAt, contact, employeeName } =
+    args;
 
   // E-mail majitele přes users propojené businesses.owner_user_id (R11.1).
   let ownerEmail: string | null = null;
@@ -127,7 +142,19 @@ async function dispatchEmails(args: {
     ownerEmail = null;
   }
 
-  const servicePriceCzk = Number(service.price_czk);
+  // Seznam služeb v pořadí + kombinované součty pro e-maily (R16.1, R16.2).
+  const combinable: CombinableService[] = services.map((service, index) => ({
+    name: service.name,
+    durationMinutes: service.duration_minutes,
+    priceCzk: Number(service.price_czk),
+    position: index,
+  }));
+  const emailServices = combinable.map((service) => ({
+    name: service.name,
+    durationMinutes: service.durationMinutes,
+  }));
+  const combinedDurationMinutes = combinedDuration(combinable);
+  const combinedPriceCzk = combinedPrice(combinable);
   const businessUrl = `${PLATFORM_BASE_URL}/${business.slug}`;
   const dashboardUrl = `${PLATFORM_BASE_URL}/dashboard/reservations`;
 
@@ -137,9 +164,9 @@ async function dispatchEmails(args: {
       recipientEmail: contact.clientEmail,
       clientName: contact.clientName,
       businessName: business.name,
-      serviceName: service.name,
-      serviceDurationMinutes: service.duration_minutes,
-      servicePriceCzk,
+      services: emailServices,
+      combinedDurationMinutes,
+      combinedPriceCzk,
       startsAt,
       status,
       businessPhone: business.phone,
@@ -154,9 +181,9 @@ async function dispatchEmails(args: {
         reservationId,
         recipientEmail: ownerEmail,
         businessName: business.name,
-        serviceName: service.name,
-        serviceDurationMinutes: service.duration_minutes,
-        servicePriceCzk,
+        services: emailServices,
+        combinedDurationMinutes,
+        combinedPriceCzk,
         startsAt,
         status,
         clientName: contact.clientName,
@@ -189,6 +216,13 @@ export async function createReservation(
       code: 400,
       message: parsed.error.issues[0]?.message ?? MESSAGES.invalidInput,
     };
+  }
+
+  // (1b) Rozsahová validace počtu vybraných služeb [1,10] (R5.1, R5.2, R5.3).
+  //      Sdílený zdroj pravdy s klientem i SQL přes `validateServiceCount`.
+  const countCheck = validateServiceCount(input.serviceIds.length);
+  if (!countCheck.ok) {
+    return { ok: false, code: 400, message: countCheck.message };
   }
 
   if (!DATE_PATTERN.test(input.date) || !TIME_PATTERN.test(input.time)) {
@@ -240,12 +274,16 @@ export async function createReservation(
     return { ok: false, code: 404, message: MESSAGES.notPublished };
   }
 
-  const { data: service, error: serviceError } = await admin
+  // (3b) Načtení VŠECH vybraných služeb jedním dotazem; každá musí existovat a
+  //      patřit podniku (R7.1). Provizorní data pro e-mail; autoritativní
+  //      Combined_Duration/ends_at počítá SQL pod zámkem v `create_reservation_multi`.
+  const uniqueServiceIds = Array.from(new Set(input.serviceIds));
+  const { data: serviceRows, error: serviceError } = await admin
     .from('services')
     .select('id,name,duration_minutes,price_czk')
-    .eq('id', input.serviceId)
+    .in('id', uniqueServiceIds)
     .eq('business_id', business.id)
-    .maybeSingle<ServiceRow>();
+    .returns<ServiceRow[]>();
 
   if (serviceError) {
     await safeLog('reservation_service_lookup_failed', {
@@ -255,40 +293,52 @@ export async function createReservation(
     return { ok: false, code: 500, message: MESSAGES.serverContext };
   }
 
-  if (!service) {
+  // Některá služba chybí / nepatří podniku → odmítnutí (R7.1).
+  if (!serviceRows || serviceRows.length !== uniqueServiceIds.length) {
     await safeLog('reservation_rejected', { businessId: business.id, reason: 'service_not_found' });
     return { ok: false, code: 404, message: MESSAGES.serviceMissing };
   }
 
-  // (4) UTC hranice slotu z Pražského data + času (R17.4).
+  // Zachovej pořadí výběru: namapuj serviceIds → načtené řádky (position pořadí).
+  const serviceById = new Map(serviceRows.map((row) => [row.id, row]));
+  const orderedServices = input.serviceIds.map((id) => serviceById.get(id));
+  if (orderedServices.some((row) => row === undefined)) {
+    await safeLog('reservation_rejected', { businessId: business.id, reason: 'service_not_found' });
+    return { ok: false, code: 404, message: MESSAGES.serviceMissing };
+  }
+  // position 0 = denormalizovaný primary (shodně se SQL service_id); seznam je
+  // v pořadí výběru a slouží pro multi-service e-maily (R16.1, R16.2).
+  const orderedServiceRows = orderedServices as ServiceRow[];
+
+  // (4) UTC počátek slotu z Pražského data + času (R17.4). Combined_Duration a
+  //     ends_at počítá autoritativně SQL — TS už ends_at nepředává.
   let startsAt: Date;
   try {
     startsAt = fromPragueInput(`${input.date}T${input.time}`);
   } catch {
     return { ok: false, code: 400, message: MESSAGES.invalidInput };
   }
-  const endsAt = new Date(startsAt.getTime() + service.duration_minutes * 60_000);
 
   // (5+6) Atomický blok delegovaný na sdílený orchestrátor `atomicSlotWrite`:
   //       pre-lock grid re-check přes Slot_Calculator (R9.3) + dispatch RPC
-  //       create_reservation, který pod advisory lockem provede overlap re-check
-  //       a insert v jediné transakci (R9.5–R9.7). Insert cesta nevylučuje žádnou
-  //       rezervaci (`excludeReservationId` = undefined).
+  //       create_reservation_multi, který pod advisory lockem provede overlap
+  //       re-check a insert rezervace + množiny služeb v jediné transakci
+  //       (R7.2, R7.3). Insert cesta nevylučuje žádnou rezervaci
+  //       (`excludeReservationId` = undefined). ends_at počítá autoritativně SQL.
   type CreateReservationRpcResponse = Awaited<ReturnType<typeof admin.rpc>>;
   let writeResult: AtomicSlotWriteResult<CreateReservationRpcResponse>;
   try {
     writeResult = await atomicSlotWrite<CreateReservationRpcResponse>({
       supabase: admin,
       businessId: business.id,
-      serviceId: service.id,
+      serviceIds: input.serviceIds,
       dateISO: input.date,
       time: input.time,
       write: () =>
-        admin.rpc('create_reservation', {
+        admin.rpc('create_reservation_multi', {
           p_business_id: business.id,
-          p_service_id: service.id,
+          p_service_ids: input.serviceIds,
           p_starts_at: startsAt.toISOString(),
-          p_ends_at: endsAt.toISOString(),
           p_client_name: parsed.data.clientName,
           p_client_phone: parsed.data.clientPhone,
           p_client_email: parsed.data.clientEmail,
@@ -298,15 +348,15 @@ export async function createReservation(
   } catch (error) {
     await safeLog('reservation_slot_recompute_failed', {
       businessId: business.id,
-      serviceId: service.id,
+      serviceIds: input.serviceIds,
       error,
     });
     return { ok: false, code: 500, message: MESSAGES.serverContext };
   }
 
   if (!writeResult.ok) {
-    // Slot nebyl v pre-lock listu → RPC create_reservation se NEVOLAL (R9.3/9.4).
-    await safeLog('slot_unavailable', { businessId: business.id, serviceId: service.id });
+    // Slot nebyl v pre-lock listu → RPC create_reservation_multi se NEVOLAL (R9.3/9.4).
+    await safeLog('slot_unavailable', { businessId: business.id, serviceIds: input.serviceIds });
     return { ok: false, code: 409, message: MESSAGES.conflict, slots: writeResult.slots };
   }
 
@@ -315,7 +365,7 @@ export async function createReservation(
   if (rpcError) {
     await safeLog('reservation_create_failed', {
       businessId: business.id,
-      serviceId: service.id,
+      serviceIds: input.serviceIds,
       error: rpcError,
     });
     return { ok: false, code: 500, message: MESSAGES.serverContext };
@@ -326,7 +376,7 @@ export async function createReservation(
   if (!row) {
     await safeLog('reservation_create_failed', {
       businessId: business.id,
-      serviceId: service.id,
+      serviceIds: input.serviceIds,
       reason: 'empty_rpc_result',
     });
     return { ok: false, code: 500, message: MESSAGES.serverContext };
@@ -337,19 +387,26 @@ export async function createReservation(
     return { ok: false, code: 404, message: MESSAGES.notPublished };
   }
 
+  if (row.invalid) {
+    // Některá služba pod zámkem zmizela / nepatří podniku, nebo počet/duplicita
+    // mimo rozsah (defenzivně — TS to už pre-validoval) (R7.1).
+    await safeLog('reservation_rejected', { businessId: business.id, reason: 'service_invalid' });
+    return { ok: false, code: 404, message: MESSAGES.serviceMissing };
+  }
+
   if (row.conflict || !row.reservation_id) {
     // Slot byl pod zámkem obsazen — vrátíme aktualizovaný list (R9.4).
     let freshSlots: string[] = [];
     try {
       freshSlots = await loadAvailableSlots(admin, {
         businessId: business.id,
-        serviceId: service.id,
+        serviceIds: input.serviceIds,
         dateISO: input.date,
       });
     } catch {
       // Recompute je best-effort; při selhání vrátíme prázdný list.
     }
-    await safeLog('slot_unavailable', { businessId: business.id, serviceId: service.id });
+    await safeLog('slot_unavailable', { businessId: business.id, serviceIds: input.serviceIds });
     return { ok: false, code: 409, message: MESSAGES.conflict, slots: freshSlots };
   }
 
@@ -383,15 +440,17 @@ export async function createReservation(
   // (8) Log úspěchu bez citlivých polí klienta (R18.1, R18.4).
   await safeLog('reservation_created', {
     businessId: business.id,
-    serviceId: service.id,
+    serviceIds: input.serviceIds,
     reservationId,
   });
 
   // (7) Post-commit best-effort e-maily — selhání nezpůsobí rollback.
+  //     Multi-service payload: seznam služeb v pořadí + Combined_Duration +
+  //     Combined_Price (R16.1, R16.2).
   await dispatchEmails({
     admin,
     business,
-    service,
+    services: orderedServiceRows,
     reservationId,
     status,
     startsAt,

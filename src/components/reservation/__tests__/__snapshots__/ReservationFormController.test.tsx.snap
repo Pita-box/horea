@@ -104,7 +104,7 @@ exports[`ReservationFormController — krok 1 (výběr služby) > vykreslí sezn
         <h2
           class="text-[20px] font-semibold text-[var(--color-rich-violet)]"
         >
-          Výběr služby
+          Výběr služeb
         </h2>
         <ul
           class="flex flex-col gap-[8px]"
@@ -112,26 +112,30 @@ exports[`ReservationFormController — krok 1 (výběr služby) > vykreslí sezn
           <li>
             <button
               aria-pressed="false"
-              class="flex min-h-[44px] w-full items-center justify-between gap-[16px] rounded-[var(--radius-cards)] border px-[16px] py-[12px] text-left transition-colors border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] hover:bg-[var(--color-soft-gray-fill)]"
+              class="flex min-h-[44px] w-full items-center justify-between gap-[16px] rounded-[var(--radius-cards)] border px-[16px] py-[12px] text-left transition-colors border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] hover:bg-[var(--color-cloud-mist)]"
               type="button"
             >
               <span
-                class="flex min-w-0 flex-col gap-[2px]"
+                class="flex min-w-0 items-center gap-[12px]"
               >
                 <span
-                  class="text-[16px] font-medium text-[var(--color-slate-text)]"
+                  class="flex min-w-0 flex-col gap-[2px]"
                 >
-                  Stříhání vlasů
-                </span>
-                <span
-                  class="text-[14px] text-[var(--color-slate-text)] opacity-70"
-                >
-                  30 min
-                </span>
-                <span
-                  class="text-[14px] font-medium text-[var(--color-rich-violet)]"
-                >
-                  500 Kč
+                  <span
+                    class="text-[16px] font-medium text-[var(--color-slate-text)]"
+                  >
+                    Stříhání vlasů
+                  </span>
+                  <span
+                    class="text-[14px] text-[var(--color-slate-text)] opacity-70"
+                  >
+                    30 min
+                  </span>
+                  <span
+                    class="text-[14px] font-medium text-[var(--color-rich-violet)]"
+                  >
+                    500 Kč
+                  </span>
                 </span>
               </span>
               <span
@@ -145,26 +149,30 @@ exports[`ReservationFormController — krok 1 (výběr služby) > vykreslí sezn
           <li>
             <button
               aria-pressed="false"
-              class="flex min-h-[44px] w-full items-center justify-between gap-[16px] rounded-[var(--radius-cards)] border px-[16px] py-[12px] text-left transition-colors border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] hover:bg-[var(--color-soft-gray-fill)]"
+              class="flex min-h-[44px] w-full items-center justify-between gap-[16px] rounded-[var(--radius-cards)] border px-[16px] py-[12px] text-left transition-colors border-[var(--color-border-vychozi)] bg-[var(--color-canvas-white)] hover:bg-[var(--color-cloud-mist)]"
               type="button"
             >
               <span
-                class="flex min-w-0 flex-col gap-[2px]"
+                class="flex min-w-0 items-center gap-[12px]"
               >
                 <span
-                  class="text-[16px] font-medium text-[var(--color-slate-text)]"
+                  class="flex min-w-0 flex-col gap-[2px]"
                 >
-                  Barvení
-                </span>
-                <span
-                  class="text-[14px] text-[var(--color-slate-text)] opacity-70"
-                >
-                  90 min
-                </span>
-                <span
-                  class="text-[14px] font-medium text-[var(--color-rich-violet)]"
-                >
-                  1 500 Kč
+                  <span
+                    class="text-[16px] font-medium text-[var(--color-slate-text)]"
+                  >
+                    Barvení
+                  </span>
+                  <span
+                    class="text-[14px] text-[var(--color-slate-text)] opacity-70"
+                  >
+                    90 min
+                  </span>
+                  <span
+                    class="text-[14px] font-medium text-[var(--color-rich-violet)]"
+                  >
+                    1 500 Kč
+                  </span>
                 </span>
               </span>
               <span

@@ -4,6 +4,7 @@ import {
   IconBriefcase,
   IconBuildingStore,
   IconCalendarEvent,
+  IconChartHistogram,
   IconClipboardList,
   IconClock,
   IconCreditCard,
@@ -15,7 +16,7 @@ import {
   IconUsersGroup,
 } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import { ToastProvider } from '@/components/ui/toast';
 
@@ -34,6 +35,7 @@ const NAV_BY_VARIANT: Record<DashboardVariant, DashboardNavItem[]> = {
     { href: '/dashboard/employees', label: 'Zaměstnanci', icon: IconUsersGroup },
     { href: '/dashboard/opening-hours', label: 'Otevírací doba', icon: IconClock },
     { href: '/dashboard/settings', label: 'Nastavení', icon: IconSettings },
+    { href: '/dashboard/analytics', label: 'Analytika', icon: IconChartHistogram },
   ],
   admin: [
     { href: '/admin', label: 'Přehled', icon: IconLayoutDashboard, exact: true },
@@ -57,6 +59,7 @@ const TITLE_BY_PATH: { prefix: string; exact?: boolean; title: string }[] = [
   { prefix: '/dashboard/employees', title: 'Zaměstnanci' },
   { prefix: '/dashboard/opening-hours', title: 'Otevírací doba' },
   { prefix: '/dashboard/settings', title: 'Nastavení' },
+  { prefix: '/dashboard/analytics', title: 'Analytika' },
   { prefix: '/dashboard/account', title: 'Nastavení účtu' },
   { prefix: '/dashboard/subscription', title: 'Předplatné' },
   { prefix: '/dashboard/plans', title: 'Tarify a funkce' },
@@ -95,7 +98,18 @@ type DashboardChromeProps = {
  */
 export function DashboardChrome({ variant = 'owner', children }: DashboardChromeProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  // Stránka rezervací potřebuje šířku (levý filtr column na „Obsazenosti") →
+  // sidebar se zde sbalí automaticky (uživatel ho může ručně zase rozbalit).
+  const isReservationsPage = pathname === '/dashboard/reservations';
+
+  useEffect(() => {
+    if (isReservationsPage) {
+      setCollapsed(true);
+    }
+  }, [isReservationsPage]);
+
   const items = NAV_BY_VARIANT[variant];
   const settingsHref = variant === 'admin' ? '/admin' : '/dashboard/settings';
   const accountHref = variant === 'admin' ? '/admin' : '/dashboard/account';
@@ -105,8 +119,17 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
     <ToastProvider>
       <div className="flex h-screen overflow-hidden bg-[var(--color-milky-gray)] text-[var(--color-slate-text)]">
         {/* Desktop sidebar */}
-        <aside className="fixed left-0 top-0 z-20 hidden h-full w-64 border-[var(--color-input-border)] bg-[var(--color-milky-gray)] lg:block">
-          <DashboardSidebar items={items} showUpgrade={variant === 'owner'} />
+        <aside
+          className={`fixed left-0 top-0 z-20 hidden h-full border-[var(--color-input-border)] bg-[var(--color-milky-gray)] lg:block ${
+            collapsed ? 'w-16' : 'w-64'
+          }`}
+        >
+          <DashboardSidebar
+            items={items}
+            showUpgrade={variant === 'owner'}
+            collapsed={collapsed}
+            onToggleCollapse={() => setCollapsed((value) => !value)}
+          />
         </aside>
 
         {/* Mobile drawer */}
@@ -128,7 +151,9 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
         ) : null}
 
         {/* Content column — fixní výška, vlastní scroll je až uvnitř panelu */}
-        <div className="flex h-screen min-w-0 flex-1 flex-col lg:ml-64">
+        <div
+          className={`flex h-screen min-w-0 flex-1 flex-col ${collapsed ? 'lg:ml-16' : 'lg:ml-64'}`}
+        >
           <DashboardHeader
             onMenuClick={() => setMobileOpen(true)}
             settingsHref={settingsHref}

@@ -118,7 +118,7 @@ describe('Property 2: atomicita vytvoření rezervace (nad mock DB)', () => {
 
         const result = await createReservation(buildInput({ time: scenario.time, ...contact }));
 
-        const createReservationCalled = client.__rpcCalls.includes('create_reservation');
+        const createReservationCalled = client.__rpcCalls.includes('create_reservation_multi');
 
         // Hlavní invariant (iff): úspěch nastane právě při dostupném slotu + úspěšném RPC.
         const expectedOk = scenario.inList && scenario.rpc.kind === 'success';

@@ -13,6 +13,7 @@ This file maps Kiro specs for Codex. `.kiro/specs/` remains the source of truth.
 | `reservation-management` | `requirements-first` | `feature` | `.kiro/specs/reservation-management/.config.kiro` |
 | `subscription-payments` | `requirements-first` | `feature` | `.kiro/specs/subscription-payments/.config.kiro` |
 | `admin-dashboard` | `requirements-first` | `feature` | `.kiro/specs/admin-dashboard/.config.kiro` |
+| `multi-service-reservations` | viz `.config.kiro` | `feature` | `.kiro/specs/multi-service-reservations/.config.kiro` |
 
 ## Logical Dependency Order
 
@@ -24,6 +25,7 @@ Source: `.kiro/specs/architecture/design.md`, section `Planned Spec Structure`.
 4. `reservation-management`.
 5. `subscription-payments`.
 6. `admin-dashboard`.
+7. `multi-service-reservations` (navazuje na `reservation-management`).
 
 ## Switching Checklist
 

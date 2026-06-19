@@ -12,7 +12,7 @@
   --color-cloud-mist: #f0f3fe;
   --color-milky-gray:#eff3f4;
   --color-slate-text: #353241;
-  --color-light-violet:#dedfef;
+  --color-light-violet:#ebe6ff;
   --color-slate-violet:#d3c8ff;
   --color-rich-violet: #21164c;
   --color-action-violet: #592eff;
@@ -24,6 +24,10 @@
   --color-electric-green: #a2ea13;
   --color-soft-gray-fill: #eeeeee;
   --color-dark:#171717;
+  --color-border-yellow:#fee685;
+  --color-bg-yellow:#fffbea;
+  --color-brown:#7b3307;
+  --color-red:#e7000b;
   /* Přepisuje Cloud Mist konkrétně pro okraje formulářových polí (na žádost uživatele). */
   --color-input-border: #d8ddef;
 
@@ -129,6 +133,30 @@ input[type='button']:not(:disabled),
 input[type='submit']:not(:disabled),
 input[type='reset']:not(:disabled) {
   cursor: pointer;
+}
+
+/*
+ * Tabulky — jednotné chování řádků (na žádost uživatele): výchozí pozadí bílé,
+ * na hover světle fialové (`--color-light-violet`). Platí pro VŠECHNY <table> na
+ * webu (datové řádky v <tbody>); hlavička <thead> se nezvýrazňuje. Pravidlo je
+ * záměrně mimo @layer, aby přebilo Tailwind utility (cascade-layer priorita),
+ * takže stačí jediná definice bez nutnosti řešit per-tabulku.
+ */
+tbody tr {
+  background-color: var(--color-canvas-white);
+  transition: background-color 150ms ease;
+}
+
+tbody tr:hover {
+  background-color: var(--color-light-violet);
+}
+
+/*
+ * Opt-out: tabulky se sloupcem „Akce" (řádky obsahují tlačítka akcí, samotný
+ * řádek není klikací) hover zvýraznění nemají — označ <table data-no-row-hover>.
+ */
+table[data-no-row-hover] tbody tr:hover {
+  background-color: var(--color-canvas-white);
 }
 
 /*

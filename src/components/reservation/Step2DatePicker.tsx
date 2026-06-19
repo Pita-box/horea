@@ -1,7 +1,8 @@
 'use client';
 
-import { Button, Input, Notice } from '@/components/ui';
+import { Button, Notice } from '@/components/ui';
 
+import { DatePickerCalendar } from './DatePickerCalendar';
 import type { SlotsState } from './types';
 
 /**
@@ -19,9 +20,15 @@ type Step2DatePickerProps = {
   today: string;
   slotsState: SlotsState;
   errorMessage: string | null;
+  /** Combined_Duration vybraných služeb (min) — pro hlášku o příliš dlouhém bloku. */
+  combinedDurationMinutes: number;
+  /** Počet vybraných služeb — hláška o odebrání dává smysl jen při více službách. */
+  serviceCount: number;
   onDateChange: (value: string) => void;
   onNext: () => void;
   onBack: () => void;
+  /** Návrat na krok 1 (výběr služeb) z hlášky „blok se nevejde". */
+  onAdjustServices: () => void;
 };
 
 const EMPTY_MESSAGE = 'V tento den nejsou dostupné žádné termíny. Zkuste jiný termín.';
@@ -31,27 +38,18 @@ export function Step2DatePicker({
   today,
   slotsState,
   errorMessage,
+  combinedDurationMinutes,
+  serviceCount,
   onDateChange,
   onNext,
   onBack,
+  onAdjustServices,
 }: Step2DatePickerProps) {
   return (
     <div className="flex w-full flex-col gap-[16px]">
       <h2 className="text-[20px] font-semibold text-[var(--color-rich-violet)]">Výběr data</h2>
 
-      <div className="flex flex-col gap-[8px]">
-        <label className="text-[14px] font-medium text-[var(--color-slate-text)]" htmlFor="date">
-          Datum
-        </label>
-        <Input
-          id="date"
-          type="date"
-          min={today}
-          value={date}
-          onChange={(event) => onDateChange(event.target.value)}
-          className="min-h-[44px]"
-        />
-      </div>
+      <DatePickerCalendar value={date} min={today} onChange={onDateChange} />
 
       {slotsState === 'loading' ? (
         <Notice aria-live="polite">Načítám dostupné termíny…</Notice>
@@ -60,6 +58,26 @@ export function Step2DatePicker({
       {slotsState === 'empty' ? (
         <Notice role="status" aria-live="polite">
           {EMPTY_MESSAGE}
+        </Notice>
+      ) : null}
+
+      {slotsState === 'too_long' ? (
+        <Notice role="status" aria-live="polite" variant="warning">
+          <span className="block">
+            Vybrané služby (celkem {combinedDurationMinutes} min) se do tohoto dne nevejdou.
+            {serviceCount > 1
+              ? ' Odeberte prosím některé služby, nebo zvolte jiný termín.'
+              : ' Zvolte prosím jiný termín.'}
+          </span>
+          {serviceCount > 1 ? (
+            <button
+              type="button"
+              onClick={onAdjustServices}
+              className="mt-[8px] text-[14px] font-medium text-[var(--color-action-violet)] underline-offset-2 hover:underline"
+            >
+              Upravit výběr služeb
+            </button>
+          ) : null}
         </Notice>
       ) : null}
 

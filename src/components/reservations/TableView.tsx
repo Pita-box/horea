@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
 import { toPragueDisplay } from '@/lib/datetime';
-import { reservationStatusLabel } from '@/lib/reservations/labels';
+import { reservationStatusLabel, type ReservationStatus } from '@/lib/reservations/labels';
 import type { ReservationListItem } from '@/lib/reservations/types';
 
 type TableViewProps = {
@@ -10,6 +10,26 @@ type TableViewProps = {
 };
 
 const HEADER = ['Datum a čas', 'Služba', 'Klient', 'Stav'];
+
+/**
+ * Barevný levý okraj řádku dle stavu rezervace (R2.4):
+ * - `pending` (čeká) — Action Violet,
+ * - `approved` (schváleno) — Electric Green,
+ * - `cancelled` (zrušeno) — Red.
+ * `rejected` zůstává bez akcentu.
+ */
+function statusAccentClass(status: ReservationStatus): string {
+  switch (status) {
+    case 'pending':
+      return 'border-l-4 border-l-[var(--color-action-violet)]';
+    case 'approved':
+      return 'border-l-4 border-l-[var(--color-electric-green)]';
+    case 'cancelled':
+      return 'border-l-4 border-l-[var(--color-red)]';
+    default:
+      return '';
+  }
+}
 
 /**
  * Tabulkový pohled na rezervace (R2.2–R2.6).
@@ -47,39 +67,40 @@ export function TableView({ reservations }: TableViewProps) {
 
       <ul className="divide-y divide-[var(--color-cloud-mist)]">
         {reservations.map((reservation) => {
-          const isPending = reservation.status === 'pending';
+          // „DD.MM.YYYY HH:mm" → datum a čas zvlášť kvůli odlišenému stylu času.
+          const [datePart, timePart] = toPragueDisplay(reservation.startsAt).split(' ');
 
           return (
             <li key={reservation.id}>
               <Link
                 href={`/dashboard/reservations/${reservation.id}`}
                 className={[
-                  'grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4',
-                  isPending
-                    ? 'border-l-4 border-l-[var(--color-action-violet)] bg-[color-mix(in_srgb,var(--color-action-violet)_6%,white)]'
-                    : '',
+                  'grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-light-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4',
+                  statusAccentClass(reservation.status),
                 ]
                   .filter(Boolean)
                   .join(' ')}
               >
                 <span className="font-medium text-[var(--color-slate-text)]">
-                  {toPragueDisplay(reservation.startsAt)}
+                  {datePart}, <span className="opacity-50">{timePart}</span>
                 </span>
                 <span className="text-sm text-[var(--color-slate-text)]">
                   {reservation.serviceName ?? '—'}
                 </span>
                 <span className="text-sm text-[var(--color-slate-text)]">
                   {reservation.clientName}
-                  {reservation.clientPhone ? (
+                  {reservation.clientPhone || reservation.clientEmail ? (
                     <span className="block text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]">
-                      {reservation.clientPhone}
+                      {[reservation.clientPhone, reservation.clientEmail]
+                        .filter(Boolean)
+                        .join(', ')}
                     </span>
                   ) : null}
                 </span>
                 <span
                   className={[
                     'text-sm font-semibold',
-                    isPending
+                    reservation.status === 'pending'
                       ? 'text-[var(--color-action-violet)]'
                       : 'text-[var(--color-slate-text)]',
                   ].join(' ')}

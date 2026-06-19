@@ -8,6 +8,15 @@ import { toPragueDisplay } from '@/lib/datetime';
 /** Stav rezervace předávaný do e-mailových šablon. */
 type ReservationStatus = 'pending' | 'approved';
 
+/**
+ * Jedna služba kombinované rezervace v uloženém pořadí (`position`).
+ * Délka i cena jsou snapshoty z okamžiku zápisu (R16.1, R16.2).
+ */
+type ServiceLine = {
+  name: string;
+  durationMinutes: number;
+};
+
 type ReservationConfirmationParams = {
   /** ID rezervace — pouze pro logování, NIKDY se nevkládá do e-mailu (R18.4). */
   reservationId: string;
@@ -15,9 +24,12 @@ type ReservationConfirmationParams = {
   recipientEmail: string;
   clientName: string;
   businessName: string;
-  serviceName: string;
-  serviceDurationMinutes: number;
-  servicePriceCzk: number;
+  /** Uspořádaná množina služeb v pořadí `position` (R16.1). */
+  services: ServiceLine[];
+  /** Kombinovaná délka rezervace v minutách (`Combined_Duration`). */
+  combinedDurationMinutes: number;
+  /** Kombinovaná cena rezervace v Kč (`Combined_Price`). */
+  combinedPriceCzk: number;
   /** Počátek slotu v UTC; do Europe/Prague se převede zde, na hraně DB↔UI (R17.2). */
   startsAt: Date | string;
   status: ReservationStatus;
@@ -32,9 +44,12 @@ type ReservationNotificationParams = {
   /** Příjemce — kontaktní e-mail majitele podniku (R11.1). */
   recipientEmail: string;
   businessName: string;
-  serviceName: string;
-  serviceDurationMinutes: number;
-  servicePriceCzk: number;
+  /** Uspořádaná množina služeb v pořadí `position` (R16.2). */
+  services: ServiceLine[];
+  /** Kombinovaná délka rezervace v minutách (`Combined_Duration`). */
+  combinedDurationMinutes: number;
+  /** Kombinovaná cena rezervace v Kč (`Combined_Price`). */
+  combinedPriceCzk: number;
   /** Počátek slotu v UTC; do Europe/Prague se převede zde, na hraně DB↔UI (R17.2). */
   startsAt: Date | string;
   status: ReservationStatus;
@@ -75,9 +90,9 @@ export async function sendReservationConfirmation(
   const email = renderReservationConfirmationEmail({
     clientName: params.clientName,
     businessName: params.businessName,
-    serviceName: params.serviceName,
-    serviceDurationMinutes: params.serviceDurationMinutes,
-    servicePriceCzk: params.servicePriceCzk,
+    services: params.services,
+    combinedDurationMinutes: params.combinedDurationMinutes,
+    combinedPriceCzk: params.combinedPriceCzk,
     reservationDate,
     reservationTime,
     status: params.status,
@@ -110,9 +125,9 @@ export async function sendReservationNotification(
 
   const email = renderReservationNotificationEmail({
     businessName: params.businessName,
-    serviceName: params.serviceName,
-    serviceDurationMinutes: params.serviceDurationMinutes,
-    servicePriceCzk: params.servicePriceCzk,
+    services: params.services,
+    combinedDurationMinutes: params.combinedDurationMinutes,
+    combinedPriceCzk: params.combinedPriceCzk,
     reservationDate,
     reservationTime,
     status: params.status,

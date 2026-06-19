@@ -4,24 +4,36 @@ import type { ReactNode } from 'react';
 
 import { Notice } from '@/components/ui/notice';
 import { CalendarView } from '@/components/reservations/CalendarView';
-import { FilterBar } from '@/components/reservations/FilterBar';
-import { TableView } from '@/components/reservations/TableView';
+import { OccupancyView } from '@/components/reservations/OccupancyView';
+import { ReservationPillFilters } from '@/components/reservations/ReservationPillFilters';
 import { fromPragueInput } from '@/lib/datetime';
 import {
   buildReservationsHref,
   parseCalendarParams,
   periodBoundsUtc,
   periodDays,
+  todayPragueDate,
   type CalendarDay,
 } from '@/lib/reservations/calendar';
 import {
+  buildMonthGrid,
+  computeDailyOccupancy,
+  openMinutesByWeekday,
+  type MonthGrid,
+  type OccupancyPoint,
+} from '@/lib/reservations/occupancy';
+import {
   buildReservationQuery,
   parseReservationFilters,
-  RESERVATIONS_PAGE_SIZE,
   type ReservationFilters,
 } from '@/lib/reservations/filters';
 import type { ReservationListItem, ServiceOption } from '@/lib/reservations/types';
 import type { AttendanceStatus, ReservationStatus } from '@/lib/reservations/labels';
+import {
+  reservationServiceLabel,
+  type EmbeddedService,
+  type ReservationServiceNameRow,
+} from '@/lib/reservations/serviceLabel';
 import { createClient } from '@/lib/supabase/server';
 
 import { CreateReservationDialog } from './CreateReservationDialog';
@@ -33,6 +45,8 @@ type ReservationsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+type ReservationServiceRow = ReservationServiceNameRow;
+
 type ReservationRow = {
   id: string;
   starts_at: string;
@@ -41,15 +55,10 @@ type ReservationRow = {
   attendance: AttendanceStatus;
   client_name: string;
   client_phone: string | null;
-  services: { name: string } | { name: string }[] | null;
+  client_email: string | null;
+  services: EmbeddedService;
+  reservation_services: ReservationServiceRow[] | null;
 };
-
-function serviceName(services: ReservationRow['services']): string | null {
-  if (!services) {
-    return null;
-  }
-  return Array.isArray(services) ? (services[0]?.name ?? null) : services.name;
-}
 
 function mapRow(row: ReservationRow): ReservationListItem {
   return {
@@ -58,98 +67,38 @@ function mapRow(row: ReservationRow): ReservationListItem {
     endsAt: row.ends_at,
     status: row.status,
     attendance: row.attendance,
-    serviceName: serviceName(row.services),
+    serviceName: reservationServiceLabel(row.reservation_services, row.services),
     clientName: row.client_name,
     clientPhone: row.client_phone,
+    clientEmail: row.client_email,
   };
 }
 
-type LoadResult =
-  | { ok: true; reservations: ReservationListItem[]; services: ServiceOption[]; hasNextPage: boolean }
-  | { ok: false; message: string };
-
-async function loadReservations(filters: ReservationFilters): Promise<LoadResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  // Podnik přihlášeného majitele — RLS (`tenant_isolation`) navíc izoluje řádky.
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('owner_user_id', user.id)
-    .maybeSingle<{ id: string }>();
-
-  if (businessError || !business) {
-    return { ok: false, message: LOAD_ERROR };
-  }
-
-  // Služby pro filtr (R3.4).
-  const { data: serviceRows, error: servicesError } = await supabase
-    .from('services')
-    .select('id,name')
-    .eq('business_id', business.id)
-    .order('name', { ascending: true })
-    .returns<ServiceOption[]>();
-
-  if (servicesError) {
-    return { ok: false, message: LOAD_ERROR };
-  }
-
-  const offset = (filters.page - 1) * RESERVATIONS_PAGE_SIZE;
-
-  let query = supabase
-    .from('reservations')
-    .select(
-      'id,starts_at,ends_at,status,attendance,client_name,client_phone,services(name)',
-      { count: 'exact' },
-    )
-    .eq('business_id', business.id);
-
-  // Konjunktivní kombinace filtrů (R3.5).
-  if (filters.statuses.length > 0) {
-    query = query.in('status', filters.statuses);
-  }
-  if (filters.serviceIds.length > 0) {
-    query = query.in('service_id', filters.serviceIds);
-  }
-
-  if (filters.from || filters.to) {
-    // Zvolený rozsah přepisuje výchozí „pouze budoucí" (R3.3); meze jsou
-    // inkluzivní a interpretované v Europe/Prague (R3.2).
-    if (filters.from) {
-      query = query.gte('starts_at', fromPragueInput(`${filters.from}T00:00:00`).toISOString());
-    }
-    if (filters.to) {
-      query = query.lte('starts_at', fromPragueInput(`${filters.to}T23:59:59`).toISOString());
-    }
-  } else {
-    // Výchozí stav: pouze budoucí rezervace (R2.1).
-    query = query.gte('starts_at', new Date().toISOString());
-  }
-
-  const { data, error, count } = await query
-    .order('starts_at', { ascending: true })
-    .range(offset, offset + RESERVATIONS_PAGE_SIZE - 1)
-    .returns<ReservationRow[]>();
+/**
+ * Posbírá id rezervací podniku, jejichž `Reservation_Service_Set` má neprázdný
+ * průnik s vyfiltrovanými službami (R3.5/R4.6). Filtr služby NELZE dělat přes
+ * denormalizovaný sloupec `reservations.service_id` — ten u kombinovaných
+ * rezervací neodráží celou množinu služeb, takže by je filtr vynechal. Čte z
+ * join tabulky `reservation_services` s inner joinem na `reservations` kvůli
+ * izolaci na `business_id`. Vrací `null` při chybě dotazu.
+ */
+async function collectServiceFilterReservationIds(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  businessId: string,
+  serviceIds: string[],
+): Promise<string[] | null> {
+  const { data, error } = await supabase
+    .from('reservation_services')
+    .select('reservation_id,reservations!inner(business_id)')
+    .eq('reservations.business_id', businessId)
+    .in('service_id', serviceIds)
+    .returns<{ reservation_id: string }[]>();
 
   if (error) {
-    return { ok: false, message: LOAD_ERROR };
+    return null;
   }
 
-  const total = count ?? 0;
-
-  return {
-    ok: true,
-    reservations: data.map(mapRow),
-    services: serviceRows,
-    hasNextPage: offset + RESERVATIONS_PAGE_SIZE < total,
-  };
+  return Array.from(new Set(data.map((row) => row.reservation_id)));
 }
 
 type CalendarLoadResult =
@@ -198,7 +147,7 @@ async function loadCalendarReservations(
 
   let query = supabase
     .from('reservations')
-    .select('id,starts_at,ends_at,status,attendance,client_name,client_phone,services(name)')
+    .select('id,starts_at,ends_at,status,attendance,client_name,client_phone,client_email,services(name),reservation_services(position,services(name))')
     .eq('business_id', business.id)
     .gte('starts_at', bounds.fromIso)
     .lte('starts_at', bounds.toIso);
@@ -208,7 +157,15 @@ async function loadCalendarReservations(
     query = query.in('status', filters.statuses);
   }
   if (filters.serviceIds.length > 0) {
-    query = query.in('service_id', filters.serviceIds);
+    const matchedIds = await collectServiceFilterReservationIds(
+      supabase,
+      business.id,
+      filters.serviceIds,
+    );
+    if (matchedIds === null) {
+      return { ok: false, message: LOAD_ERROR };
+    }
+    query = query.in('id', matchedIds);
   }
 
   const { data, error } = await query
@@ -220,6 +177,115 @@ async function loadCalendarReservations(
   }
 
   return { ok: true, reservations: data.map(mapRow), services: serviceRows };
+}
+
+type OccupancyLoadResult =
+  | {
+      ok: true;
+      grid: MonthGrid;
+      points: OccupancyPoint[];
+      reservations: ReservationListItem[];
+      services: ServiceOption[];
+    }
+  | { ok: false; message: string };
+
+/**
+ * Načte data pohledu „Obsazenost" pro měsíc dle `anchor`: rezervace měsíce
+ * (všechny stavy — filtruje až výběr v kalendáři), otevírací dobu a z nich
+ * přepočtenou denní obsazenost pro graf. Status/služba z `FilterBar` se zde
+ * neuplatňují — filtrem je výběr dne/rozsahu v kalendáři.
+ */
+async function loadOccupancyMonth(
+  anchor: string,
+  filters: ReservationFilters,
+): Promise<OccupancyLoadResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  const { data: business, error: businessError } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('owner_user_id', user.id)
+    .maybeSingle<{ id: string }>();
+
+  if (businessError || !business) {
+    return { ok: false, message: LOAD_ERROR };
+  }
+
+  const grid = buildMonthGrid(anchor);
+  const firstDay = grid.monthDates[0];
+  const lastDay = grid.monthDates[grid.monthDates.length - 1];
+  const fromIso = fromPragueInput(`${firstDay}T00:00:00`).toISOString();
+  const toIso = fromPragueInput(`${lastDay}T23:59:59`).toISOString();
+
+  const { data: serviceRows, error: servicesError } = await supabase
+    .from('services')
+    .select('id,name')
+    .eq('business_id', business.id)
+    .order('name', { ascending: true })
+    .returns<ServiceOption[]>();
+
+  if (servicesError) {
+    return { ok: false, message: LOAD_ERROR };
+  }
+
+  const { data: hoursRows, error: hoursError } = await supabase
+    .from('opening_hours')
+    .select('day_of_week,opens_at,closes_at')
+    .eq('business_id', business.id)
+    .returns<{ day_of_week: number; opens_at: string; closes_at: string }[]>();
+
+  if (hoursError) {
+    return { ok: false, message: LOAD_ERROR };
+  }
+
+  let monthQuery = supabase
+    .from('reservations')
+    .select(
+      'id,starts_at,ends_at,status,attendance,client_name,client_phone,client_email,services(name),reservation_services(position,services(name))',
+    )
+    .eq('business_id', business.id)
+    .gte('starts_at', fromIso)
+    .lte('starts_at', toIso);
+
+  // Konjunktivní filtry stav/služba (shodně s tabulkou); časový rozsah řeší výběr v kalendáři.
+  if (filters.statuses.length > 0) {
+    monthQuery = monthQuery.in('status', filters.statuses);
+  }
+  if (filters.serviceIds.length > 0) {
+    const matchedIds = await collectServiceFilterReservationIds(
+      supabase,
+      business.id,
+      filters.serviceIds,
+    );
+    if (matchedIds === null) {
+      return { ok: false, message: LOAD_ERROR };
+    }
+    monthQuery = monthQuery.in('id', matchedIds);
+  }
+
+  const { data, error } = await monthQuery
+    .order('starts_at', { ascending: true })
+    .returns<ReservationRow[]>();
+
+  if (error) {
+    return { ok: false, message: LOAD_ERROR };
+  }
+
+  const reservations = data.map(mapRow);
+  const points = computeDailyOccupancy(
+    grid.monthDates,
+    reservations,
+    openMinutesByWeekday(hoursRows ?? []),
+  );
+
+  return { ok: true, grid, points, reservations, services: serviceRows };
 }
 
 export default async function ReservationsPage({ searchParams }: ReservationsPageProps) {
@@ -234,10 +300,13 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
 
     return (
       <ReservationsShell
-        tableHref={buildReservationsHref(filters, { view: 'table' })}
         calendarHref={buildReservationsHref(filters, {
           view: 'calendar',
           mode: calendar.mode,
+          anchor: calendar.anchor,
+        })}
+        occupancyHref={buildReservationsHref(filters, {
+          view: 'occupancy',
           anchor: calendar.anchor,
         })}
         activeView="calendar"
@@ -245,16 +314,14 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
         exportHref={`/dashboard/reservations/export${buildReservationQuery(filters)}`}
       >
         {calendarResult.ok ? (
-          <>
-            <FilterBar filters={filters} services={calendarResult.services} />
-            <CalendarView
-              reservations={calendarResult.reservations}
-              mode={calendar.mode}
-              anchor={calendar.anchor}
-              days={days}
-              filters={filters}
-            />
-          </>
+          <CalendarView
+            reservations={calendarResult.reservations}
+            mode={calendar.mode}
+            anchor={calendar.anchor}
+            days={days}
+            filters={filters}
+            services={calendarResult.services}
+          />
         ) : (
           <Notice role="alert" variant="error">
             {calendarResult.message}
@@ -264,56 +331,50 @@ export default async function ReservationsPage({ searchParams }: ReservationsPag
     );
   }
 
-  const result = await loadReservations(filters);
+  // Výchozí pohled: Obsazenost (pohled „Tabulka" byl zrušen).
+  const occupancy = await loadOccupancyMonth(calendar.anchor, filters);
+  const today = todayPragueDate();
 
   return (
     <ReservationsShell
-      tableHref={buildReservationsHref(filters, { view: 'table' })}
       calendarHref={buildReservationsHref(filters, {
         view: 'calendar',
         mode: calendar.mode,
         anchor: calendar.anchor,
       })}
-      activeView="table"
-      services={result.ok ? result.services : []}
+      occupancyHref={buildReservationsHref(filters, {
+        view: 'occupancy',
+        anchor: calendar.anchor,
+      })}
+      activeView="occupancy"
+      services={occupancy.ok ? occupancy.services : []}
       exportHref={`/dashboard/reservations/export${buildReservationQuery(filters)}`}
     >
-      {result.ok ? (
-        <>
-          <FilterBar filters={filters} services={result.services} />
-          <TableView reservations={result.reservations} />
-
-          {(filters.page > 1 || result.hasNextPage) && result.reservations.length > 0 ? (
-            <nav className="flex items-center justify-between" aria-label="Stránkování rezervací">
-              {filters.page > 1 ? (
-                <Link
-                  className="text-sm font-medium text-[var(--color-action-violet)] hover:underline"
-                  href={`/dashboard/reservations${buildReservationQuery({ ...filters, page: filters.page - 1 })}`}
-                >
-                  ← Předchozí
-                </Link>
-              ) : (
-                <span />
-              )}
-
-              <span className="text-sm text-[var(--color-slate-text)]">Strana {filters.page}</span>
-
-              {result.hasNextPage ? (
-                <Link
-                  className="text-sm font-medium text-[var(--color-action-violet)] hover:underline"
-                  href={`/dashboard/reservations${buildReservationQuery({ ...filters, page: filters.page + 1 })}`}
-                >
-                  Další →
-                </Link>
-              ) : (
-                <span />
-              )}
-            </nav>
-          ) : null}
-        </>
+      {occupancy.ok ? (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
+          <ReservationPillFilters
+            filters={filters}
+            services={occupancy.services}
+            anchor={calendar.anchor}
+          />
+          <OccupancyView
+            grid={occupancy.grid}
+            points={occupancy.points}
+            reservations={occupancy.reservations}
+            today={today}
+            prevHref={buildReservationsHref(filters, {
+              view: 'occupancy',
+              anchor: occupancy.grid.prevAnchor,
+            })}
+            nextHref={buildReservationsHref(filters, {
+              view: 'occupancy',
+              anchor: occupancy.grid.nextAnchor,
+            })}
+          />
+        </div>
       ) : (
         <Notice role="alert" variant="error">
-          {result.message}
+          {occupancy.message}
         </Notice>
       )}
     </ReservationsShell>
@@ -326,14 +387,14 @@ function viewToggleClass(active: boolean): string {
     'inline-flex h-11 items-center justify-center rounded-[var(--radius-buttons)] px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-violet)]',
     active
       ? 'bg-[var(--color-action-violet)] text-[var(--color-canvas-white)]'
-      : 'border border-[var(--color-border-vychozi)] text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]',
+      : 'border border-[var(--color-border-vychozi)] text-[var(--color-slate-text)] bg-[var(--color-cloud-mist)] hover:text-[white] hover:bg-[var(--color-action-violet)]',
   ].join(' ');
 }
 
 type ReservationsShellProps = {
-  tableHref: string;
   calendarHref: string;
-  activeView: 'table' | 'calendar';
+  occupancyHref: string;
+  activeView: 'calendar' | 'occupancy';
   services: ServiceOption[];
   exportHref: string;
   children: ReactNode;
@@ -341,12 +402,12 @@ type ReservationsShellProps = {
 
 /**
  * Společný rám stránky se záhlavím, akcemi a přepínačem pohledu
- * tabulka ↔ kalendář. Přepínač mění pouze parametr `view` a zachovává filtry
- * statusu a služby (R4.6) — odkazy už nesou předpočítané `href`.
+ * kalendář ↔ obsazenost. Přepínač mění pouze parametry pohledu a zachovává
+ * filtry statusu a služby (R4.6) — odkazy už nesou předpočítané `href`.
  */
 function ReservationsShell({
-  tableHref,
   calendarHref,
+  occupancyHref,
   activeView,
   services,
   exportHref,
@@ -366,7 +427,7 @@ function ReservationsShell({
           {/* CSV_Exporter je server-only route handler; odkaz nese aktuální filtry (R17.1). */}
           <a
             href={exportHref}
-            className="inline-flex h-10 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] bg-transparent px-5 text-sm font-normal leading-none text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-cloud-mist)]"
+            className="inline-flex h-10 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] bg-white px-5 text-sm font-normal leading-none text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-light-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-cloud-mist)]"
           >
             Exportovat do CSV
           </a>
@@ -375,11 +436,11 @@ function ReservationsShell({
 
       <nav className="flex items-center gap-2" aria-label="Přepínač pohledu">
         <Link
-          href={tableHref}
-          className={viewToggleClass(activeView === 'table')}
-          aria-current={activeView === 'table' ? 'page' : undefined}
+          href={occupancyHref}
+          className={viewToggleClass(activeView === 'occupancy')}
+          aria-current={activeView === 'occupancy' ? 'page' : undefined}
         >
-          Tabulka
+          Obsazenost
         </Link>
         <Link
           href={calendarHref}

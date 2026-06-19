@@ -86,7 +86,7 @@ describe('Property 3: status ruční tvorby je vždy approved', () => {
         createAdminClientMock.mockReturnValue(admin);
 
         const result = await createManualReservation({
-          serviceId: 'svc-1',
+          serviceIds: ['svc-1'],
           date: DATE,
           time: TIME,
           clientName: contact.clientName,
@@ -97,12 +97,14 @@ describe('Property 3: status ruční tvorby je vždy approved', () => {
         // (1) Úspěch nezávisí na auto-approve.
         expect(result.ok).toBe(true);
 
-        // (2) Routuje VÝHRADNĚ na approved-only RPC (ne create_reservation).
-        expect(admin.__rpcCalls).toContain('create_manual_reservation');
-        expect(admin.__rpcCalls).not.toContain('create_reservation');
+        // (2) Routuje VÝHRADNĚ na approved-only RPC (ne create_reservation_multi).
+        expect(admin.__rpcCalls).toContain('create_manual_reservation_multi');
+        expect(admin.__rpcCalls).not.toContain('create_reservation_multi');
 
         // (3) Do RPC se NEPŘEDÁVÁ žádný auto_approve parametr → status nemůže na něm záviset.
-        const manualCall = admin.__rpcArgs.find((entry) => entry.fn === 'create_manual_reservation');
+        const manualCall = admin.__rpcArgs.find(
+          (entry) => entry.fn === 'create_manual_reservation_multi',
+        );
         expect(manualCall).toBeDefined();
         const argKeys = Object.keys((manualCall?.args ?? {}) as Record<string, unknown>);
         expect(argKeys.some((key) => key.toLowerCase().includes('auto_approve'))).toBe(false);

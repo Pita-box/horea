@@ -191,7 +191,7 @@ describe('Property 7: e-maily mutací jsou best-effort (reservation-management)'
 
         const result = await editReservation({
           reservationId: state.id,
-          serviceId: 'svc-1',
+          serviceIds: ['svc-1'],
           date: '2025-06-16',
           time: SLOT,
         });

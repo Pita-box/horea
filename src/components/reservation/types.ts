@@ -31,6 +31,8 @@ export type SubmitState = 'idle' | 'pending' | 'error' | 'success';
  * - `loading` — probíhá serverové volání,
  * - `error` — volání selhalo,
  * - `empty` — server vrátil prázdný seznam termínů,
+ * - `too_long` — prázdný seznam, protože kombinovaný blok vybraných služeb se
+ *   do dne nevejde; klient by měl odebrat některé služby (R6.2),
  * - `loaded` — k dispozici je neprázdný seznam termínů.
  */
-export type SlotsState = 'idle' | 'loading' | 'error' | 'empty' | 'loaded';
+export type SlotsState = 'idle' | 'loading' | 'error' | 'empty' | 'too_long' | 'loaded';

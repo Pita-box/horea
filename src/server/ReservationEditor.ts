@@ -6,6 +6,12 @@ import { fromPragueInput, toPragueDisplay } from '@/lib/datetime';
 import { dispatchTransactionalEmail } from '@/lib/email/dispatcher';
 import { renderReservationModifiedEmail } from '@/lib/email/templates/reservation-modified';
 import { serverLog } from '@/lib/log-server';
+import {
+  combinedDuration,
+  combinedPrice,
+  type CombinableService,
+} from '@/lib/reservation/combine';
+import { validateServiceCount } from '@/lib/reservation/limits';
 import { atomicSlotWrite, type AtomicSlotWriteResult } from '@/lib/reservations/atomicSlotWrite';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -13,30 +19,35 @@ import { createClient } from '@/lib/supabase/server';
 import { loadAvailableSlots } from './slots/loadAvailableSlots';
 
 /**
- * Reservation_Editor — server action upravující čas (`starts_at`) a/nebo službu
- * (`service_id`) existující rezervace (R9). Nejcitlivější mutace feature: sdílí
- * atomický blok s `ReservationCreator` přes `atomicSlotWrite`, ale s jedním
- * rozdílem — VYLUČUJE upravovanou rezervaci z konfliktní kontroly
- * (`excludeReservationId`), aby nekolidovala sama se sebou (R9.3).
+ * Reservation_Editor — server action upravující čas (`starts_at`) a/nebo množinu
+ * služeb (`Reservation_Service_Set`) existující rezervace (R9). Nejcitlivější
+ * mutace feature: sdílí atomický blok s `ReservationCreator` přes
+ * `atomicSlotWrite`, ale s jedním rozdílem — VYLUČUJE upravovanou rezervaci z
+ * konfliktní kontroly (`excludeReservationId`), aby nekolidovala sama se sebou
+ * (R9.5).
  *
  * Tok:
  *  1. Ověření přihlášení + příslušnosti rezervace a podniku majiteli pod
  *     uživatelským JWT (RLS izoluje data na podnik majitele; navíc ověříme
  *     `businesses.owner_user_id = user.id`).
- *  2. Guard stavu {pending, approved} necháme na RPC `edit_reservation` (`invalid`).
- *  3. Service lookup (admin) → trvání pro výpočet `ends_at`; startsAt/endsAt v UTC.
- *  4. `atomicSlotWrite` s `excludeReservationId` (pre-lock grid re-check) → RPC
- *     `edit_reservation` (advisory lock + overlap re-check s vyloučením sebe sama
- *     + UPDATE) v jediné transakci.
- *  5. conflict (z pre-lock listu NEBO z RPC) → 409 „Tento termín není dostupný"
+ *  2. Rozsahová validace počtu služeb (MIN..MAX) shodná se submission handlerem (R9.6).
+ *  3. Guard stavu {pending, approved} necháme na RPC `edit_reservation_multi` (`invalid`).
+ *  4. Service lookup (admin) všech služeb jedním dotazem; každá musí patřit
+ *     podniku (R9.4). Pořadí výběru se zachová pro e-mail. `ends_at` /
+ *     `Combined_Duration` autoritativně počítá SQL pod zámkem (R9.2).
+ *  5. `atomicSlotWrite` se `serviceIds` a `excludeReservationId` (pre-lock grid
+ *     re-check) → RPC `edit_reservation_multi` (advisory lock + overlap re-check
+ *     s vyloučením sebe sama + náhrada množiny) v jediné transakci (R9.3).
+ *  6. conflict (z pre-lock listu NEBO z RPC) → 409 „Tento termín není dostupný"
  *     + aktualizovaný Available_Slot_List (R9.4); invalid → 409 s hláškou.
- *  6. Po commitu best-effort `Reservation_Modified_Email` s hodnotami PO úpravě
- *     (R9.6). Log bez PII.
+ *  7. Po commitu best-effort `Reservation_Modified_Email` s hodnotami PO úpravě
+ *     (seznam služeb + součty). Log bez PII.
  */
 
 export type EditReservationInput = {
   reservationId: string;
-  serviceId: string;
+  /** ID vybraných služeb v pořadí výběru (`Reservation_Service_Set`, R9.1). */
+  serviceIds: string[];
   /** Datum v pásmu Europe/Prague ve tvaru `YYYY-MM-DD`. */
   date: string;
   /** Počáteční čas slotu v pásmu Europe/Prague ve tvaru `HH:mm`. */
@@ -82,18 +93,32 @@ async function safeLog(message: string, context: Record<string, unknown>): Promi
   }
 }
 
+/** Mapuje DB řádek služby na vstup čistých kombinovaných helperů (R9.2). */
+function toCombinable(service: ServiceRow, position: number): CombinableService {
+  return {
+    name: service.name,
+    durationMinutes: service.duration_minutes,
+    priceCzk: Number(service.price_czk),
+    position,
+  };
+}
+
 /**
  * Post-commit best-effort Reservation_Modified_Email s hodnotami PO úpravě.
  * Selhání e-mailu se jen zaloguje a NIKDY nezpůsobí rollback úpravy (R9.6).
+ *
+ * `services` je v pořadí výběru (`position`). Pro Combined_Duration /
+ * Combined_Price se použijí čisté helpery; šablona dostane seznam služeb i
+ * součty (R16.1, R16.3).
  */
 async function dispatchModifiedEmail(args: {
   admin: SupabaseClient;
   businessId: string;
   reservationId: string;
-  service: ServiceRow;
+  services: ServiceRow[];
   startsAt: Date;
 }): Promise<void> {
-  const { admin, businessId, reservationId, service, startsAt } = args;
+  const { admin, businessId, reservationId, services, startsAt } = args;
 
   const { data: business } = await admin
     .from('businesses')
@@ -111,13 +136,18 @@ async function dispatchModifiedEmail(args: {
     return;
   }
 
+  const combinable = services.map((service, index) => toCombinable(service, index));
   const [reservationDate, reservationTime] = toPragueDisplay(startsAt).split(' ');
+
   const email = renderReservationModifiedEmail({
     clientName: reservation.client_name,
     businessName: business.name,
-    serviceName: service.name,
-    serviceDurationMinutes: service.duration_minutes,
-    servicePriceCzk: Number(service.price_czk),
+    services: combinable.map((service) => ({
+      name: service.name,
+      durationMinutes: service.durationMinutes,
+    })),
+    combinedDurationMinutes: combinedDuration(combinable),
+    combinedPriceCzk: combinedPrice(combinable),
     reservationDate,
     reservationTime,
     businessUrl: `${PLATFORM_BASE_URL}/${business.slug}`,
@@ -138,6 +168,12 @@ export async function editReservation(
 ): Promise<EditReservationResult> {
   if (!DATE_PATTERN.test(input.date) || !TIME_PATTERN.test(input.time)) {
     return { ok: false, code: 400, message: MESSAGES.invalidInput };
+  }
+
+  // (2) Rozsahová validace počtu služeb shodná se submission handlerem (R9.6).
+  const countCheck = validateServiceCount(input.serviceIds.length);
+  if (!countCheck.ok) {
+    return { ok: false, code: 400, message: countCheck.message };
   }
 
   // (1) Přihlášení + příslušnost rezervace majiteli pod uživatelským JWT (RLS).
@@ -188,22 +224,30 @@ export async function editReservation(
     return { ok: false, code: 500, message: MESSAGES.serverContext };
   }
 
-  // (3) Služba musí patřit podniku → trvání pro ends_at.
-  const { data: service, error: serviceError } = await admin
+  // (4) Všechny služby musí patřit podniku → načteme je jedním dotazem.
+  //     Pořadí výběru zachováme pro e-mail; SQL autoritativně počítá délku/cenu.
+  const { data: serviceRows, error: serviceError } = await admin
     .from('services')
     .select('id, name, duration_minutes, price_czk')
-    .eq('id', input.serviceId)
+    .in('id', input.serviceIds)
     .eq('business_id', businessId)
-    .maybeSingle<ServiceRow>();
+    .returns<ServiceRow[]>();
 
   if (serviceError) {
     await safeLog('reservation_edit_service_lookup_failed', { businessId });
     return { ok: false, code: 500, message: MESSAGES.serverContext };
   }
 
-  if (!service) {
-    // Služba neexistuje nebo nepatří podniku → neplatná úprava (R9.4).
-    return { ok: false, code: 409, message: MESSAGES.conflict };
+  // Některá služba chybí / nepatří podniku (i duplicity v `serviceIds`) →
+  // neplatná úprava (R9.4). Zachováme pořadí výběru a ověříme úplnost.
+  const serviceById = new Map((serviceRows ?? []).map((row) => [row.id, row]));
+  const orderedServices: ServiceRow[] = [];
+  for (const serviceId of input.serviceIds) {
+    const row = serviceById.get(serviceId);
+    if (!row) {
+      return { ok: false, code: 409, message: MESSAGES.conflict };
+    }
+    orderedServices.push(row);
   }
 
   let startsAt: Date;
@@ -212,27 +256,27 @@ export async function editReservation(
   } catch {
     return { ok: false, code: 400, message: MESSAGES.invalidInput };
   }
-  const endsAt = new Date(startsAt.getTime() + service.duration_minutes * 60_000);
 
-  // (4) Atomický blok: pre-lock grid re-check s vyloučením sebe sama → RPC edit_reservation.
+  // (5) Atomický blok: pre-lock grid re-check s vyloučením sebe sama → RPC
+  //     edit_reservation_multi. `ends_at` / Combined_Duration počítá SQL pod
+  //     zámkem (NEPŘEDÁVÁME p_ends_at).
   type EditRpcResponse = Awaited<ReturnType<typeof admin.rpc>>;
   let writeResult: AtomicSlotWriteResult<EditRpcResponse>;
   try {
     writeResult = await atomicSlotWrite<EditRpcResponse>({
       supabase: admin,
       businessId,
-      serviceId: service.id,
+      serviceIds: input.serviceIds,
       dateISO: input.date,
       time: input.time,
       excludeReservationId: input.reservationId,
       requirePublished: false,
       write: () =>
-        admin.rpc('edit_reservation', {
+        admin.rpc('edit_reservation_multi', {
           p_reservation_id: input.reservationId,
           p_business_id: businessId,
-          p_service_id: service.id,
+          p_service_ids: input.serviceIds,
           p_starts_at: startsAt.toISOString(),
-          p_ends_at: endsAt.toISOString(),
         }),
     });
   } catch (error) {
@@ -270,7 +314,7 @@ export async function editReservation(
     try {
       freshSlots = await loadAvailableSlots(admin, {
         businessId,
-        serviceId: service.id,
+        serviceIds: input.serviceIds,
         dateISO: input.date,
         excludeReservationId: input.reservationId,
         requirePublished: false,
@@ -288,12 +332,12 @@ export async function editReservation(
     action_type: 'edit',
   });
 
-  // (6) Post-commit best-effort e-mail s hodnotami PO úpravě (R9.6).
+  // (7) Post-commit best-effort e-mail s hodnotami PO úpravě (R9.6).
   await dispatchModifiedEmail({
     admin,
     businessId,
     reservationId: input.reservationId,
-    service,
+    services: orderedServices,
     startsAt,
   });
 

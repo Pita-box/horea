@@ -52,7 +52,7 @@ describe('ReservationFormController — krok 1 (výběr služby)', () => {
   it('vykreslí seznam služeb a blokuje přechod bez výběru', () => {
     const { container } = render(<ReservationFormController slug="kavarna" services={SERVICES} />);
 
-    expect(screen.getByRole('heading', { name: 'Výběr služby' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Výběr služeb' })).toBeTruthy();
     expect(screen.getByRole('button', { name: /Stříhání vlasů/ })).toBeTruthy();
     expect(screen.getByRole('button', { name: /Barvení/ })).toBeTruthy();
 
@@ -79,7 +79,7 @@ describe('ReservationFormController — zachování dat při návratu (R8.2)', (
 
     // Krok 2 → zpět na krok 1.
     fireEvent.click(screen.getByRole('button', { name: 'Zpět' }));
-    expect(screen.getByRole('heading', { name: 'Výběr služby' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Výběr služeb' })).toBeTruthy();
 
     // Služba je stále vybraná (data se neztratila — R8.2).
     const stillSelected = screen.getByRole('button', { name: /Stříhání vlasů/ });
@@ -98,19 +98,24 @@ describe('ReservationFormController — synchronní disable v kroku 5 (R8.4)', (
       }),
     );
 
-    render(<ReservationFormController slug="kavarna" services={SERVICES} />);
+    const { container } = render(<ReservationFormController slug="kavarna" services={SERVICES} />);
 
     // Krok 1 → vyber službu → pokračuj.
     fireEvent.click(screen.getByRole('button', { name: /Stříhání vlasů/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Pokračovat' }));
 
-    // Krok 2 → vyber budoucí datum → počkej na načtení slotů (Pokračovat se odemkne).
-    fireEvent.change(screen.getByLabelText('Datum'), { target: { value: '2099-12-31' } });
-    await waitFor(() => {
-      const next = screen.getByRole('button', { name: 'Pokračovat' }) as HTMLButtonElement;
-      expect(next.disabled).toBe(false);
-    });
-    fireEvent.click(screen.getByRole('button', { name: 'Pokračovat' }));
+    // Krok 2 → klikni na dnešní den v kalendáři; po načtení slotů formulář
+    // AUTOMATICKY přejde na krok 3 (auto-advance).
+    const todayIso = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Prague',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+    const todayButton = container.querySelector(`[data-date="${todayIso}"]`) as HTMLButtonElement;
+    expect(todayButton).not.toBeNull();
+    fireEvent.click(todayButton);
+    await screen.findByRole('button', { name: '09:00' });
 
     // Krok 3 → vyber čas → pokračuj.
     fireEvent.click(screen.getByRole('button', { name: '09:00' }));

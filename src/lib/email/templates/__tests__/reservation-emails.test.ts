@@ -7,9 +7,12 @@ describe('renderReservationConfirmationEmail', () => {
   const base = {
     clientName: 'Jan Novák',
     businessName: 'Kadeřnictví Květa',
-    serviceName: 'Střih',
-    serviceDurationMinutes: 45,
-    servicePriceCzk: 350,
+    services: [
+      { name: 'Střih', durationMinutes: 45 },
+      { name: 'Foukání', durationMinutes: 30 },
+    ],
+    combinedDurationMinutes: 75,
+    combinedPriceCzk: 350,
     reservationDate: '15.07.2024',
     reservationTime: '09:30',
     businessUrl: 'https://horea.cz/kadernictvi-kveta',
@@ -30,6 +33,27 @@ describe('renderReservationConfirmationEmail', () => {
     expect(email.text).toContain('15.07.2024');
     expect(email.text).toContain('09:30');
     expect(email.text).toContain('na vyžádání podniku');
+  });
+
+  it('vypíše všechny služby v pořadí a kombinované součty', () => {
+    const email = renderReservationConfirmationEmail({ ...base, status: 'approved' });
+    expect(email.text).toContain('- Střih (45 min)');
+    expect(email.text).toContain('- Foukání (30 min)');
+    expect(email.text).toContain('Celková délka: 75 min');
+    expect(email.text).toContain('celková cena: 350 Kč');
+    expect(email.html).toContain('<li>Střih (45 min)</li>');
+    expect(email.html).toContain('<li>Foukání (30 min)</li>');
+  });
+
+  it('neuvede kombinovanou cenu, pokud je 0 Kč', () => {
+    const email = renderReservationConfirmationEmail({
+      ...base,
+      combinedPriceCzk: 0,
+      status: 'approved',
+    });
+    expect(email.text).toContain('Celková délka: 75 min.');
+    expect(email.text).not.toContain('celková cena');
+    expect(email.html).not.toContain('celková cena');
   });
 
   it('u stavu approved uvede potvrzení', () => {
@@ -66,9 +90,12 @@ describe('renderReservationConfirmationEmail', () => {
 describe('renderReservationNotificationEmail', () => {
   const base = {
     businessName: 'Kadeřnictví Květa',
-    serviceName: 'Barvení',
-    serviceDurationMinutes: 90,
-    servicePriceCzk: 1200,
+    services: [
+      { name: 'Barvení', durationMinutes: 90 },
+      { name: 'Střih', durationMinutes: 30 },
+    ],
+    combinedDurationMinutes: 120,
+    combinedPriceCzk: 1200,
     reservationDate: '15.07.2024',
     reservationTime: '14:00',
     clientName: 'Jan Novák',
@@ -77,9 +104,18 @@ describe('renderReservationNotificationEmail', () => {
     dashboardUrl: 'https://horea.cz/dashboard/reservations',
   } as const;
 
-  it('sestaví subject se službou, datem a časem', () => {
+  it('sestaví subject se spojenými službami, datem a časem', () => {
     const email = renderReservationNotificationEmail({ ...base, status: 'pending' });
-    expect(email.subject).toBe('Nová rezervace — Barvení, 15.07.2024 14:00');
+    expect(email.subject).toBe('Nová rezervace — Barvení + Střih, 15.07.2024 14:00');
+  });
+
+  it('vypíše všechny služby v pořadí a kombinované součty', () => {
+    const email = renderReservationNotificationEmail({ ...base, status: 'approved' });
+    expect(email.text).toContain('- Barvení (90 min)');
+    expect(email.text).toContain('- Střih (30 min)');
+    expect(email.text).toContain('Celková délka: 120 min');
+    expect(email.html).toContain('<li>Barvení (90 min)</li>');
+    expect(email.html).toContain('<li>Střih (30 min)</li>');
   });
 
   it('obsahuje kontaktní údaje klienta a odkaz na dashboard', () => {

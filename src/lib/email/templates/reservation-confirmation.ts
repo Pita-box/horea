@@ -3,17 +3,25 @@ import { wrapEmail } from './base';
 /** Stav rezervace, který určuje text dalších kroků v e-mailu (R10.2). */
 type ReservationStatus = 'pending' | 'approved';
 
+/** Jedna služba v uspořádané množině rezervace (R16.1). */
+type ServiceLine = {
+  /** Název služby (uživatelský vstup — v HTML se escapuje). */
+  name: string;
+  /** Trvání služby v minutách. */
+  durationMinutes: number;
+};
+
 type ReservationConfirmationEmailInput = {
   /** Jméno klienta pro oslovení (uživatelský vstup — v HTML se escapuje). */
   clientName: string;
   /** Název podniku (uživatelský vstup — escapuje se). */
   businessName: string;
-  /** Název služby (uživatelský vstup — escapuje se). */
-  serviceName: string;
-  /** Trvání služby v minutách. */
-  serviceDurationMinutes: number;
-  /** Cena služby v Kč. */
-  servicePriceCzk: number;
+  /** Uspořádaná množina služeb v pořadí `position` (R4.3, R16.1). */
+  services: ServiceLine[];
+  /** Kombinovaná délka rezervace v minutách (`Combined_Duration`, R2.1). */
+  combinedDurationMinutes: number;
+  /** Kombinovaná cena rezervace v Kč (`Combined_Price`, R3.1). */
+  combinedPriceCzk: number;
   /** Datum slotu už naformátované v pásmu Europe/Prague (např. „15.07.2024"). */
   reservationDate: string;
   /** Počáteční čas slotu už naformátovaný v Europe/Prague (např. „09:30"). */
@@ -57,20 +65,32 @@ function statusMessage(status: ReservationStatus): string {
 }
 
 /**
- * Sestaví Reservation_Confirmation_Email pro klienta (R10).
+ * Sestaví Reservation_Confirmation_Email pro klienta (R10, R16.1, R16.3).
  *
- * Časy se očekávají už převedené do pásma Europe/Prague (převod řeší volající
- * `EmailNotifier`), cena se formátuje v Kč. Veškerá uživatelská pole se
- * v HTML variantě escapují.
+ * Vypíše všechny služby rezervace v uloženém pořadí (název + délka),
+ * `Combined_Duration` a `Combined_Price` (cena 0 Kč se neuvádí, R3.3) a jeden
+ * časový blok. Časy se očekávají už převedené do pásma Europe/Prague (převod
+ * řeší volající `EmailNotifier`), cena se formátuje v Kč. Veškerá uživatelská
+ * pole se v HTML variantě escapují.
  */
 export function renderReservationConfirmationEmail(
   input: ReservationConfirmationEmailInput,
 ): RenderedEmail {
   const subject = `Vaše rezervace — ${input.businessName}`;
-  const price = formatPriceCzk(input.servicePriceCzk);
+  const totalDuration = `${input.combinedDurationMinutes} min`;
+  const totalPrice = formatPriceCzk(input.combinedPriceCzk);
+  const showPrice = input.combinedPriceCzk > 0;
   const status = statusMessage(input.status);
 
   // --- HTML varianta (uživatelská pole escapujeme) ---
+  const servicesHtml = input.services
+    .map((service) => `<li>${escapeHtml(service.name)} (${service.durationMinutes} min)</li>`)
+    .join('\n');
+
+  const totalsHtml = `<p style="margin:0 0 16px;">Celková délka: <strong>${totalDuration}</strong>${
+    showPrice ? `, celková cena: <strong>${totalPrice}</strong>` : ''
+  }</p>`;
+
   const contactLinesHtml: string[] = [];
   if (input.businessPhone) {
     contactLinesHtml.push(`Telefon: ${escapeHtml(input.businessPhone)}`);
@@ -89,11 +109,35 @@ export function renderReservationConfirmationEmail(
 <p style="margin:0;color:#667085;">E-mail byl odeslán automaticky platformou Horea.cz na vyžádání podniku.</p>`;
 
   const body = `<p style="margin:0 0 16px;">Dobrý den, ${escapeHtml(input.clientName)},</p>
-<p style="margin:0 0 16px;">rezervovali jste si v podniku <strong>${escapeHtml(input.businessName)}</strong> službu <strong>${escapeHtml(input.serviceName)}</strong> (${input.serviceDurationMinutes} min, ${price}) na <strong>${escapeHtml(input.reservationDate)}</strong> v <strong>${escapeHtml(input.reservationTime)}</strong> (čas Europe/Prague).</p>
+<p style="margin:0 0 8px;">rezervovali jste si v podniku <strong>${escapeHtml(input.businessName)}</strong> na <strong>${escapeHtml(input.reservationDate)}</strong> v <strong>${escapeHtml(input.reservationTime)}</strong> (čas Europe/Prague) tyto služby:</p>
+<ul style="margin:0 0 16px;padding-left:20px;">
+${servicesHtml}
+</ul>
+${totalsHtml}
 <p style="margin:0 0 24px;">${status}</p>
 ${footerHtml}`;
 
   // --- Textová varianta ---
+  const textLines = [
+    `Dobrý den, ${input.clientName},`,
+    '',
+    `rezervovali jste si v podniku ${input.businessName} na ${input.reservationDate} v ${input.reservationTime} (čas Europe/Prague) tyto služby:`,
+  ];
+
+  for (const service of input.services) {
+    textLines.push(`- ${service.name} (${service.durationMinutes} min)`);
+  }
+
+  textLines.push('');
+  textLines.push(
+    showPrice
+      ? `Celková délka: ${totalDuration}, celková cena: ${totalPrice}.`
+      : `Celková délka: ${totalDuration}.`,
+  );
+  textLines.push('');
+  textLines.push(status);
+  textLines.push('');
+
   const contactLinesText: string[] = [];
   if (input.businessPhone) {
     contactLinesText.push(`Telefon: ${input.businessPhone}`);
@@ -101,15 +145,6 @@ ${footerHtml}`;
   if (input.businessEmail) {
     contactLinesText.push(`E-mail: ${input.businessEmail}`);
   }
-
-  const textLines = [
-    `Dobrý den, ${input.clientName},`,
-    '',
-    `rezervovali jste si v podniku ${input.businessName} službu ${input.serviceName} (${input.serviceDurationMinutes} min, ${price}) na ${input.reservationDate} v ${input.reservationTime} (čas Europe/Prague).`,
-    '',
-    status,
-    '',
-  ];
 
   if (contactLinesText.length > 0) {
     textLines.push(`Kontakt na podnik — ${contactLinesText.join(', ')}.`);

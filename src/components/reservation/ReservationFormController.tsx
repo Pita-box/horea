@@ -5,6 +5,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 import { Notice } from '@/components/ui';
+import { combinedDuration } from '@/lib/reservation/combine';
+import {
+  clearEmployeeIfOutsideSelection,
+  employeesForSelection,
+  type ServiceEmployeeMapping,
+} from '@/lib/reservation/employees';
+import { MAX_SERVICES_PER_RESERVATION } from '@/lib/reservation/limits';
+import { toggleService } from '@/lib/reservation/selection';
 import { createReservation } from '@/server/ReservationCreator';
 import { getAvailableSlots } from '@/server/AvailableSlotsService';
 
@@ -76,7 +84,9 @@ export function ReservationFormController({
 
   const [step, setStep] = useState(1);
   const [maxStep, setMaxStep] = useState(1);
-  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  // `Selected_Service_List` — uspořádaná množina vybraných služeb v pořadí výběru
+  // (R1.1–R1.3). První služba = `position 0` = primary.
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -89,22 +99,68 @@ export function ReservationFormController({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [reservationStatus, setReservationStatus] = useState<'pending' | 'approved' | null>(null);
 
-  // Klíč posledního dokončeného/probíhajícího fetch slotů (`serviceId|date`) a
-  // token pro zahození zastaralých odpovědí při rychlé změně data/služby.
+  // Klíč posledního dokončeného/probíhajícího fetch slotů (`serviceIds.join(',')|date`)
+  // a token pro zahození zastaralých odpovědí při rychlé změně data/množiny služeb (R6.1).
   const lastFetchKeyRef = useRef<string | null>(null);
   const fetchTokenRef = useRef(0);
   // Synchronní guard proti dvojkliku na „Odeslat rezervaci" (R8.4) — drží se
   // mimo React state, protože setState není synchronní vůči dalšímu kliku.
   const submittingRef = useRef(false);
 
-  const selectedService = useMemo(
-    () => services.find((service) => service.id === selectedServiceId) ?? null,
-    [services, selectedServiceId],
+  // Vybrané služby v pořadí výběru (`position`) — zdroj pro souhrn (krok 5) i
+  // pro průběžné kombinované součty.
+  const selectedServices = useMemo(
+    () =>
+      selectedServiceIds
+        .map((id) => services.find((service) => service.id === id))
+        .filter((service): service is ReservationService => service != null),
+    [services, selectedServiceIds],
   );
 
+  // Combined_Duration vybraných služeb — pro hlášku „blok se do dne nevejde" (R6.2).
+  const combinedDurationMinutes = useMemo(
+    () => combinedDuration(selectedServices),
+    [selectedServices],
+  );
+
+  // Mapování služba → ID zaměstnanců (tvar pro helper `employeesForSelection`).
+  // Služba bez řádku = „umí ji všichni" (R8.2).
+  const employeeMapping = useMemo<ServiceEmployeeMapping>(() => {
+    const mapping: Record<string, string[]> = {};
+    for (const [serviceId, employees] of Object.entries(serviceEmployees)) {
+      mapping[serviceId] = employees.map((employee) => employee.id);
+    }
+    return mapping;
+  }, [serviceEmployees]);
+
+  // Vyhledávací mapa zaměstnanec → objekt (pro carousel) napříč všemi službami.
+  const employeeById = useMemo(() => {
+    const map = new Map<string, { id: string; name: string; photoUrl: string | null }>();
+    for (const employees of Object.values(serviceEmployees)) {
+      for (const employee of employees) {
+        if (!map.has(employee.id)) {
+          map.set(employee.id, employee);
+        }
+      }
+    }
+    return map;
+  }, [serviceEmployees]);
+
+  // Nabídnutelní zaměstnanci = PRŮNIK přes všechny vybrané služby (R8.2, R8.3).
+  const offeredEmployees = useMemo(() => {
+    if (!allowEmployeeSelection || selectedServiceIds.length === 0) {
+      return [];
+    }
+    return employeesForSelection(employeeMapping, selectedServiceIds)
+      .map((id) => employeeById.get(id))
+      .filter((employee): employee is { id: string; name: string; photoUrl: string | null } =>
+        employee != null,
+      );
+  }, [allowEmployeeSelection, selectedServiceIds, employeeMapping, employeeById]);
+
   const fetchSlots = useCallback(
-    async (serviceId: string, dateISO: string) => {
-      const key = `${serviceId}|${dateISO}`;
+    async (serviceIds: string[], dateISO: string) => {
+      const key = `${serviceIds.join(',')}|${dateISO}`;
       lastFetchKeyRef.current = key;
       const token = ++fetchTokenRef.current;
 
@@ -113,7 +169,7 @@ export function ReservationFormController({
       setSlots([]);
       setTime('');
 
-      const result = await getAvailableSlots({ slug, date: dateISO, serviceId });
+      const result = await getAvailableSlots({ slug, date: dateISO, serviceIds });
 
       // Zahodíme odpověď, pokud mezitím proběhl novější požadavek.
       if (token !== fetchTokenRef.current) {
@@ -127,43 +183,65 @@ export function ReservationFormController({
       }
 
       if (result.slots.length === 0) {
-        setSlotsState('empty');
+        // Prázdno kvůli příliš dlouhému kombinovanému bloku → klient má odebrat
+        // služby (R6.2); jinak běžné „v tento den nic" (plno/zavřeno).
+        setSlotsState(result.durationExceedsDay ? 'too_long' : 'empty');
         return;
       }
 
       setSlots([...result.slots].sort());
       setSlotsState('loaded');
+      // Auto-přechod: jakmile jsou pro vybrané datum dostupné termíny, pošli
+      // klienta rovnou na krok 3 (výběr času). Návrat zpět na krok 2 už
+      // nerefetchuje (klíč `serviceIds|date` sedí), takže k opětovnému
+      // auto-skoku nedojde a klient může datum v klidu změnit. Prázdný/chybový
+      // výsledek auto-skok nespustí — krok 2 zůstane s příslušnou hláškou.
+      setSubmitError(null);
+      setStep(3);
+      setMaxStep((current) => Math.max(current, 3));
     },
     [slug],
   );
 
-  // Načtení termínů pro aktuální kombinaci (služba, datum) při zobrazení kroku 2.
-  // Reaguje i na změnu služby (klíč se změní) a vyhne se duplicitnímu fetchi pro
-  // už načtenou kombinaci (zachování dat při návratu — R8.2).
+  // Načtení termínů pro aktuální kombinaci (množina služeb, datum) při zobrazení
+  // kroku 2. Reaguje i na změnu množiny služeb (klíč `serviceIds.join(',')|date`
+  // se změní) a vyhne se duplicitnímu fetchi pro už načtenou kombinaci (R8.2).
   useEffect(() => {
-    if (step !== 2 || !selectedServiceId || !date || date < today) {
+    if (step !== 2 || selectedServiceIds.length === 0 || !date || date < today) {
       return;
     }
-    const key = `${selectedServiceId}|${date}`;
+    const key = `${selectedServiceIds.join(',')}|${date}`;
     if (key === lastFetchKeyRef.current) {
       return;
     }
-    void fetchSlots(selectedServiceId, date);
-  }, [step, selectedServiceId, date, today, fetchSlots]);
+    void fetchSlots(selectedServiceIds, date);
+  }, [step, selectedServiceIds, date, today, fetchSlots]);
 
-  function selectService(serviceId: string) {
-    if (serviceId === selectedServiceId) {
+  // Toggle výběru služby přes čistý reducer (R1.1–R1.3) s pojistkou horního
+  // limitu (R1.6 — picker drží stejný strop). Změna MNOŽINY služeb zneplatní
+  // dříve načtené termíny i vybraný čas a vrátí formulář na krok 1 (sloty jsou
+  // závislé na množině služeb — R6.1).
+  function handleToggleService(serviceId: string) {
+    const isSelected = selectedServiceIds.includes(serviceId);
+    // Pojistka horního limitu: přidání 11. služby ignorujeme (R1.6).
+    if (!isSelected && selectedServiceIds.length >= MAX_SERVICES_PER_RESERVATION) {
       return;
     }
-    // Změna služby zneplatní dříve načtené termíny i vybraný čas (R8.2 zachovává
-    // jen logicky platná data — sloty jsou závislé na službě).
-    setSelectedServiceId(serviceId);
-    setSelectedEmployeeId('');
+
+    const next = toggleService(selectedServiceIds, serviceId);
+    setSelectedServiceIds(next);
+
+    // Vybraný zaměstnanec mimo nový průnik se zruší (R8.3).
+    setSelectedEmployeeId(
+      (current) =>
+        clearEmployeeIfOutsideSelection(employeeMapping, next, current || null) ?? '',
+    );
+
     setTime('');
     setSlots([]);
     setSlotsState('idle');
     lastFetchKeyRef.current = null;
-    // Změna služby zneplatní navštívené kroky dál — návrat na krok 1.
+    // Změna množiny služeb zneplatní navštívené kroky dál — návrat na krok 1.
     setMaxStep(1);
   }
 
@@ -209,8 +287,7 @@ export function ReservationFormController({
     if (submittingRef.current) {
       return;
     }
-    const service = selectedService;
-    if (!service || !date || !time) {
+    if (selectedServiceIds.length === 0 || !date || !time) {
       return;
     }
 
@@ -220,7 +297,7 @@ export function ReservationFormController({
 
     void createReservation({
       slug,
-      serviceId: service.id,
+      serviceIds: selectedServiceIds,
       date,
       time,
       clientName: contact.clientName,
@@ -285,13 +362,13 @@ export function ReservationFormController({
         {step === 1 ? (
           <Step1ServicePicker
             services={services}
-            selectedServiceId={selectedServiceId}
-            onSelect={selectService}
+            selectedServiceIds={selectedServiceIds}
+            onToggle={handleToggleService}
             onNext={() => goToStep(2)}
             afterServices={
-              allowEmployeeSelection && selectedServiceId ? (
+              allowEmployeeSelection && selectedServiceIds.length > 0 ? (
                 <EmployeeCarousel
-                  employees={serviceEmployees[selectedServiceId] ?? []}
+                  employees={offeredEmployees}
                   selectedEmployeeId={selectedEmployeeId}
                   onToggle={(id) => setSelectedEmployeeId((current) => (current === id ? '' : id))}
                 />
@@ -306,9 +383,12 @@ export function ReservationFormController({
             today={today}
             slotsState={slotsState}
             errorMessage={slotsError}
+            combinedDurationMinutes={combinedDurationMinutes}
+            serviceCount={selectedServiceIds.length}
             onDateChange={handleDateChange}
             onNext={() => goToStep(3)}
             onBack={() => goBackToStep(1)}
+            onAdjustServices={() => goBackToStep(1)}
           />
         ) : null}
 
@@ -333,9 +413,9 @@ export function ReservationFormController({
           />
         ) : null}
 
-        {step === 5 && selectedService ? (
+        {step === 5 && selectedServices.length > 0 ? (
           <Step5Summary
-            service={selectedService}
+            services={selectedServices}
             date={date}
             time={time}
             contact={contact}

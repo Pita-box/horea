@@ -10,7 +10,7 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     'rounded-[var(--radius-buttons)] bg-[var(--color-action-violet)] px-5 py-0 text-[var(--color-canvas-white)] hover:brightness-95 focus-visible:outline-[var(--color-action-violet)]',
   ghost:
-    'rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] bg-transparent px-5 py-0 text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline-[var(--color-cloud-mist)]',
+    'rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] bg-transparent px-5 py-0 text-[var(--color-slate-text)] hover:bg-[var(--color-light-violet)] focus-visible:outline-[var(--color-cloud-mist)]',
   outline:
     'rounded-[var(--radius-lg)] border border-[var(--color-slate-text)] bg-transparent px-[5px] py-0 text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline-[var(--color-slate-text)]',
   icon: 'size-10 rounded-[var(--radius-2xl)] bg-transparent p-0 text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline-[var(--color-slate-text)]',

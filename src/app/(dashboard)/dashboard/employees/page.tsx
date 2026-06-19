@@ -2,12 +2,14 @@ import { Card } from '@/components/ui/card';
 import { Notice } from '@/components/ui/notice';
 
 import { EmployeesManager } from '../settings/EmployeesManager';
-import { getEmployees, getServiceAssignments } from '../settings/employee-actions';
+import { getEmployees, getServiceAssignments, getTopEmployees } from '../settings/employee-actions';
 import { ServiceEmployeesManager } from './ServiceEmployeesManager';
+import { TopEmployees } from './TopEmployees';
 
 export default async function EmployeesPage() {
   const team = await getEmployees();
   const assignments = await getServiceAssignments();
+  const topEmployees = await getTopEmployees();
 
   if (!team.ok) {
     return (
@@ -23,12 +25,22 @@ export default async function EmployeesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card
-        as="section"
-        className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
-      >
-        <EmployeesManager initialEmployees={team.employees} initialSettings={team.settings} />
-      </Card>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch">
+        <Card
+          as="section"
+          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)] lg:col-span-2"
+        >
+          <EmployeesManager initialEmployees={team.employees} initialSettings={team.settings} />
+        </Card>
+
+        {topEmployees.ok ? (
+          <div className="relative">
+            <div className="lg:absolute lg:inset-0">
+              <TopEmployees employees={topEmployees.employees} />
+            </div>
+          </div>
+        ) : null}
+      </div>
 
       {showServiceAssignment ? (
         <Card

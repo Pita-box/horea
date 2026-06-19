@@ -1,7 +1,14 @@
 'use client';
 
 import { Logo } from '@/components/Logo';
-import { IconCalendarBolt, IconHelpCircle, IconLogout, type IconProps } from '@tabler/icons-react';
+import {
+  IconCalendarBolt,
+  IconHelpCircle,
+  IconLayoutSidebarLeftCollapse,
+  IconLayoutSidebarLeftExpand,
+  IconLogout,
+  type IconProps,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ComponentType } from 'react';
@@ -24,25 +31,57 @@ type DashboardSidebarProps = {
   showUpgrade?: boolean;
   /** Voláno po kliknutí na odkaz (zavření mobilního draweru). */
   onNavigate?: () => void;
+  /** Sbalený režim — jen ikony (desktop rail). */
+  collapsed?: boolean;
+  /** Přepínač sbalení (jen desktop); když chybí, tlačítko se nezobrazí. */
+  onToggleCollapse?: () => void;
 };
 
 /**
  * Sidebar dashboardu — stejný layout, dynamické položky (`items`). Brand nahoře,
  * navigace uprostřed (aktivní stav dle `usePathname`), akce dole (předplatné/nápověda/odhlášení).
+ * V režimu `collapsed` se skryjí textové popisky a zůstanou jen vycentrované ikony
+ * (popisky dostupné přes `title` a skrytý text pro čtečky).
  */
-export function DashboardSidebar({ items, showUpgrade = false, onNavigate }: DashboardSidebarProps) {
+export function DashboardSidebar({
+  items,
+  showUpgrade = false,
+  onNavigate,
+  collapsed = false,
+  onToggleCollapse,
+}: DashboardSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col gap-6 px-4 py-8">
-      <Link
-        href="/dashboard"
-        onClick={onNavigate}
-        className="flex items-center px-4 transition-opacity hover:opacity-80"
-      >
-        <Logo width={104} height={36} className="h-8 w-auto" />
-        <span className="sr-only">Horea</span>
-      </Link>
+    <div className={`flex h-full flex-col gap-6 py-8 ${collapsed ? 'px-2' : 'px-4'}`}>
+      <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between px-4'}`}>
+        {collapsed ? null : (
+          <Link
+            href="/dashboard"
+            onClick={onNavigate}
+            className="flex items-center transition-opacity hover:opacity-80"
+          >
+            <Logo width={104} height={36} className="h-8 w-auto" />
+            <span className="sr-only">Horea</span>
+          </Link>
+        )}
+        {onToggleCollapse ? (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? 'Rozbalit postranní panel' : 'Sbalit postranní panel'}
+            aria-pressed={collapsed}
+            title={collapsed ? 'Rozbalit' : 'Sbalit'}
+            className="hidden rounded-[var(--radius-buttons)] p-2 text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)] lg:flex"
+          >
+            {collapsed ? (
+              <IconLayoutSidebarLeftExpand size={20} stroke={2} aria-hidden="true" />
+            ) : (
+              <IconLayoutSidebarLeftCollapse size={20} stroke={2} aria-hidden="true" />
+            )}
+          </button>
+        ) : null}
+      </div>
 
       <nav aria-label="Hlavní navigace" className="flex flex-1 flex-col gap-1">
         {items.map((item) => {
@@ -54,15 +93,17 @@ export function DashboardSidebar({ items, showUpgrade = false, onNavigate }: Das
               href={item.href}
               onClick={onNavigate}
               aria-current={active ? 'page' : undefined}
+              title={collapsed ? item.label : undefined}
               className={[
-                'flex items-center gap-3 rounded-[var(--radius-buttons)] px-4 py-3 text-sm transition-colors',
+                'flex items-center gap-3 rounded-[var(--radius-buttons)] text-sm transition-colors',
+                collapsed ? 'justify-center px-0 py-3' : 'px-4 py-3',
                 active
                   ? 'bg-[var(--color-canvas-white)] font-semibold text-[var(--color-action-violet)] shadow-sm'
                   : 'font-medium text-[var(--color-slate-text)] hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
               ].join(' ')}
             >
               <Icon size={20} stroke={2} aria-hidden="true" />
-              {item.label}
+              {collapsed ? <span className="sr-only">{item.label}</span> : item.label}
             </Link>
           );
         })}
@@ -73,27 +114,39 @@ export function DashboardSidebar({ items, showUpgrade = false, onNavigate }: Das
           <Link
             href="/dashboard/plans"
             onClick={onNavigate}
-            className="mb-2 flex items-center justify-center gap-3 rounded-[var(--radius-buttons)] bg-[var(--color-canvas-white)] py-3 text-center text-sm font-semibold text-[var(--color-action-violet)] shadow-sm transition-colors hover:bg-[var(--color-action-violet)] hover:text-[white]"
+            title={collapsed ? 'Tarify' : undefined}
+            className={[
+              'mb-2 flex items-center justify-center gap-3 rounded-[var(--radius-buttons)] bg-[var(--color-canvas-white)] py-3 text-center text-sm font-semibold text-[var(--color-action-violet)] shadow-sm transition-colors hover:bg-[var(--color-action-violet)] hover:text-[white]',
+              collapsed ? 'px-0' : '',
+            ].join(' ')}
           >
             <IconCalendarBolt size={20} stroke={2} aria-hidden="true" />
-            Tarify
+            {collapsed ? <span className="sr-only">Tarify</span> : 'Tarify'}
           </Link>
         ) : null}
         <Link
           href="/kontakt"
           onClick={onNavigate}
-          className="flex items-center gap-3 rounded-[var(--radius-buttons)] px-4 py-2 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]"
+          title={collapsed ? 'Nápověda' : undefined}
+          className={[
+            'flex items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
+            collapsed ? 'justify-center px-0' : 'px-4',
+          ].join(' ')}
         >
           <IconHelpCircle size={20} stroke={2} aria-hidden="true" />
-          Nápověda
+          {collapsed ? <span className="sr-only">Nápověda</span> : 'Nápověda'}
         </Link>
         <form action="/logout" method="post">
           <button
             type="submit"
-            className="flex w-full items-center gap-3 rounded-[var(--radius-buttons)] px-4 py-2 text-left text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]"
+            title={collapsed ? 'Odhlásit se' : undefined}
+            className={[
+              'flex w-full items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-left text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
+              collapsed ? 'justify-center px-0' : 'px-4',
+            ].join(' ')}
           >
             <IconLogout size={20} stroke={2} aria-hidden="true" />
-            Odhlásit se
+            {collapsed ? <span className="sr-only">Odhlásit se</span> : 'Odhlásit se'}
           </button>
         </form>
       </div>

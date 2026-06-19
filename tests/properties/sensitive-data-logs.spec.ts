@@ -254,21 +254,24 @@ function buildAnonymizeAdmin(): unknown {
   };
 }
 
-/** Fake admin pro ruční tvorbu — services lookup + RPC + clients upsert (insert). */
+/** Fake admin pro ruční tvorbu — services lookup (POLE) + RPC + clients upsert. */
 function buildManualLogsAdmin(): unknown {
   return {
     from(table: string) {
-      const filters: Record<string, unknown> = {};
+      const ids: unknown[] = [];
       const builder = {
         select: () => builder,
-        eq: (column: string, value: unknown) => {
-          filters[column] = value;
+        in: (_column: string, value: unknown[]) => {
+          ids.push(...value);
           return builder;
         },
-        maybeSingle: () =>
+        eq: () => builder,
+        // Multi-service: služby se čtou přes `.in(...).returns()` → POLE řádků.
+        returns: () =>
           table === 'services'
-            ? Promise.resolve({ data: { id: filters.id ?? 'svc-1', duration_minutes: 30 }, error: null })
-            : Promise.resolve({ data: null, error: null }),
+            ? Promise.resolve({ data: ids.map((id) => ({ id })), error: null })
+            : Promise.resolve({ data: [], error: null }),
+        maybeSingle: () => Promise.resolve({ data: null, error: null }),
         insert: () => Promise.resolve({ error: null }),
         then: <T1, T2>(
           onF?: ((value: { data: unknown[]; error: null }) => T1 | PromiseLike<T1>) | null,
@@ -278,9 +281,9 @@ function buildManualLogsAdmin(): unknown {
       return builder;
     },
     rpc: (fn: string) =>
-      fn === 'create_manual_reservation'
+      fn === 'create_manual_reservation_multi'
         ? Promise.resolve({
-            data: { reservation_id: 'res-new', conflict: false, not_published: false },
+            data: { reservation_id: 'res-new', conflict: false, not_published: false, invalid: false },
             error: null,
           })
         : Promise.resolve({ data: null, error: null }),
@@ -393,7 +396,7 @@ async function runMutation(kind: MutationKind, contact: Contact): Promise<void> 
       loadAvailableSlotsMock.mockResolvedValue([SLOT_TIME]);
       await editReservation({
         reservationId: state.id,
-        serviceId: 'svc-1',
+        serviceIds: ['svc-1'],
         date: EDIT_DATE,
         time: SLOT_TIME,
       });
@@ -415,7 +418,7 @@ async function runMutation(kind: MutationKind, contact: Contact): Promise<void> 
       createAdminClientMock.mockReturnValue(buildManualLogsAdmin());
       loadAvailableSlotsMock.mockResolvedValue([SLOT_TIME]);
       await createManualReservation({
-        serviceId: 'svc-1',
+        serviceIds: ['svc-1'],
         date: EDIT_DATE,
         time: SLOT_TIME,
         clientName: contact.clientName,

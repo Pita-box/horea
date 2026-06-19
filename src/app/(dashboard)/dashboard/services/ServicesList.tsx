@@ -55,7 +55,7 @@ export function ServicesList({ services }: ServicesListProps) {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-sm">
+            <table data-no-row-hover className="w-full border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--color-border-vychozi)] text-[var(--color-rich-violet)]">
                   <th className="py-3 pr-4 font-semibold">Název</th>

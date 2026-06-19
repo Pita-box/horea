@@ -15,6 +15,7 @@ export type ReservationListItem = {
   serviceName: string | null;
   clientName: string;
   clientPhone: string | null;
+  clientEmail: string | null;
 };
 
 /** Volba služby pro filtr a select (R3.4). */

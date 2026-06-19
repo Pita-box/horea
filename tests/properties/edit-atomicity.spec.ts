@@ -120,13 +120,13 @@ describe('Property 2: atomicita úpravy (vyloučení sebe sama)', () => {
 
         const result = await editReservation({
           reservationId: RESERVATION_ID,
-          serviceId: 'svc-1',
+          serviceIds: ['svc-1'],
           date: DATE,
           time: scenario.targetTime,
         });
 
         const slotAvailable = !scenario.occupiedByOthers.includes(scenario.targetTime);
-        const rpcCalled = admin.__rpcCalls.includes('edit_reservation');
+        const rpcCalled = admin.__rpcCalls.includes('edit_reservation_multi');
 
         if (!slotAvailable) {
           // Slot obsazen jinou rezervací → pre-lock list ho nemá → RPC se NEVOLÁ (R9.4).
@@ -187,13 +187,13 @@ describe('Property 2: atomicita úpravy (vyloučení sebe sama)', () => {
           // Úprava ponechávající VLASTNÍ čas (SELF_TIME) — typický „změna jen služby".
           const result = await editReservation({
             reservationId: RESERVATION_ID,
-            serviceId: 'svc-2',
+            serviceIds: ['svc-2'],
             date: DATE,
             time: SELF_TIME,
           });
 
           // Nikdy neselže kvůli konfliktu se sebou: RPC proběhne a zápis uspěje.
-          expect(admin.__rpcCalls).toContain('edit_reservation');
+          expect(admin.__rpcCalls).toContain('edit_reservation_multi');
           expect(result.ok).toBe(true);
         },
       ),

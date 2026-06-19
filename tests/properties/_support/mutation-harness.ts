@@ -208,8 +208,9 @@ export type EditRpcRow = { updated: boolean; conflict: boolean; invalid: boolean
 /**
  * Fake `@/lib/supabase/admin` klient (createAdminClient) pro `Reservation_Editor`.
  * Podporuje právě volání, která editor dělá v server kontextu:
- *  - `from('services').select(...).eq(...).eq(...).maybeSingle()` → trvání služby,
- *  - `rpc('edit_reservation', ...)` → výsledek pod zámkem (race simulace),
+ *  - `from('services').select(...).in('id', ids).eq('business_id', id).returns()`
+ *    → POLE řádků služeb (multi-service `edit_reservation_multi`),
+ *  - `rpc('edit_reservation_multi', ...)` → výsledek pod zámkem (race simulace),
  *  - post-commit lookupy `from('businesses')` / `from('reservations')` pro e-mail
  *    (client_email = null ⇒ dispatch se přeskočí; e-mail tu netestujeme).
  */
@@ -232,29 +233,36 @@ export function buildEditorAdmin(options: {
     __rpcArgs: rpcArgs,
     from(table: string) {
       const filters: Record<string, unknown> = {};
+      const ids: unknown[] = [];
       const builder = {
         select() {
+          return builder;
+        },
+        in(_column: string, value: unknown[]) {
+          ids.push(...value);
           return builder;
         },
         eq(column: string, value: unknown) {
           filters[column] = value;
           return builder;
         },
-        maybeSingle() {
+        // Multi-service: služby se čtou přes `.in(...).returns()` → POLE řádků.
+        returns() {
           if (table === 'services') {
             if (!serviceExists) {
-              return Promise.resolve({ data: null, error: null });
+              return Promise.resolve({ data: [], error: null });
             }
-            return Promise.resolve({
-              data: {
-                id: filters.id ?? 'svc-1',
-                name: 'Strihani',
-                duration_minutes: duration,
-                price_czk: 300,
-              },
-              error: null,
-            });
+            const rows = ids.map((id) => ({
+              id,
+              name: 'Strihani',
+              duration_minutes: duration,
+              price_czk: 300,
+            }));
+            return Promise.resolve({ data: rows, error: null });
           }
+          return Promise.resolve({ data: [], error: null });
+        },
+        maybeSingle() {
           if (table === 'businesses') {
             return Promise.resolve({ data: { name: 'Kavarna U Lipy', slug: 'kavarna' }, error: null });
           }
@@ -273,7 +281,7 @@ export function buildEditorAdmin(options: {
     rpc(fn: string, args?: unknown) {
       rpcCalls.push(fn);
       rpcArgs.push({ fn, args });
-      if (fn === 'edit_reservation') {
+      if (fn === 'edit_reservation_multi') {
         return Promise.resolve({ data: rpcRow, error: null });
       }
       return Promise.resolve({ data: null, error: null });
@@ -285,11 +293,13 @@ export type ManualRpcRow = {
   reservation_id: string | null;
   conflict: boolean;
   not_published: boolean;
+  invalid: boolean;
 };
 
 /**
  * Fake `@/lib/supabase/admin` klient pro `Manual_Reservation_Creator`.
- * Podporuje `from('services')` lookup a `rpc('create_manual_reservation', ...)`.
+ * Podporuje `from('services').select('id').in(...).eq(...).returns()` lookup
+ * (POLE řádků) a `rpc('create_manual_reservation_multi', ...)`.
  * Zaznamenává volané RPC + argumenty, aby šlo ověřit, že ruční tvorba routuje
  * na approved-only RPC a NEpředává žádný `auto_approve` parametr (Property 3).
  */
@@ -301,8 +311,8 @@ export function buildManualAdmin(options: {
     reservation_id: 'res-new',
     conflict: false,
     not_published: false,
+    invalid: false,
   };
-  const duration = options.serviceDurationMinutes ?? 30;
   const rpcCalls: string[] = [];
   const rpcArgs: Array<{ fn: string; args: unknown }> = [];
 
@@ -310,23 +320,23 @@ export function buildManualAdmin(options: {
     __rpcCalls: rpcCalls,
     __rpcArgs: rpcArgs,
     from(table: string) {
-      const filters: Record<string, unknown> = {};
+      const ids: unknown[] = [];
       const builder = {
         select() {
           return builder;
         },
-        eq(column: string, value: unknown) {
-          filters[column] = value;
+        in(_column: string, value: unknown[]) {
+          ids.push(...value);
           return builder;
         },
-        maybeSingle() {
+        eq() {
+          return builder;
+        },
+        returns() {
           if (table === 'services') {
-            return Promise.resolve({
-              data: { id: filters.id ?? 'svc-1', duration_minutes: duration },
-              error: null,
-            });
+            return Promise.resolve({ data: ids.map((id) => ({ id })), error: null });
           }
-          return Promise.resolve({ data: null, error: null });
+          return Promise.resolve({ data: [], error: null });
         },
       };
       return builder;
@@ -334,7 +344,7 @@ export function buildManualAdmin(options: {
     rpc(fn: string, args?: unknown) {
       rpcCalls.push(fn);
       rpcArgs.push({ fn, args });
-      if (fn === 'create_manual_reservation') {
+      if (fn === 'create_manual_reservation_multi') {
         return Promise.resolve({ data: rpcRow, error: null });
       }
       return Promise.resolve({ data: null, error: null });

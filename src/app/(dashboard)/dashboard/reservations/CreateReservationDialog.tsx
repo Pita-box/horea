@@ -6,6 +6,7 @@ import { useEffect, useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
+import { toggleService } from '@/lib/reservation/selection';
 import type { ServiceOption } from '@/lib/reservations/types';
 import { createManualReservation } from '@/server/ManualReservationCreator';
 
@@ -16,6 +17,7 @@ type CreateReservationDialogProps = {
 
 const CONTACT_REQUIRED = 'Zadejte alespoň jeden kontakt — telefon nebo e-mail';
 const NAME_REQUIRED = 'Zadejte prosím jméno klienta';
+const SERVICE_REQUIRED = 'Vyberte alespoň jednu službu';
 
 /**
  * Dialog ruční tvorby rezervace (R12.1). Sbírá službu, datum, čas a kontakt
@@ -31,7 +33,7 @@ export function CreateReservationDialog({ services }: CreateReservationDialogPro
   const [error, setError] = useState<string | null>(null);
   const [slots, setSlots] = useState<string[] | null>(null);
 
-  const [serviceId, setServiceId] = useState(services[0]?.id ?? '');
+  const [serviceIds, setServiceIds] = useState<string[]>([]);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [clientName, setClientName] = useState('');
@@ -62,7 +64,7 @@ export function CreateReservationDialog({ services }: CreateReservationDialogPro
   function reset() {
     setError(null);
     setSlots(null);
-    setServiceId(services[0]?.id ?? '');
+    setServiceIds([]);
     setDate('');
     setTime('');
     setClientName('');
@@ -81,6 +83,10 @@ export function CreateReservationDialog({ services }: CreateReservationDialogPro
     setSlots(null);
 
     // Lehká klientská kontrola (server validuje shodně, R12.2).
+    if (serviceIds.length === 0) {
+      setError(SERVICE_REQUIRED);
+      return;
+    }
     if (clientName.trim().length === 0) {
       setError(NAME_REQUIRED);
       return;
@@ -92,7 +98,7 @@ export function CreateReservationDialog({ services }: CreateReservationDialogPro
 
     startTransition(() => {
       void createManualReservation({
-        serviceId,
+        serviceIds,
         date,
         time,
         clientName,
@@ -138,22 +144,57 @@ export function CreateReservationDialog({ services }: CreateReservationDialogPro
             </h2>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium" htmlFor="create-service">
-                Služba
-              </label>
-              <select
-                id="create-service"
-                className={fieldClass}
-                value={serviceId}
-                onChange={(event) => setServiceId(event.target.value)}
-              >
-                {services.length === 0 ? <option value="">Žádná služba</option> : null}
-                {services.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.name}
-                  </option>
-                ))}
-              </select>
+              <span className="text-sm font-medium">Služby (v pořadí)</span>
+              {services.length === 0 ? (
+                <Notice>Žádná služba k výběru</Notice>
+              ) : (
+                <ul className="flex flex-col gap-2">
+                  {services.map((service) => {
+                    const order = serviceIds.indexOf(service.id);
+                    const selected = order !== -1;
+                    return (
+                      <li key={service.id}>
+                        <button
+                          type="button"
+                          onClick={() => setServiceIds((current) => toggleService(current, service.id))}
+                          aria-pressed={selected}
+                          className={[
+                            'flex min-h-[44px] w-full items-center justify-between gap-3 rounded-[var(--radius-buttons)] border px-3 py-2 text-left text-sm transition-colors',
+                            selected
+                              ? 'border-[var(--color-action-violet)] bg-[color-mix(in_srgb,var(--color-action-violet)_8%,white)]'
+                              : 'border-[var(--color-input-border)] bg-[var(--color-canvas-white)] hover:bg-[var(--color-soft-gray-fill)]',
+                          ].join(' ')}
+                        >
+                          <span className="flex min-w-0 items-center gap-2">
+                            {selected ? (
+                              <span
+                                aria-hidden="true"
+                                className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[var(--color-action-violet)] text-[12px] font-semibold text-white"
+                              >
+                                {order + 1}
+                              </span>
+                            ) : null}
+                            <span className="truncate text-[var(--color-slate-text)]">
+                              {service.name}
+                            </span>
+                          </span>
+                          <span
+                            aria-hidden="true"
+                            className={[
+                              'shrink-0 text-[13px] font-medium',
+                              selected
+                                ? 'text-[var(--color-action-violet)]'
+                                : 'text-[var(--color-slate-text)] opacity-70',
+                            ].join(' ')}
+                          >
+                            {selected ? 'Vybráno' : 'Vybrat'}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">

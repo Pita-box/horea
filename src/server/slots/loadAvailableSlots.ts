@@ -24,7 +24,13 @@ import type { Reservation, SlotCalculatorInput } from '@/lib/slots';
  */
 export type LoadAvailableSlotsParams = {
   businessId: string;
-  serviceId: string;
+  /**
+   * Uspořádaná množina služeb rezervace. Délka předaná `calculateSlots` je
+   * `Combined_Duration` = součet `duration_minutes` všech služeb (R6.1). Prázdná
+   * nebo nevalidní množina (některá služba chybí / nepatří podniku) → `[]`
+   * (R6.4 i defenzivní R7.1).
+   */
+  serviceIds: string[];
   /** Kalendářní datum v pásmu Europe/Prague ve tvaru `YYYY-MM-DD`. */
   dateISO: string;
   /**
@@ -84,30 +90,66 @@ function toHourMinute(pgTime: string): string {
   return pgTime.slice(0, 5);
 }
 
-export async function loadAvailableSlots(
+/** Výsledek detailního výpočtu dostupných termínů. */
+export type LoadAvailableSlotsResult = {
+  /**
+   * Dostupné počáteční časy v HH:mm pro `Combined_Duration` (pro dnešek už bez
+   * minulých časů).
+   */
+  slots: string[];
+  /**
+   * `true`, jen když je `slots` prázdné A důvodem je DÉLKA kombinovaného bloku:
+   * pro kratší blok (nejmenší vybraná služba) by se v daný den nějaký termín
+   * našel. Signál pro klienta, že odebrání služeb může pomoci (R6.2). Pro
+   * jednoslužbový výběr je vždy `false` (odebírat není co).
+   */
+  durationExceedsDay: boolean;
+};
+
+/**
+ * Detailní varianta `loadAvailableSlots`: kromě seznamu termínů vrací i příznak,
+ * zda je důvodem prázdného seznamu příliš dlouhý kombinovaný blok. Veškerá I/O
+ * (DB dotazy) proběhne jednou; rozhodnutí o limitující délce se dopočítá čistě
+ * druhým během `calculateSlots` (bez další DB zátěže).
+ */
+export async function loadAvailableSlotsDetailed(
   supabase: SupabaseClient,
   params: LoadAvailableSlotsParams,
-): Promise<string[]> {
-  const { businessId, serviceId, dateISO, excludeReservationId, requirePublished = true } = params;
+): Promise<LoadAvailableSlotsResult> {
+  const empty: LoadAvailableSlotsResult = { slots: [], durationExceedsDay: false };
+  const { businessId, serviceIds, dateISO, excludeReservationId, requirePublished = true } = params;
 
   if (!DATE_PATTERN.test(dateISO)) {
-    return [];
+    return empty;
   }
 
-  // Služba musí patřit danému businessu (R9.2) → její trvání.
-  const { data: service, error: serviceError } = await supabase
+  // Prázdná množina služeb → žádné sloty (R6.4).
+  if (serviceIds.length === 0) {
+    return empty;
+  }
+
+  // Trvání všech služeb jedním dotazem; každá musí patřit danému businessu
+  // (R6.1, R9.2). Combined_Duration = součet duration_minutes.
+  const { data: services, error: serviceError } = await supabase
     .from('services')
     .select('duration_minutes')
-    .eq('id', serviceId)
+    .in('id', serviceIds)
     .eq('business_id', businessId)
-    .maybeSingle<{ duration_minutes: number }>();
+    .returns<{ duration_minutes: number }[]>();
 
   if (serviceError) {
     throw serviceError;
   }
-  if (!service) {
-    return [];
+  // Pokud kterákoli služba chybí / nepatří podniku → defenzivně `[]`
+  // (R6.4 i R7.1). Porovnáváme počet unikátních ID se zadanou množinou.
+  const uniqueServiceIds = new Set(serviceIds);
+  if (!services || services.length !== uniqueServiceIds.size) {
+    return empty;
   }
+
+  const combinedDuration = services.reduce((sum, service) => sum + service.duration_minutes, 0);
+  // Nejkratší jednotlivá služba = nejmenší možný blok po odebrání ostatních.
+  const minServiceDuration = Math.min(...services.map((service) => service.duration_minutes));
 
   // Nastavení paralelních slotů daného podniku.
   const { data: business, error: businessError } = await supabase
@@ -120,7 +162,7 @@ export async function loadAvailableSlots(
     throw businessError;
   }
   if (!business) {
-    return [];
+    return empty;
   }
 
   // Otevírací doba pro daný den. Chybějící řádek = zavřený den → žádné sloty.
@@ -136,7 +178,7 @@ export async function loadAvailableSlots(
     throw hoursError;
   }
   if (!hours) {
-    return [];
+    return empty;
   }
 
   // Aktivní rezervace v rámci Pražského dne. UTC hranice počítáme přes
@@ -215,21 +257,64 @@ export async function loadAvailableSlots(
     reservations.push({ start: startTime, end: endTime });
   }
 
-  const input: SlotCalculatorInput = {
-    config: {
-      allowParallelSlots: business.allow_parallel_slots,
-      timezone: 'Europe/Prague',
-    },
-    openingHours: {
-      closed: false,
-      opensAt: toHourMinute(hours.opens_at),
-      closesAt: toHourMinute(hours.closes_at),
-    },
-    service: {
-      durationMinutes: service.duration_minutes,
-    },
-    reservations,
+  // Pro dnešní den (Europe/Prague) se odfiltrují počáteční časy, které už
+  // proběhly (R5.2). Gate platí i serverově: pre-lock grid re-check v
+  // `atomicSlotWrite` čte tentýž seznam. Pro budoucí dny se nefiltruje nic.
+  const [nowDate, nowTime] = toPragueDisplay(new Date()).split(' ');
+  const isToday = nowDate === targetLabel;
+  const [nowHour, nowMinute] = nowTime.split(':').map(Number);
+  const nowMinutes = nowHour * 60 + nowMinute;
+
+  // Spočítá dostupné termíny pro danou délku bloku (sdílí konfiguraci, otevírací
+  // dobu i rezervace). Čistá funkce `calculateSlots` se volá bez další DB zátěže.
+  const buildSlots = (durationMinutes: number): string[] => {
+    const input: SlotCalculatorInput = {
+      config: {
+        allowParallelSlots: business.allow_parallel_slots,
+        timezone: 'Europe/Prague',
+      },
+      openingHours: {
+        closed: false,
+        opensAt: toHourMinute(hours.opens_at),
+        closesAt: toHourMinute(hours.closes_at),
+      },
+      service: {
+        durationMinutes,
+      },
+      reservations,
+    };
+
+    const computed = calculateSlots(input);
+    if (!isToday) {
+      return computed;
+    }
+    return computed.filter((slot) => {
+      const [slotHour, slotMinute] = slot.split(':').map(Number);
+      return slotHour * 60 + slotMinute >= nowMinutes;
+    });
   };
 
-  return calculateSlots(input);
+  const slots = buildSlots(combinedDuration);
+
+  // Je-li výběr vícesložkový a kombinovaný blok se do dne nevejde, zjisti, zda by
+  // odebrání služeb pomohlo: vejde-li se nejmenší jednotlivá služba, je limitem
+  // právě délka kombinovaného bloku (R6.2). Druhý běh je čistý (bez DB).
+  let durationExceedsDay = false;
+  if (slots.length === 0 && serviceIds.length >= 2 && minServiceDuration < combinedDuration) {
+    durationExceedsDay = buildSlots(minServiceDuration).length > 0;
+  }
+
+  return { slots, durationExceedsDay };
+}
+
+/**
+ * Zpětně kompatibilní obal: vrací jen seznam termínů (pre-lock grid re-check
+ * v `atomicSlotWrite`, recompute při konfliktu apod.). Klientská cesta používá
+ * {@link loadAvailableSlotsDetailed} kvůli rozlišení důvodu prázdného seznamu.
+ */
+export async function loadAvailableSlots(
+  supabase: SupabaseClient,
+  params: LoadAvailableSlotsParams,
+): Promise<string[]> {
+  return (await loadAvailableSlotsDetailed(supabase, params)).slots;
 }

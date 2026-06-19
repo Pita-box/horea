@@ -3,174 +3,946 @@
 exports[`CalendarView (R4.5, R4.6) > vizuálně odliší rejected/cancelled od aktivních rezervací 1`] = `
 <div>
   <div
-    class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] space-y-5 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+    class="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr] lg:items-start"
   >
     <div
-      class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      class="flex flex-col gap-6"
     >
       <div
-        class="flex items-center gap-2"
+        class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] border border-[var(--color-border-vychozi)] p-[var(--spacing-20)]"
       >
-        <a
-          aria-label="Předchozí období"
-          class="inline-flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] px-4 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-violet)]"
-          href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-14"
+        <div
+          class="mb-3 flex items-center justify-between"
         >
-          ←
-        </a>
-        <a
-          class="inline-flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] px-4 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-violet)]"
-          href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-15"
+          <span
+            class="font-[var(--font-polysans)] text-base font-semibold capitalize text-[var(--color-rich-violet)]"
+          >
+            červenec 2024
+          </span>
+          <div
+            class="flex items-center gap-1"
+          >
+            <a
+              aria-label="Předchozí měsíc"
+              class="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-soft-gray-fill)]"
+              href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-06-01"
+            >
+              <svg
+                class="tabler-icon tabler-icon-chevron-left "
+                fill="none"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 6l-6 6l6 6"
+                />
+              </svg>
+            </a>
+            <a
+              aria-label="Další měsíc"
+              class="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-soft-gray-fill)]"
+              href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-08-01"
+            >
+              <svg
+                class="tabler-icon tabler-icon-chevron-right "
+                fill="none"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9 6l6 6l-6 6"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div
+          class="grid grid-cols-7 text-center text-[11px] font-medium text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
         >
-          Dnes
-        </a>
-        <a
-          aria-label="Následující období"
-          class="inline-flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] px-4 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-violet)]"
-          href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-16"
+          <span
+            class="py-1"
+          >
+            Po
+          </span>
+          <span
+            class="py-1"
+          >
+            Út
+          </span>
+          <span
+            class="py-1"
+          >
+            St
+          </span>
+          <span
+            class="py-1"
+          >
+            Čt
+          </span>
+          <span
+            class="py-1"
+          >
+            Pá
+          </span>
+          <span
+            class="py-1"
+          >
+            So
+          </span>
+          <span
+            class="py-1"
+          >
+            Ne
+          </span>
+        </div>
+        <div
+          class="grid grid-cols-7 gap-y-1 text-center text-[13px]"
         >
-          →
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-01"
+          >
+            1
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-02"
+          >
+            2
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-03"
+          >
+            3
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-04"
+          >
+            4
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-05"
+          >
+            5
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-06"
+          >
+            6
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-07"
+          >
+            7
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-08"
+          >
+            8
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-09"
+          >
+            9
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-10"
+          >
+            10
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-11"
+          >
+            11
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-12"
+          >
+            12
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-13"
+          >
+            13
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-14"
+          >
+            14
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors bg-[var(--color-action-violet)] font-semibold text-white"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-15"
+          >
+            15
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-16"
+          >
+            16
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-17"
+          >
+            17
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-18"
+          >
+            18
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-19"
+          >
+            19
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-20"
+          >
+            20
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-21"
+          >
+            21
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-22"
+          >
+            22
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-23"
+          >
+            23
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-24"
+          >
+            24
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-25"
+          >
+            25
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-26"
+          >
+            26
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-27"
+          >
+            27
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-28"
+          >
+            28
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-29"
+          >
+            29
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-30"
+          >
+            30
+          </a>
+          <a
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-31"
+          >
+            31
+          </a>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            1
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            2
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            3
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            4
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            5
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            6
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            7
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            8
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            9
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            10
+          </span>
+          <span
+            aria-hidden="true"
+            class="py-1 text-[color-mix(in_srgb,var(--color-slate-text)_28%,white)]"
+          >
+            11
+          </span>
+        </div>
+      </div>
+      <div
+        class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] bg-[var(--color-action-violet)] p-[var(--spacing-20)] text-white"
+      >
+        <p
+          class="text-xs font-medium text-[color-mix(in_srgb,white_80%,var(--color-action-violet))]"
+        >
+          Nejbližší rezervace
+        </p>
+        <p
+          class="mt-1 font-[var(--font-polysans)] text-lg font-semibold leading-tight"
+        >
+          Barvení
+        </p>
+        <p
+          class="mt-2 text-sm text-[color-mix(in_srgb,white_88%,var(--color-action-violet))]"
+        >
+          15
+          . 
+          7
+          . 
+          2024
+           · 
+          12:00
+          –
+          13:00
+        </p>
+        <p
+          class="text-sm text-[color-mix(in_srgb,white_80%,var(--color-action-violet))]"
+        >
+          Eva Malá
+        </p>
+        <a
+          class="mt-3 inline-flex h-9 items-center rounded-[var(--radius-buttons)] bg-white px-4 text-sm font-semibold text-[var(--color-action-violet)] transition-opacity hover:opacity-90"
+          href="/dashboard/reservations/res-approved"
+        >
+          Otevřít detail
         </a>
       </div>
       <div
-        class="flex items-center gap-2"
+        class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] space-y-5 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
       >
-        <a
-          aria-current="true"
-          class="inline-flex h-11 items-center justify-center rounded-[var(--radius-buttons)] px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-violet)] bg-[var(--color-action-violet)] text-[var(--color-canvas-white)]"
-          href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-15"
+        <fieldset
+          class="space-y-2"
         >
-          Den
-        </a>
-        <a
-          class="inline-flex h-11 items-center justify-center rounded-[var(--radius-buttons)] px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-violet)] border border-[var(--color-border-vychozi)] text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
-          href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=week&anchor=2024-07-15"
+          <legend
+            class="text-sm font-semibold text-[var(--color-rich-violet)]"
+          >
+            Stav
+          </legend>
+          <div
+            class="flex flex-wrap gap-x-5 gap-y-2"
+          >
+            <label
+              class="flex cursor-pointer items-start gap-2 text-sm text-[var(--color-slate-text)]"
+            >
+              <span
+                class="relative mt-[3px] inline-flex h-[16px] w-[16px] shrink-0"
+              >
+                <input
+                  checked=""
+                  class="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  type="checkbox"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none h-[16px] w-[16px] rounded-[4px] border border-[var(--color-slate-text)] bg-[var(--color-canvas-white)] transition-colors peer-[[aria-invalid=true]:not(:checked)]:bg-[#ffaae642] peer-checked:border-[var(--color-slate-text)] peer-checked:bg-[var(--color-slate-text)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--color-slate-text)] peer-disabled:opacity-50"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none absolute left-[5px] top-[2px] h-[9px] w-[5px] rotate-45 border-b-2 border-r-2 border-[var(--color-canvas-white)] opacity-0 peer-checked:opacity-100 peer-disabled:opacity-50"
+                />
+              </span>
+              <span>
+                Čeká na schválení
+              </span>
+            </label>
+            <label
+              class="flex cursor-pointer items-start gap-2 text-sm text-[var(--color-slate-text)]"
+            >
+              <span
+                class="relative mt-[3px] inline-flex h-[16px] w-[16px] shrink-0"
+              >
+                <input
+                  checked=""
+                  class="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  type="checkbox"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none h-[16px] w-[16px] rounded-[4px] border border-[var(--color-slate-text)] bg-[var(--color-canvas-white)] transition-colors peer-[[aria-invalid=true]:not(:checked)]:bg-[#ffaae642] peer-checked:border-[var(--color-slate-text)] peer-checked:bg-[var(--color-slate-text)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--color-slate-text)] peer-disabled:opacity-50"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none absolute left-[5px] top-[2px] h-[9px] w-[5px] rotate-45 border-b-2 border-r-2 border-[var(--color-canvas-white)] opacity-0 peer-checked:opacity-100 peer-disabled:opacity-50"
+                />
+              </span>
+              <span>
+                Schváleno
+              </span>
+            </label>
+            <label
+              class="flex cursor-pointer items-start gap-2 text-sm text-[var(--color-slate-text)]"
+            >
+              <span
+                class="relative mt-[3px] inline-flex h-[16px] w-[16px] shrink-0"
+              >
+                <input
+                  class="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  type="checkbox"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none h-[16px] w-[16px] rounded-[4px] border border-[var(--color-slate-text)] bg-[var(--color-canvas-white)] transition-colors peer-[[aria-invalid=true]:not(:checked)]:bg-[#ffaae642] peer-checked:border-[var(--color-slate-text)] peer-checked:bg-[var(--color-slate-text)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--color-slate-text)] peer-disabled:opacity-50"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none absolute left-[5px] top-[2px] h-[9px] w-[5px] rotate-45 border-b-2 border-r-2 border-[var(--color-canvas-white)] opacity-0 peer-checked:opacity-100 peer-disabled:opacity-50"
+                />
+              </span>
+              <span>
+                Odmítnuto
+              </span>
+            </label>
+            <label
+              class="flex cursor-pointer items-start gap-2 text-sm text-[var(--color-slate-text)]"
+            >
+              <span
+                class="relative mt-[3px] inline-flex h-[16px] w-[16px] shrink-0"
+              >
+                <input
+                  class="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  type="checkbox"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none h-[16px] w-[16px] rounded-[4px] border border-[var(--color-slate-text)] bg-[var(--color-canvas-white)] transition-colors peer-[[aria-invalid=true]:not(:checked)]:bg-[#ffaae642] peer-checked:border-[var(--color-slate-text)] peer-checked:bg-[var(--color-slate-text)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--color-slate-text)] peer-disabled:opacity-50"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none absolute left-[5px] top-[2px] h-[9px] w-[5px] rotate-45 border-b-2 border-r-2 border-[var(--color-canvas-white)] opacity-0 peer-checked:opacity-100 peer-disabled:opacity-50"
+                />
+              </span>
+              <span>
+                Zrušeno
+              </span>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset
+          class="space-y-2"
         >
-          Týden
-        </a>
+          <legend
+            class="text-sm font-semibold text-[var(--color-rich-violet)]"
+          >
+            Služba
+          </legend>
+          <div
+            class="flex flex-wrap gap-x-5 gap-y-2"
+          >
+            <label
+              class="flex cursor-pointer items-start gap-2 text-sm text-[var(--color-slate-text)]"
+            >
+              <span
+                class="relative mt-[3px] inline-flex h-[16px] w-[16px] shrink-0"
+              >
+                <input
+                  checked=""
+                  class="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  type="checkbox"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none h-[16px] w-[16px] rounded-[4px] border border-[var(--color-slate-text)] bg-[var(--color-canvas-white)] transition-colors peer-[[aria-invalid=true]:not(:checked)]:bg-[#ffaae642] peer-checked:border-[var(--color-slate-text)] peer-checked:bg-[var(--color-slate-text)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--color-slate-text)] peer-disabled:opacity-50"
+                />
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none absolute left-[5px] top-[2px] h-[9px] w-[5px] rotate-45 border-b-2 border-r-2 border-[var(--color-canvas-white)] opacity-0 peer-checked:opacity-100 peer-disabled:opacity-50"
+                />
+              </span>
+              <span>
+                Stříhání
+              </span>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset
+          class="space-y-2"
+        >
+          <legend
+            class="text-sm font-semibold text-[var(--color-rich-violet)]"
+          >
+            Časový rozsah
+          </legend>
+          <div
+            class="flex flex-wrap items-center gap-3"
+          >
+            <label
+              class="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]"
+            >
+              <span>
+                Od
+              </span>
+              <input
+                class="w-full rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] bg-[var(--color-canvas-white)] px-[var(--input-padding-x)] py-[var(--input-padding-y)] text-base leading-[1.1] text-[var(--color-slate-text)] outline-none transition-colors placeholder:text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)] focus:border-[var(--color-action-violet)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-action-violet)_18%,transparent)] disabled:opacity-50 w-auto"
+                type="date"
+                value=""
+              />
+            </label>
+            <label
+              class="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]"
+            >
+              <span>
+                Do
+              </span>
+              <input
+                class="w-full rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] bg-[var(--color-canvas-white)] px-[var(--input-padding-x)] py-[var(--input-padding-y)] text-base leading-[1.1] text-[var(--color-slate-text)] outline-none transition-colors placeholder:text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)] focus:border-[var(--color-action-violet)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-action-violet)_18%,transparent)] disabled:opacity-50 w-auto"
+                type="date"
+                value=""
+              />
+            </label>
+          </div>
+          <p
+            class="text-xs leading-5 text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]"
+          >
+            Zvolený rozsah přepíše výchozí zobrazení pouze budoucích rezervací.
+          </p>
+        </fieldset>
+        <div
+          class="flex justify-end"
+        >
+          <button
+            class="inline-flex h-10 items-center justify-center text-sm font-normal leading-none transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] bg-transparent px-5 py-0 text-[var(--color-slate-text)] hover:bg-[var(--color-light-violet)] focus-visible:outline-[var(--color-cloud-mist)]"
+            type="button"
+          >
+            Zrušit filtry
+          </button>
+        </div>
       </div>
     </div>
     <div
-      class=""
+      class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] border border-[var(--color-border-vychozi)] p-[var(--spacing-20)]"
     >
       <div
-        class="grid grid-cols-1 gap-3"
+        class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <section
-          class="flex flex-col gap-2 rounded-[var(--radius-buttons)] bg-[var(--color-soft-gray-fill)] p-3"
+        <div
+          class="flex items-center gap-2"
         >
-          <header
-            class="text-sm font-semibold text-[var(--color-action-violet)]"
+          <a
+            aria-label="Předchozí období"
+            class="flex h-9 w-9 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-14"
           >
-            <span
-              class="capitalize"
+            <svg
+              class="tabler-icon tabler-icon-chevron-left "
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              po
-            </span>
-             
-            15.07.
-          </header>
-          <ul
-            class="flex flex-col gap-2"
+              <path
+                d="M15 6l-6 6l6 6"
+              />
+            </svg>
+          </a>
+          <a
+            class="inline-flex h-9 items-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] px-4 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-15"
           >
-            <li>
-              <a
-                class="flex min-h-11 flex-col justify-center gap-0.5 rounded-[var(--radius-lg)] border-l-4 bg-[var(--color-canvas-white)] px-3 py-2 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] border-l-[var(--color-action-violet)]"
-                href="/dashboard/reservations/res-pending"
+            Dnes
+          </a>
+          <a
+            aria-label="Následující období"
+            class="flex h-9 w-9 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] text-[var(--color-rich-violet)] transition-colors hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-16"
+          >
+            <svg
+              class="tabler-icon tabler-icon-chevron-right "
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 6l6 6l-6 6"
+              />
+            </svg>
+          </a>
+        </div>
+        <div
+          class="flex items-center gap-1 rounded-[var(--radius-buttons)] bg-[var(--color-cloud-mist)] p-1"
+        >
+          <a
+            aria-current="true"
+            class="inline-flex h-9 items-center justify-center rounded-[var(--radius-buttons)] px-4 text-sm font-medium transition-colors bg-[var(--color-action-violet)] text-white"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=day&anchor=2024-07-15"
+          >
+            Den
+          </a>
+          <a
+            class="inline-flex h-9 items-center justify-center rounded-[var(--radius-buttons)] px-4 text-sm font-medium transition-colors text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]"
+            href="/dashboard/reservations?status=pending%2Capproved&service=svc-1%2Csvc-2&view=calendar&mode=week&anchor=2024-07-15"
+          >
+            Týden
+          </a>
+        </div>
+      </div>
+      <div
+        class="overflow-x-auto overflow-y-hidden"
+      >
+        <div
+          class=""
+        >
+          <div
+            class="flex border-b border-[var(--color-border-vychozi)]"
+          >
+            <div
+              aria-hidden="true"
+              class="w-14 shrink-0"
+            />
+            <div
+              class="grid flex-1"
+              style="grid-template-columns: repeat(1, minmax(0, 1fr));"
+            >
+              <div
+                class="px-2 py-3 text-center"
               >
-                <span
-                  class="text-xs font-semibold text-[var(--color-rich-violet)]"
+                <p
+                  class="text-xs uppercase tracking-wide text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
                 >
-                  10:00
-                  –
-                  11:00
-                </span>
-                <span
-                  class="text-sm font-medium text-[var(--color-slate-text)]"
+                  po
+                </p>
+                <p
+                  class="mt-1 text-lg font-semibold text-[var(--color-action-violet)]"
                 >
-                  Stříhání
-                </span>
-                <span
-                  class="text-xs text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
-                >
-                  Jan Novák
-                </span>
-              </a>
-            </li>
-            <li>
-              <a
-                class="flex min-h-11 flex-col justify-center gap-0.5 rounded-[var(--radius-lg)] border-l-4 bg-[var(--color-canvas-white)] px-3 py-2 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] border-l-[var(--color-action-violet)]"
-                href="/dashboard/reservations/res-approved"
+                  15
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex"
+          >
+            <div
+              class="relative w-14 shrink-0"
+              style="height: 668px;"
+            >
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 0px;"
               >
-                <span
-                  class="text-xs font-semibold text-[var(--color-rich-violet)]"
-                >
-                  12:00
-                  –
-                  13:00
-                </span>
-                <span
-                  class="text-sm font-medium text-[var(--color-slate-text)]"
-                >
-                  Barvení
-                </span>
-                <span
-                  class="text-xs text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
-                >
-                  Eva Malá
-                </span>
-              </a>
-            </li>
-            <li>
-              <a
-                class="flex min-h-11 flex-col justify-center gap-0.5 rounded-[var(--radius-lg)] border-l-4 bg-[var(--color-canvas-white)] px-3 py-2 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] border-l-[color-mix(in_srgb,var(--color-slate-text)_30%,white)] opacity-60 line-through"
-                href="/dashboard/reservations/res-rejected"
+                08
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 64px;"
               >
-                <span
-                  class="text-xs font-semibold text-[var(--color-rich-violet)]"
-                >
-                  14:00
-                  –
-                  14:30
-                </span>
-                <span
-                  class="text-sm font-medium text-[var(--color-slate-text)]"
-                >
-                  Konzultace
-                </span>
-                <span
-                  class="text-xs text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
-                >
-                  Petr Velký
-                </span>
-              </a>
-            </li>
-            <li>
-              <a
-                class="flex min-h-11 flex-col justify-center gap-0.5 rounded-[var(--radius-lg)] border-l-4 bg-[var(--color-canvas-white)] px-3 py-2 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] border-l-[color-mix(in_srgb,var(--color-slate-text)_30%,white)] opacity-60 line-through"
-                href="/dashboard/reservations/res-cancelled"
+                09
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 128px;"
               >
-                <span
-                  class="text-xs font-semibold text-[var(--color-rich-violet)]"
+                10
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 192px;"
+              >
+                11
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 256px;"
+              >
+                12
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 320px;"
+              >
+                13
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 384px;"
+              >
+                14
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 476px;"
+              >
+                15
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 540px;"
+              >
+                16
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 604px;"
+              >
+                17
+                :00
+              </span>
+              <span
+                class="absolute right-2 -translate-y-1/2 text-xs text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]"
+                style="top: 668px;"
+              >
+                18
+                :00
+              </span>
+            </div>
+            <div
+              class="grid flex-1"
+              style="grid-template-columns: repeat(1, minmax(0, 1fr));"
+            >
+              <div
+                class="relative border-l border-[var(--color-border-vychozi)]"
+                style="height: 668px;"
+              >
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 64px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 128px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 192px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 256px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 320px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 384px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 476px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 540px;"
+                />
+                <div
+                  aria-hidden="true"
+                  class="absolute inset-x-0 border-t border-[color-mix(in_srgb,var(--color-border-vychozi)_70%,white)]"
+                  style="top: 604px;"
+                />
+                <a
+                  class="absolute cursor-pointer overflow-hidden rounded-[var(--radius-lg)] px-2 py-1 text-left shadow-sm transition-all hover:z-10 hover:shadow-md hover:ring-2 hover:ring-inset hover:ring-[var(--color-action-violet)] bg-[var(--color-light-violet)] text-[var(--color-rich-violet)]"
+                  href="/dashboard/reservations/res-pending"
+                  style="top: 128px; height: 64px; left: calc(0% + 2px); width: calc(100% - 4px);"
                 >
-                  16:00
-                  –
-                  17:00
-                </span>
-                <span
-                  class="text-sm font-medium text-[var(--color-slate-text)]"
+                  <span
+                    class="block truncate text-xs font-semibold"
+                  >
+                    Stříhání
+                  </span>
+                  <span
+                    class="block truncate text-[11px] opacity-80"
+                  >
+                    10:00
+                    –
+                    11:00
+                  </span>
+                  <span
+                    class="block truncate text-[11px] opacity-80"
+                  >
+                    Jan Novák
+                  </span>
+                </a>
+                <a
+                  class="absolute cursor-pointer overflow-hidden rounded-[var(--radius-lg)] px-2 py-1 text-left shadow-sm transition-all hover:z-10 hover:shadow-md hover:ring-2 hover:ring-inset hover:ring-[var(--color-action-violet)] bg-[var(--color-air-blue)] text-[var(--color-rich-violet)]"
+                  href="/dashboard/reservations/res-approved"
+                  style="top: 256px; height: 64px; left: calc(0% + 2px); width: calc(100% - 4px);"
                 >
-                  Masáž
-                </span>
-                <span
-                  class="text-xs text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]"
+                  <span
+                    class="block truncate text-xs font-semibold"
+                  >
+                    Barvení
+                  </span>
+                  <span
+                    class="block truncate text-[11px] opacity-80"
+                  >
+                    12:00
+                    –
+                    13:00
+                  </span>
+                  <span
+                    class="block truncate text-[11px] opacity-80"
+                  >
+                    Eva Malá
+                  </span>
+                </a>
+                <a
+                  class="absolute cursor-pointer overflow-hidden rounded-[var(--radius-lg)] px-2 py-1 text-left shadow-sm transition-all hover:z-10 hover:shadow-md hover:ring-2 hover:ring-inset hover:ring-[var(--color-action-violet)] bg-[var(--color-soft-gray-fill)] text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)] line-through opacity-60"
+                  href="/dashboard/reservations/res-rejected"
+                  style="top: 384px; height: 46px; left: calc(0% + 2px); width: calc(100% - 4px);"
                 >
-                  Klára Nová
-                </span>
-              </a>
-            </li>
-          </ul>
-        </section>
+                  <span
+                    class="block truncate text-xs font-semibold"
+                  >
+                    Konzultace
+                  </span>
+                  <span
+                    class="block truncate text-[11px] opacity-80"
+                  >
+                    14:00
+                    –
+                    14:30
+                  </span>
+                </a>
+                <a
+                  class="absolute cursor-pointer overflow-hidden rounded-[var(--radius-lg)] px-2 py-1 text-left shadow-sm transition-all hover:z-10 hover:shadow-md hover:ring-2 hover:ring-inset hover:ring-[var(--color-action-violet)] bg-[var(--color-soft-gray-fill)] text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)] line-through opacity-60"
+                  href="/dashboard/reservations/res-cancelled"
+                  style="top: 540px; height: 64px; left: calc(0% + 2px); width: calc(100% - 4px);"
+                >
+                  <span
+                    class="block truncate text-xs font-semibold"
+                  >
+                    Masáž
+                  </span>
+                  <span
+                    class="block truncate text-[11px] opacity-80"
+                  >
+                    16:00
+                    –
+                    17:00
+                  </span>
+                  <span
+                    class="block truncate text-[11px] opacity-80"
+                  >
+                    Klára Nová
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -223,13 +995,19 @@ exports[`TableView (R2.2–R2.4) > zobrazí všechny stavy v češtině a zvýra
     >
       <li>
         <a
-          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4 border-l-4 border-l-[var(--color-action-violet)] bg-[color-mix(in_srgb,var(--color-action-violet)_6%,white)]"
+          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-light-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4 border-l-4 border-l-[var(--color-action-violet)]"
           href="/dashboard/reservations/res-pending"
         >
           <span
             class="font-medium text-[var(--color-slate-text)]"
           >
-            15.07.2024 10:00
+            15.07.2024
+            , 
+            <span
+              class="opacity-50"
+            >
+              10:00
+            </span>
           </span>
           <span
             class="text-sm text-[var(--color-slate-text)]"
@@ -243,7 +1021,7 @@ exports[`TableView (R2.2–R2.4) > zobrazí všechny stavy v češtině a zvýra
             <span
               class="block text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]"
             >
-              +420777888999
+              +420777888999, jan@example.cz
             </span>
           </span>
           <span
@@ -255,13 +1033,19 @@ exports[`TableView (R2.2–R2.4) > zobrazí všechny stavy v češtině a zvýra
       </li>
       <li>
         <a
-          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4"
+          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-light-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4 border-l-4 border-l-[var(--color-electric-green)]"
           href="/dashboard/reservations/res-approved"
         >
           <span
             class="font-medium text-[var(--color-slate-text)]"
           >
-            15.07.2024 12:00
+            15.07.2024
+            , 
+            <span
+              class="opacity-50"
+            >
+              12:00
+            </span>
           </span>
           <span
             class="text-sm text-[var(--color-slate-text)]"
@@ -272,6 +1056,11 @@ exports[`TableView (R2.2–R2.4) > zobrazí všechny stavy v češtině a zvýra
             class="text-sm text-[var(--color-slate-text)]"
           >
             Eva Malá
+            <span
+              class="block text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]"
+            >
+              eva@example.cz
+            </span>
           </span>
           <span
             class="text-sm font-semibold text-[var(--color-slate-text)]"
@@ -282,13 +1071,19 @@ exports[`TableView (R2.2–R2.4) > zobrazí všechny stavy v češtině a zvýra
       </li>
       <li>
         <a
-          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4"
+          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-light-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4"
           href="/dashboard/reservations/res-rejected"
         >
           <span
             class="font-medium text-[var(--color-slate-text)]"
           >
-            15.07.2024 14:00
+            15.07.2024
+            , 
+            <span
+              class="opacity-50"
+            >
+              14:00
+            </span>
           </span>
           <span
             class="text-sm text-[var(--color-slate-text)]"
@@ -309,13 +1104,19 @@ exports[`TableView (R2.2–R2.4) > zobrazí všechny stavy v češtině a zvýra
       </li>
       <li>
         <a
-          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-cloud-mist)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4"
+          class="grid grid-cols-1 gap-1 px-6 py-4 transition-colors hover:bg-[var(--color-light-violet)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-action-violet)] md:grid-cols-[1.2fr_1.2fr_1.4fr_1fr] md:items-center md:gap-4 border-l-4 border-l-[var(--color-red)]"
           href="/dashboard/reservations/res-cancelled"
         >
           <span
             class="font-medium text-[var(--color-slate-text)]"
           >
-            15.07.2024 16:00
+            15.07.2024
+            , 
+            <span
+              class="opacity-50"
+            >
+              16:00
+            </span>
           </span>
           <span
             class="text-sm text-[var(--color-slate-text)]"

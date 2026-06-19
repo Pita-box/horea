@@ -1,6 +1,12 @@
 import { render } from '@testing-library/react';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+// FilterBar (uvnitř CalendarView) je klientská a používá next/navigation.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn(), replace: vi.fn() }),
+  usePathname: () => '/dashboard/reservations',
+}));
+
 import { CalendarView } from '@/components/reservations/CalendarView';
 import { TableView } from '@/components/reservations/TableView';
 import { periodDays } from '@/lib/reservations/calendar';
@@ -33,6 +39,7 @@ const RESERVATIONS: ReservationListItem[] = [
     serviceName: 'Stříhání',
     clientName: 'Jan Novák',
     clientPhone: '+420777888999',
+    clientEmail: 'jan@example.cz',
   },
   {
     id: 'res-approved',
@@ -43,6 +50,7 @@ const RESERVATIONS: ReservationListItem[] = [
     serviceName: 'Barvení',
     clientName: 'Eva Malá',
     clientPhone: null,
+    clientEmail: 'eva@example.cz',
   },
   {
     id: 'res-rejected',
@@ -53,6 +61,7 @@ const RESERVATIONS: ReservationListItem[] = [
     serviceName: 'Konzultace',
     clientName: 'Petr Velký',
     clientPhone: null,
+    clientEmail: null,
   },
   {
     id: 'res-cancelled',
@@ -63,6 +72,7 @@ const RESERVATIONS: ReservationListItem[] = [
     serviceName: 'Masáž',
     clientName: 'Klára Nová',
     clientPhone: null,
+    clientEmail: null,
   },
 ];
 
@@ -84,13 +94,22 @@ describe('TableView (R2.2–R2.4)', () => {
     expect(container.textContent).toContain('Odmítnuto');
     expect(container.textContent).toContain('Zrušeno');
 
-    // Zvýraznění pending řádku — barevný levý okraj (R2.4).
+    // Barevný levý okraj dle stavu (R2.4): pending = Action Violet,
+    // approved = Electric Green, cancelled = Red.
     const pendingLink = container.querySelector('a[href="/dashboard/reservations/res-pending"]');
-    expect(pendingLink?.className).toContain('border-l-4');
+    expect(pendingLink?.className).toContain('border-l-[var(--color-action-violet)]');
 
-    // Ostatní řádky zvýraznění nemají.
     const approvedLink = container.querySelector('a[href="/dashboard/reservations/res-approved"]');
-    expect(approvedLink?.className).not.toContain('border-l-4');
+    expect(approvedLink?.className).toContain('border-l-[var(--color-electric-green)]');
+
+    const cancelledLink = container.querySelector(
+      'a[href="/dashboard/reservations/res-cancelled"]',
+    );
+    expect(cancelledLink?.className).toContain('border-l-[var(--color-red)]');
+
+    // Odmítnuté (rejected) bez barevného akcentu.
+    const rejectedLink = container.querySelector('a[href="/dashboard/reservations/res-rejected"]');
+    expect(rejectedLink?.className).not.toContain('border-l-4');
 
     expect(container).toMatchSnapshot();
   });
@@ -123,6 +142,7 @@ describe('CalendarView (R4.5, R4.6)', () => {
         anchor="2024-07-15"
         days={days}
         filters={FILTERS}
+        services={[{ id: 'svc-1', name: 'Stříhání' }]}
       />,
     );
 
@@ -149,6 +169,7 @@ describe('CalendarView (R4.5, R4.6)', () => {
         anchor="2024-07-15"
         days={days}
         filters={FILTERS}
+        services={[{ id: 'svc-1', name: 'Stříhání' }]}
       />,
     );
 

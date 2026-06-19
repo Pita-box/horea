@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { fromPragueInput } from '@/lib/datetime';
 import { serverLog } from '@/lib/log-server';
+import { validateServiceCount } from '@/lib/reservation/limits';
 import { RESERVATION_MESSAGES } from '@/lib/reservation/schema';
 import { atomicSlotWrite, type AtomicSlotWriteResult } from '@/lib/reservations/atomicSlotWrite';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -14,26 +15,29 @@ import { loadAvailableSlots } from './slots/loadAvailableSlots';
 
 /**
  * Manual_Reservation_Creator — server action vytvářející rezervaci jménem majitele
- * (telefonní objednávky, R12). Sdílí atomický blok s `ReservationCreator` přes
+ * (telefonní objednávky, R15). Sdílí atomický blok s `ReservationCreator` přes
  * `atomicSlotWrite` (insert varianta), ale s dvěma rozdíly: status je VŽDY
- * `approved` (řeší RPC `create_manual_reservation`, R12.4) a klientovi se
- * neodesílá ŽÁDNÝ potvrzovací e-mail (R12.5).
+ * `approved` (řeší RPC `create_manual_reservation_multi`, R15.1) a klientovi se
+ * neodesílá ŽÁDNÝ potvrzovací e-mail (R15.4).
  *
  * Validace (R12.2) je LEHČÍ než klientský `reservationContactSchema`: jméno je
  * povinné (1–100 po trim) a stačí ALESPOŇ JEDEN kontakt (telefon NEBO e-mail),
- * validní formát se ověřuje jen u vyplněného pole.
+ * validní formát se ověřuje jen u vyplněného pole. Počet služeb musí být v
+ * rozsahu [MIN, MAX] = [1, 10] (R5.4).
  *
  * Tok:
- *  1. Lehká serverová validace polí.
+ *  1. Lehká serverová validace polí + rozsah počtu služeb (R5.4).
  *  2. Přihlášení + odvození podniku majitele (`businesses.owner_user_id = user.id`).
- *  3. Service lookup (admin) → trvání; startsAt/endsAt v UTC.
- *  4. `atomicSlotWrite` → RPC `create_manual_reservation` (advisory lock + overlap
- *     re-check + insert se status approved). conflict → 409 + Available_Slot_List (R12.6).
- *  5. Po commitu best-effort `Client_Upsertor` (R12 → R15.1). Log bez PII.
+ *  3. Ověření, že všechny služby existují a patří podniku (R15.2); startsAt v UTC.
+ *  4. `atomicSlotWrite` → RPC `create_manual_reservation_multi` (advisory lock +
+ *     Combined_Duration + overlap re-check + insert se status approved). conflict →
+ *     409 + Available_Slot_List (R15.5), invalid → 404 (R15.2).
+ *  5. Po commitu best-effort `Client_Upsertor` (R15.1). Log bez PII.
  */
 
 export type CreateManualReservationInput = {
-  serviceId: string;
+  /** ID vybraných služeb v pořadí výběru (`Reservation_Service_Set`, R15.1). */
+  serviceIds: string[];
   /** Datum v pásmu Europe/Prague ve tvaru `YYYY-MM-DD`. */
   date: string;
   /** Počáteční čas slotu v pásmu Europe/Prague ve tvaru `HH:mm`. */
@@ -66,13 +70,13 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type ServiceRow = {
   id: string;
-  duration_minutes: number;
 };
 
 type ManualReservationRpcRow = {
   reservation_id: string | null;
   conflict: boolean;
   not_published: boolean;
+  invalid: boolean;
 };
 
 type ValidatedContact = {
@@ -141,6 +145,12 @@ export async function createManualReservation(
     return { ok: false, code: 400, message: validated.message };
   }
 
+  // Rozsahová validace počtu služeb [MIN, MAX] = [1, 10] (R5.4).
+  const countCheck = validateServiceCount(input.serviceIds.length);
+  if (!countCheck.ok) {
+    return { ok: false, code: 400, message: countCheck.message };
+  }
+
   if (!DATE_PATTERN.test(input.date) || !TIME_PATTERN.test(input.time)) {
     return { ok: false, code: 400, message: MESSAGES.invalidInput };
   }
@@ -181,19 +191,23 @@ export async function createManualReservation(
     return { ok: false, code: 500, message: MESSAGES.serverContext };
   }
 
-  const { data: service, error: serviceError } = await admin
+  // Všechny služby musí existovat a patřit danému podniku (R15.2). Jedním
+  // dotazem; finální autoritativní kontrolu i Combined_Duration řeší RPC.
+  const { data: services, error: serviceError } = await admin
     .from('services')
-    .select('id, duration_minutes')
-    .eq('id', input.serviceId)
+    .select('id')
+    .in('id', input.serviceIds)
     .eq('business_id', businessId)
-    .maybeSingle<ServiceRow>();
+    .returns<ServiceRow[]>();
 
   if (serviceError) {
     await safeLog('manual_reservation_service_lookup_failed', { businessId });
     return { ok: false, code: 500, message: MESSAGES.serverContext };
   }
 
-  if (!service) {
+  // Porovnání s počtem unikátních ID — chybějící / cizí služba → 404 (R15.2).
+  const uniqueServiceIds = new Set(input.serviceIds);
+  if (!services || services.length !== uniqueServiceIds.size) {
     return { ok: false, code: 404, message: MESSAGES.serviceMissing };
   }
 
@@ -203,7 +217,6 @@ export async function createManualReservation(
   } catch {
     return { ok: false, code: 400, message: MESSAGES.invalidInput };
   }
-  const endsAt = new Date(startsAt.getTime() + service.duration_minutes * 60_000);
 
   const { clientName, clientPhone, clientEmail, note } = validated.data;
 
@@ -214,16 +227,15 @@ export async function createManualReservation(
     writeResult = await atomicSlotWrite<ManualRpcResponse>({
       supabase: admin,
       businessId,
-      serviceId: service.id,
+      serviceIds: input.serviceIds,
       dateISO: input.date,
       time: input.time,
       requirePublished: false,
       write: () =>
-        admin.rpc('create_manual_reservation', {
+        admin.rpc('create_manual_reservation_multi', {
           p_business_id: businessId,
-          p_service_id: service.id,
+          p_service_ids: input.serviceIds,
           p_starts_at: startsAt.toISOString(),
-          p_ends_at: endsAt.toISOString(),
           p_client_name: clientName,
           p_client_phone: clientPhone ? clientPhone : null,
           p_client_email: clientEmail ? clientEmail : null,
@@ -255,17 +267,19 @@ export async function createManualReservation(
     return { ok: false, code: 500, message: MESSAGES.serverContext };
   }
 
-  if (row.not_published) {
+  if (row.not_published || row.invalid) {
+    // Operace majitele nikdy nenastaví not_published; invalid značí chybějící /
+    // cizí službu nebo počet mimo rozsah pod zámkem (R15.2).
     return { ok: false, code: 404, message: MESSAGES.serviceMissing };
   }
 
   if (row.conflict || !row.reservation_id) {
-    // Slot byl pod zámkem obsazen — vrátíme aktualizovaný list (R12.6).
+    // Slot byl pod zámkem obsazen — vrátíme aktualizovaný list (R15.5).
     let freshSlots: string[] = [];
     try {
       freshSlots = await loadAvailableSlots(admin, {
         businessId,
-        serviceId: service.id,
+        serviceIds: input.serviceIds,
         dateISO: input.date,
         requirePublished: false,
       });
@@ -282,7 +296,7 @@ export async function createManualReservation(
     action_type: 'manual_create',
   });
 
-  // (5) Post-commit best-effort upsert klienta (R12 → R15.1). Žádný e-mail klientovi (R12.5).
+  // (5) Post-commit best-effort upsert klienta (R15.1). Žádný e-mail klientovi (R15.4).
   await upsertClientFromReservation({
     supabase: admin,
     businessId,

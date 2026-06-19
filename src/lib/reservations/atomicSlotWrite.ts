@@ -32,7 +32,12 @@ import { loadAvailableSlots } from '@/server/slots/loadAvailableSlots';
 export type AtomicSlotWriteParams<T> = {
   supabase: SupabaseClient;
   businessId: string;
-  serviceId: string;
+  /**
+   * ID vybraných služeb v uloženém pořadí (`Reservation_Service_Set`, R5.1).
+   * Předá se do `loadAvailableSlots`, kde se z nich spočítá `Combined_Duration`
+   * pro pre-lock grid re-check (R7.2, R15.2).
+   */
+  serviceIds: string[];
   /** Kalendářní datum v pásmu Europe/Prague ve tvaru `YYYY-MM-DD`. */
   dateISO: string;
   /** Počáteční čas slotu v pásmu Europe/Prague ve tvaru `HH:mm`. */
@@ -60,13 +65,13 @@ export type AtomicSlotWriteResult<T> =
 export async function atomicSlotWrite<T>(
   params: AtomicSlotWriteParams<T>,
 ): Promise<AtomicSlotWriteResult<T>> {
-  const { supabase, businessId, serviceId, dateISO, time, excludeReservationId, requirePublished, write } =
+  const { supabase, businessId, serviceIds, dateISO, time, excludeReservationId, requirePublished, write } =
     params;
 
   // (1) Pre-lock grid re-check přes sdílený Slot_Calculator (R9.3).
   const slots = await loadAvailableSlots(supabase, {
     businessId,
-    serviceId,
+    serviceIds,
     dateISO,
     excludeReservationId,
     requirePublished,
