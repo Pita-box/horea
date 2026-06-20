@@ -3,7 +3,7 @@ import 'server-only';
 import { fromPragueInput } from '@/lib/datetime';
 import { todayPragueDate } from '@/lib/reservations/calendar';
 import type { AttendanceStatus, ReservationStatus } from '@/lib/reservations/labels';
-import { normalizePhone } from '@/server/ClientUpsertor';
+import { matchClient, type ClientCandidate } from '@/server/ClientUpsertor';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -61,19 +61,14 @@ function embeddedName(value: EmbeddedName): string | null {
   return Array.isArray(value) ? (value[0]?.name ?? null) : value.name;
 }
 
-/** Stabilní identita klienta: normalizovaný telefon → e-mail → jméno. */
-function clientKeyOf(row: ReservationRow): string {
-  const phone = normalizePhone(row.client_phone);
-  if (phone) {
-    return `tel:${phone}`;
-  }
-  if (row.client_email) {
-    return `mail:${row.client_email.trim().toLowerCase()}`;
-  }
-  return `name:${row.client_name.trim().toLowerCase()}`;
-}
-
-function mapRow(row: ReservationRow): AnalyticsReservation {
+/**
+ * Identita klienta přes PÁROVACÍ PRAVIDLO proti tabulce `clients` (shodně se
+ * stránkou Klienti): rezervace se přiřadí klientovi dle telefonu/e-mailu.
+ * Rezervace bez odpovídajícího klienta (anonymní/walk-in bez kontaktu, nebo
+ * jen jméno) dostane prázdný klíč a do klientské analytiky se nezapočítá —
+ * proto se v „TOP klienti" neobjeví jména, která nejsou skutečnými klienty.
+ */
+function mapRow(row: ReservationRow, candidates: ClientCandidate[]): AnalyticsReservation {
   const services = (row.reservation_services ?? []).map((service) => ({
     serviceId: service.service_id,
     name: embeddedName(service.services) ?? '—',
@@ -89,13 +84,15 @@ function mapRow(row: ReservationRow): AnalyticsReservation {
     employeeIds.add(row.employee_id);
   }
 
+  const matched = matchClient(candidates, row.client_phone ?? '', row.client_email ?? '');
+
   return {
     id: row.id,
     startsAt: row.starts_at,
     status: row.status,
     attendance: row.attendance,
-    clientKey: clientKeyOf(row),
-    clientName: row.client_name,
+    clientKey: matched ? matched.id : '',
+    clientName: matched?.name ?? row.client_name,
     employeeIds: [...employeeIds],
     services,
     revenue,
@@ -146,6 +143,19 @@ export async function loadAnalytics(periodKeyRaw: string | undefined): Promise<A
     employeeNames[employee.id] = employee.name;
   }
 
+  // Klienti podniku pro párování identity rezervací (shodně se stránkou Klienti).
+  const { data: clientRows, error: clientsError } = await admin
+    .from('clients')
+    .select('id,name,phone,email')
+    .eq('business_id', business.id)
+    .returns<ClientCandidate[]>();
+
+  if (clientsError) {
+    return { ok: false, message: LOAD_ERROR };
+  }
+
+  const candidates: ClientCandidate[] = clientRows ?? [];
+
   // Rezervace okna [windowStart, period.to] po dávkách (Supabase limit 1000/req).
   const rows: ReservationRow[] = [];
   for (let offset = 0; ; offset += FETCH_BATCH_SIZE) {
@@ -171,7 +181,7 @@ export async function loadAnalytics(periodKeyRaw: string | undefined): Promise<A
     }
   }
 
-  const all = rows.map(mapRow);
+  const all = rows.map((row) => mapRow(row, candidates));
   const inRange = (r: AnalyticsReservation, from: string, to: string): boolean => {
     const date = r.startsAt;
     // Porovnáváme přes UTC ISO meze odpovídající pražským dnům.

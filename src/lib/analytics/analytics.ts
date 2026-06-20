@@ -369,7 +369,7 @@ export type ClientRanking = { clientKey: string; name: string; spend: number; vi
 export function topClientsBySpend(reservations: AnalyticsReservation[]): ClientRanking[] {
   const map = new Map<string, ClientRanking>();
   for (const r of reservations) {
-    if (!isAttended(r)) {
+    if (!isAttended(r) || !r.clientKey) {
       continue;
     }
     const entry = map.get(r.clientKey) ?? {
@@ -396,8 +396,10 @@ export function computeClientMix(
   periodReservations: AnalyticsReservation[],
   historyBeforePeriod: AnalyticsReservation[],
 ): ClientMix {
-  const seenBefore = new Set(historyBeforePeriod.map((r) => r.clientKey));
-  const periodClients = new Set(periodReservations.map((r) => r.clientKey));
+  const seenBefore = new Set(
+    historyBeforePeriod.filter((r) => r.clientKey).map((r) => r.clientKey),
+  );
+  const periodClients = new Set(periodReservations.filter((r) => r.clientKey).map((r) => r.clientKey));
   let newClients = 0;
   let returningClients = 0;
   for (const clientKey of periodClients) {

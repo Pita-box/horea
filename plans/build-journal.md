@@ -2,6 +2,16 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-16 — Analytika TOP klienti: párování proti tabulce clients (oprava falešných „klientů")
+
+### Bug & fix
+- **Symptom:** V „TOP klienti" se objevilo jméno (např. „Anna"), které není skutečný klient (shoduje se jen se jménem zaměstnance / jde o rezervaci bez klientského záznamu).
+- **Root cause:** Analytika odvozovala identitu klienta přímo z polí rezervace (`client_name`/telefon/e-mail), takže i rezervace bez odpovídajícího řádku v `clients` (jen jméno) vytvořila „klienta".
+- **Fix:** `analytics/load.ts` nově páruje rezervaci proti tabulce `clients` přes `matchClient` (telefon/e-mail), shodně se stránkou Klienti. Bez shody → prázdný `clientKey`. Agregace `topClientsBySpend` a `computeClientMix` prázdné klíče přeskakují. „TOP klienti" tak zobrazuje jen skutečné klienty.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm exec vitest run analytics` → 9 passed.
+
 ## 2026-06-16 — TOP zaměstnanci: metrika = podíl na odvedené práci (ne obsazenost)
 
 ### Změna chování
