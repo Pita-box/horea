@@ -39,7 +39,8 @@ export function TopEmployees({ employees }: { employees: TopEmployee[] }) {
   return (
     <Card
       as="section"
-      className="flex max-h-full flex-col border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+      id="top-zamestnanci"
+      className="flex max-h-full flex-col scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-1">

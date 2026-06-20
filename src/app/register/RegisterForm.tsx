@@ -3,10 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { Notice } from '@/components/ui/notice';
 import { passwordChecks } from '@/lib/auth/password';
 import { IconCircle, IconCircleCheck, IconCircleX } from '@tabler/icons-react';
-import { useState, useTransition, type FormEvent } from 'react';
+import { useRef, useState, useTransition, type FormEvent } from 'react';
 
 import { registerAction } from './actions';
 import { INITIAL_REGISTER_STATE, type RegisterActionState } from './state';
@@ -57,18 +58,29 @@ export function RegisterForm() {
   const [state, setState] = useState<RegisterActionState>(INITIAL_REGISTER_STATE);
   const [password, setPassword] = useState('');
   const [isPending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  function submit() {
+    const form = formRef.current;
+    if (!form) {
+      return;
+    }
+    const formData = new FormData(form);
 
     startTransition(() => {
       void registerAction(formData).then(setState);
     });
   }
 
+  // Odeslání přes Enter v poli — zabráníme nativnímu submitu (ten je v
+  // sandboxovaném rámci bez `allow-forms` blokován) a zpracujeme přes JS.
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submit();
+  }
+
   return (
-    <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="space-y-5" onSubmit={handleSubmit} noValidate>
       {state.message ? (
         <Notice role="alert" variant="error">
           {state.message}
@@ -92,10 +104,9 @@ export function RegisterForm() {
 
       <label className="block text-sm font-semibold text-[var(--color-slate-text)]">
         Heslo
-        <Input
+        <PasswordInput
           className="mt-2"
           name="password"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}
@@ -161,7 +172,7 @@ export function RegisterForm() {
         </span>
       </label>
 
-      <Button className="w-full" type="submit" disabled={isPending}>
+      <Button className="w-full" type="button" onClick={submit} disabled={isPending}>
         {isPending ? 'Odesílám...' : 'Vytvořit účet'}
       </Button>
     </form>

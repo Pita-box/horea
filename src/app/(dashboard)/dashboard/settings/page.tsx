@@ -19,7 +19,8 @@ export default async function SettingsPage() {
       {info.ok ? (
         <Card
           as="section"
-          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+          id="o-nas-a-kontakt"
+          className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         >
           <ProfileInfoForm initialInfo={info.info} />
         </Card>
@@ -28,7 +29,8 @@ export default async function SettingsPage() {
       {images.ok ? (
         <Card
           as="section"
-          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+          id="vzhled-profilu"
+          className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         >
           <ProfileImagesForm initialImages={images.images} businessName={images.businessName} />
         </Card>
@@ -37,7 +39,8 @@ export default async function SettingsPage() {
       {social.ok ? (
         <Card
           as="section"
-          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+          id="socialni-site"
+          className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         >
           <SocialLinksForm initialLinks={social.links} />
         </Card>
@@ -46,7 +49,8 @@ export default async function SettingsPage() {
       {result.ok ? (
         <Card
           as="section"
-          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+          id="automaticke-schvalovani-rezervaci"
+          className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         >
           <SettingsForm initialSettings={result.settings} />
         </Card>

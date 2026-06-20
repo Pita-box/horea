@@ -27,7 +27,9 @@ async function getResetRedirectTo(): Promise<string> {
   const origin =
     headerStore.get('origin') ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
-  return new URL('/reset-password', origin).toString();
+  // Odkaz míří na Route Handler, který umí zapsat session cookies a před
+  // verifikací odhlásí případnou jinou session (viz app/auth/confirm/route.ts).
+  return new URL('/auth/confirm', origin).toString();
 }
 
 function getResetUrl(redirectTo: string, tokenHash: string): string {

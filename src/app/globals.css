@@ -240,3 +240,33 @@ table[data-no-row-hover] tbody tr:hover {
     animation: none;
   }
 }
+
+/*
+ * Přechodné zvýraznění cílové sekce po odscrollování z vyhledávání (R4.4).
+ * Outline v action-violet + měkká rozmazaná záře (box-shadow blur), které
+ * během ~1,5 s plynule vyhasnou (fade out). Outline ani shadow nezpůsobí
+ * layout shift (jsou mimo box model). Přidává/odebírá ScrollToHashOnLoad.
+ */
+@keyframes search-target-fade {
+  from {
+    outline-color: var(--color-action-violet);
+    box-shadow: 0 0 16px 4px color-mix(in srgb, var(--color-action-violet) 45%, transparent);
+  }
+  to {
+    outline-color: transparent;
+    box-shadow: 0 0 16px 4px transparent;
+  }
+}
+
+.search-target-highlight {
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  border-radius: var(--radius-buttons);
+  animation: search-target-fade 1.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-target-highlight {
+    animation: none;
+  }
+}

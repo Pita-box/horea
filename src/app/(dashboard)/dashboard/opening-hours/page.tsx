@@ -12,7 +12,8 @@ export default async function OpeningHoursPage() {
       {result.ok ? (
         <Card
           as="section"
-          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+          id="oteviraci-doba"
+          className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         >
           <OpeningHoursForm initialWeek={result.week} />
         </Card>

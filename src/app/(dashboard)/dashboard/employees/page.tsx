@@ -28,7 +28,8 @@ export default async function EmployeesPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch">
         <Card
           as="section"
-          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)] lg:col-span-2"
+          id="zamestnanci"
+          className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)] lg:col-span-2"
         >
           <EmployeesManager initialEmployees={team.employees} initialSettings={team.settings} />
         </Card>
@@ -45,7 +46,8 @@ export default async function EmployeesPage() {
       {showServiceAssignment ? (
         <Card
           as="section"
-          className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+          id="zamestnanci-u-sluzeb"
+          className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         >
           <ServiceEmployeesManager
             services={assignments.services}

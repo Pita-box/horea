@@ -1,9 +1,9 @@
 import { Logo } from '@/components/Logo';
 import { Card } from '@/components/ui/card';
-import { serverLog } from '@/lib/log-server';
 import { createClient } from '@/lib/supabase/server';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { ResetPasswordForm } from './ResetPasswordForm';
 
@@ -11,6 +11,7 @@ type ResetPasswordSearchParams = {
   code?: string | string[];
   token_hash?: string | string[];
   type?: string | string[];
+  error?: string | string[];
 };
 
 type ResetPasswordPageProps = {
@@ -30,39 +31,6 @@ function getParam(value: string | string[] | undefined): string | null {
   }
 
   return value ?? null;
-}
-
-async function establishRecoverySession(params: ResetPasswordSearchParams): Promise<boolean> {
-  const tokenHash = getParam(params.token_hash);
-  const type = getParam(params.type);
-
-  if (tokenHash && type === 'recovery') {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' });
-
-    if (error) {
-      await serverLog.warn('reset_password_verify_otp_failed', { error });
-      return false;
-    }
-
-    return true;
-  }
-
-  // Zpětná kompatibilita se staršími odkazy s parametrem `?code=`.
-  const code = getParam(params.code);
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (error) {
-      await serverLog.warn('reset_password_code_exchange_failed', { error });
-      return false;
-    }
-
-    return true;
-  }
-
-  return false;
 }
 
 function ResetLayout({
@@ -100,9 +68,35 @@ function ResetLayout({
 
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
   const params = await searchParams;
-  const isValidSession = await establishRecoverySession(params);
 
-  if (!isValidSession) {
+  // Verifikaci recovery tokenu řeší Route Handler /auth/confirm (umí zapsat
+  // cookies a nejdřív odhlásí případnou jinou session). Odkazy mířící sem
+  // s tokenem (např. starší e-maily) tam přesměrujeme se zachováním parametrů.
+  const tokenHash = getParam(params.token_hash);
+  const type = getParam(params.type);
+  const code = getParam(params.code);
+
+  if ((tokenHash && type) || code) {
+    const query = new URLSearchParams();
+    if (tokenHash) {
+      query.set('token_hash', tokenHash);
+    }
+    if (type) {
+      query.set('type', type);
+    }
+    if (code) {
+      query.set('code', code);
+    }
+    redirect(`/auth/confirm?${query.toString()}`);
+  }
+
+  // Bez tokenu rozhoduje existence recovery session (nastavené /auth/confirm).
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return (
       <ResetLayout
         title="Odkaz nefunguje"

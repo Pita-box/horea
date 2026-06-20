@@ -6,7 +6,9 @@ import {
   SubscriptionStatusCard,
   type SubscriptionStatus,
 } from '@/components/subscription/SubscriptionStatusCard';
+import { PlanCards } from '@/components/subscription/PlanCards';
 import type { SubscriptionPlan } from '@/lib/checkout/pricing';
+import { loadPlanFeatureMatrix } from '@/lib/plans/feature-matrix';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -49,11 +51,14 @@ export default async function AccountPage() {
         .maybeSingle<SubscriptionRow>()
     : { data: null };
 
+  const matrix = await loadPlanFeatureMatrix(admin);
+
   return (
     <div className="flex flex-col gap-6">
       <Card
         as="section"
-        className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+        id="prihlasovaci-udaje"
+        className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
       >
         <AccountCredentialsForm initialEmail={user.email ?? ''} />
       </Card>
@@ -69,16 +74,43 @@ export default async function AccountPage() {
 
           <Card
             as="section"
-            className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+            id="zmena-tarifu"
+            className="scroll-mt-20 flex flex-col gap-[var(--spacing-16)] border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
           >
-            <SubscriptionManager
+            <div className="space-y-1">
+              <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
+                Změna tarifu
+              </h2>
+              <p className="text-sm leading-6 text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]">
+                Vyberte tarif a pokračujte k platbě. Aktuální tarif je zvýrazněný.
+              </p>
+            </div>
+
+            <PlanCards
+              currentPlan={subscription.plan}
               status={subscription.status}
-              plan={subscription.plan}
-              autoRenew={subscription.auto_renew}
-              pendingPlanChange={subscription.pending_plan_change}
-              initialPlan={null}
+              periodEnd={subscription.current_period_end}
+              matrix={matrix}
             />
           </Card>
+
+          {subscription.status === 'active' || subscription.status === 'grace_period' ? (
+            <Card
+              as="section"
+              className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+            >
+              {/* Změnu tarifu řeší karty výše; zde zůstává automatická obnova
+                  a případné zrušení čekající změny tarifu (showPlanChange=false). */}
+              <SubscriptionManager
+                status={subscription.status}
+                plan={subscription.plan}
+                autoRenew={subscription.auto_renew}
+                pendingPlanChange={subscription.pending_plan_change}
+                initialPlan={null}
+                showPlanChange={false}
+              />
+            </Card>
+          ) : null}
         </>
       ) : (
         <Notice role="status" variant="neutral">

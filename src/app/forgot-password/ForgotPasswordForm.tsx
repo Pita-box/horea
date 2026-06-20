@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
-import { useState, useTransition, type FormEvent } from 'react';
+import { useRef, useState, useTransition, type FormEvent } from 'react';
 
 import { forgotPasswordAction } from './actions';
 import { INITIAL_FORGOT_PASSWORD_STATE, type ForgotPasswordState } from './state';
@@ -11,18 +11,29 @@ import { INITIAL_FORGOT_PASSWORD_STATE, type ForgotPasswordState } from './state
 export function ForgotPasswordForm() {
   const [state, setState] = useState<ForgotPasswordState>(INITIAL_FORGOT_PASSWORD_STATE);
   const [isPending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  function submit() {
+    const form = formRef.current;
+    if (!form) {
+      return;
+    }
+    const formData = new FormData(form);
 
     startTransition(() => {
       void forgotPasswordAction(formData).then(setState);
     });
   }
 
+  // Odeslání přes Enter v poli — zabráníme nativnímu submitu (ten je v
+  // sandboxovaném rámci bez `allow-forms` blokován) a zpracujeme přes JS.
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submit();
+  }
+
   return (
-    <form className="w-full space-y-5 text-left" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="w-full space-y-5 text-left" onSubmit={handleSubmit} noValidate>
       {state.message ? <Notice role="status">{state.message}</Notice> : null}
 
       <label className="block text-sm font-semibold text-[var(--color-slate-text)]">
@@ -44,7 +55,7 @@ export function ForgotPasswordForm() {
         ) : null}
       </label>
 
-      <Button className="w-full" type="submit" disabled={isPending}>
+      <Button className="w-full" type="button" onClick={submit} disabled={isPending}>
         {isPending ? 'Odesílám...' : 'Odeslat odkaz'}
       </Button>
     </form>

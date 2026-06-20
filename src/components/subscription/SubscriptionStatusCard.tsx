@@ -27,6 +27,7 @@ type SubscriptionStatusCardProps = {
   plan: SubscriptionPlan | null;
   periodStart: string | null;
   periodEnd: string | null;
+  id?: string;
 };
 
 /**
@@ -38,9 +39,19 @@ export function SubscriptionStatusCard({
   plan,
   periodStart,
   periodEnd,
+  id,
 }: SubscriptionStatusCardProps) {
   return (
-    <Card as="section" className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]">
+    <Card
+      as="section"
+      id={id}
+      className={[
+        'border border-[var(--color-border-vychozi)] p-[var(--card-padding)]',
+        id ? 'scroll-mt-20' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <dl className="grid gap-[var(--spacing-16)] sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1">
           <dt className="text-sm font-medium text-[var(--color-slate-text)]">Stav</dt>

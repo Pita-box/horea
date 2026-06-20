@@ -69,13 +69,13 @@ describe('forgotPasswordAction', () => {
     expect(generateLinkMock).toHaveBeenCalledWith({
       type: 'recovery',
       email: 'existuje@example.cz',
-      options: { redirectTo: 'https://horea.test/reset-password' },
+      options: { redirectTo: 'https://horea.test/auth/confirm' },
     });
 
     const sendArgs = sendEmailMock.mock.calls[0][0];
     expect(sendArgs.subject).toBe('Obnovení hesla — Horea');
     expect(sendArgs.text).toContain(
-      'https://horea.test/reset-password?token_hash=reset-tok&type=recovery',
+      'https://horea.test/auth/confirm?token_hash=reset-tok&type=recovery',
     );
   });
 

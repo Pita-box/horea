@@ -4,6 +4,7 @@ import { useState, useTransition, type FormEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { Notice } from '@/components/ui/notice';
 import { useToast } from '@/components/ui/toast';
 
@@ -113,10 +114,9 @@ export function AccountCredentialsForm({ initialEmail }: AccountCredentialsFormP
             <label className="block text-sm font-semibold" htmlFor="account-password">
               Nové heslo
             </label>
-            <Input
+            <PasswordInput
               id="account-password"
               name="password"
-              type="password"
               autoComplete="new-password"
               disabled={isPasswordPending}
             />
@@ -125,10 +125,9 @@ export function AccountCredentialsForm({ initialEmail }: AccountCredentialsFormP
             <label className="block text-sm font-semibold" htmlFor="account-password-confirm">
               Heslo znovu
             </label>
-            <Input
+            <PasswordInput
               id="account-password-confirm"
               name="passwordConfirm"
-              type="password"
               autoComplete="new-password"
               disabled={isPasswordPending}
             />

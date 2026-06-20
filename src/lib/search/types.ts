@@ -3,7 +3,7 @@
  * skládají z více zdrojů (statický index nastavení/FAQ + dynamičtí klienti z DB).
  * Do budoucna lze přidat další skupiny (rezervace, faktury, …) bez změny UI.
  */
-export type SearchGroup = 'settings' | 'clients' | 'faq';
+export type SearchGroup = 'settings' | 'sections' | 'clients' | 'faq';
 
 export type SearchResult = {
   id: string;
@@ -20,6 +20,7 @@ export type ClientSearchResponse =
 
 export const SEARCH_GROUP_LABELS: Record<SearchGroup, string> = {
   settings: 'Nastavení',
+  sections: 'Sekce',
   clients: 'Klienti',
   faq: 'Nápověda',
 };

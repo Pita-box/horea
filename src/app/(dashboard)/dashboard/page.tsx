@@ -242,7 +242,7 @@ function DashboardShell({
   {
   return (
     
-    <div className="ahoj flex flex-col gap-[var(--section-gap)]">hej
+    <div className="ahoj flex flex-col gap-[var(--section-gap)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]">
           Přihlášený účet: {email}

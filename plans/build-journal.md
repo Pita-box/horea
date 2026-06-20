@@ -2,6 +2,54 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-20 — dashboard-fulltext-search: finální checkpoint (Task 8) + souhrn feature
+
+### Nové funkce (souhrn dokončené feature)
+- **Index obsahu** (`src/lib/search/content-index.ts`) — deklarativní registr `CONTENT_INDEX` klíčovaný cestou stránky (settings, services, reservations, clients, opening-hours, subscription, plans, analytics, employees, faq, account) s typy `SectionRecord`/`ContentIndex`. Čistá funkce `searchContentIndex(query)` lokálně porovnává normalizovaný dotaz proti nadpisu/popisu a vrací výsledky skupiny `sections` s `href` ve tvaru `cesta#anchor`.
+- **Agregace + helpery** (`src/lib/search/search-aggregate.ts`) — `aggregateResults` (pořadí skupin settings → sections → clients → faq, ořez sekcí na `SECTION_RESULT_LIMIT = 6`, skrývání prázdných skupin, zachování `locked` u clients), `flattenResults` (plochý seznam pro klávesovou navigaci), `safeNormalize` (idempotentní, fallback na raw text), `shouldSearch` a `resolveActivation`. Sdílené typy v `src/lib/search/types.ts` rozšířeny o skupinu `sections` (`SEARCH_GROUP_LABELS.sections = 'Sekce'`).
+- **Odscrollování na sekci** (`src/components/dashboard/ScrollToHashOnLoad.tsx`) — klientská komponenta reagující na `usePathname`/`hashchange`: najde element dle `location.hash`, `scrollIntoView` (respekt `prefers-reduced-motion`), nastaví fokus pro čtečky a přechodné zvýraznění; chybějící kotva tiše bez chyby. CSS třída `.search-target-highlight` v `globals.css`. Zapojeno v owner shellu (`DashboardChrome.tsx`).
+- **Kotvy sekcí** — aditivní `id` (+ `scroll-mt`) odpovídající `CONTENT_INDEX` doplněny napříč stránkami dashboardu (settings, opening-hours, services, reservations, clients, subscription, plans, analytics, employees, faq, account).
+- **DashboardSearch** (`src/components/dashboard/DashboardSearch.tsx`) — přidán lokální zdroj sekcí, seskupení přes `aggregateResults`, plná klávesová navigace (ArrowUp/Down s wrap-around, Enter = klik) a ARIA (`aria-activedescendant`, `role="option"`, `aria-selected`). Výběr sekce naviguje na `cesta#anchor` a zavírá panel.
+
+### Verifikace (Task 8 finální checkpoint)
+- `pnpm lint` čistý (exit 0).
+- `pnpm test:run` → 541 passed / 57 skipped (104 test files passed / 23 skipped).
+- `pnpm build` OK na první pokus (39/39 stránek, žádná prerender chyba na `/dashboard/reservations`). Benigní pre-existující CSS warning `.bg-[var(...)]` (nesouvisí s feature).
+- `get_diagnostics` na klíčových souborech (DashboardSearch, DashboardChrome, ScrollToHashOnLoad, content-index, search-aggregate, types) bez nálezů.
+
+## 2026-06-16 — dashboard-fulltext-search: integrace sekcí + klávesová navigace v DashboardSearch (Task 6.1)
+
+### Nové funkce
+- `DashboardSearch.tsx` rozšířen o lokální zdroj sekcí: `searchContentIndex(trimmed)` → skupina `sections` (R1, R13.1).
+- Ad-hoc seskupení nahrazeno čistou `aggregateResults(...)` + iterací přes `RenderGroup[]`; stav klientů mapován do `ClientsState` (`locked` → hláška o vyšším tarifu, `results`/`idle`). Skrývání prázdných skupin a limit sekcí (≤6) řeší agregace (R3, R13.2).
+- Klávesová navigace (R11): stav `activeIndex` nad `flattenResults(groups)`, ArrowDown/ArrowUp s wrap-around (preventDefault), Enter → `resolveActivation` → `router.push(href)` + zavření panelu; reset na -1 při změně výsledků.
+- ARIA: `aria-activedescendant` na inputu, každá `<li>` má `role="option"`, stabilní `id` `${panelId}-opt-${flatIndex}` a `aria-selected`; aktivní položka zvýrazněna `bg-[var(--color-soft-gray-fill)]`. Plochý index se počítá průběžným počítadlem v pořadí render skupin (settings → sekce → klienti → faq), shodném s `flattenResults`.
+
+### Verifikace
+- `pnpm lint` čistý; `get_diagnostics` na `DashboardSearch.tsx` bez chyb.
+
+## 2026-06-16 — dashboard-fulltext-search: id kotvy employees/faq/account (Task 5.4)
+
+### Nové funkce
+- Přidány `id` + `scroll-mt-20` na sekční wrappery, aby odpovídaly kotvám v `CONTENT_INDEX`:
+  - `/dashboard/employees` (`page.tsx`): `id="zamestnanci"` na Card s `EmployeesManager`; `id="zamestnanci-u-sluzeb"` na Card s `ServiceEmployeesManager`.
+  - `TopEmployees.tsx`: `id="top-zamestnanci"` na vnitřní `Card as="section"`.
+  - `/dashboard/faq` (`page.tsx`): `id="caste-dotazy"` na Card s `FaqAccordion`.
+  - `/dashboard/account` (`page.tsx`): `id="prihlasovaci-udaje"` na Card s `AccountCredentialsForm`.
+- Surgical/aditivní — pouze `id` a `scroll-mt-20`, žádná změna chování.
+
+### Verifikace
+- `pnpm lint` čistý; `get_diagnostics` na editovaných souborech bez chyb.
+
+## 2026-06-16 — dashboard-fulltext-search: odscrollování na sekci (Task 4.1)
+
+### Nové funkce
+- `ScrollToHashOnLoad` (`src/components/dashboard/ScrollToHashOnLoad.tsx`) — klientská komponenta (vrací `null`), která po vykreslení/změně cesty (`usePathname`) a na `hashchange` najde element dle `location.hash`, odscrolluje ho (`scrollIntoView`, behavior dle `prefers-reduced-motion`), nastaví fokus pro čtečky (dočasný `tabindex=-1`) a přidá přechodné zvýraznění. Chybějící kotva → tiše bez chyby (R4.2–R4.5). Montuje se v owner dashboard shellu v pozdějším tasku.
+- CSS třída `.search-target-highlight` (`src/app/globals.css`) — subtilní outline v `--color-action-violet`, bez layout shiftu.
+
+### Verifikace
+- `pnpm lint` čistý; `get_diagnostics` na nové komponentě bez chyb.
+
 ## 2026-06-16 — Analytika TOP klienti: párování proti tabulce clients (oprava falešných „klientů")
 
 ### Bug & fix
@@ -2441,3 +2489,63 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 
 ### Pozn.
 - `engine-strict` není zapnutý (žádný `.npmrc`), takže pnpm pod nevyhovujícím Node jen varuje, neblokuje. Produkce/CI běží dle `.nvmrc`/`engines`.
+
+## 2026-06-20 — Účet: „Změna tarifu" kartově (sdílená komponenta PlanCards)
+
+### Nové funkce
+- Nová sdílená komponenta `src/components/subscription/PlanCards.tsx` — mřížka karet tarifů (Start/Pokročilý/Max) s cenou, feature listem, zvýrazněným aktuálním tarifem („Váš aktuální tarif", jen když je předplatné aktivní/ne-free) a CTA „Upgradovat/Zvolit tarif" prokliknutím na `/dashboard/subscription?plan=…` (→ platba). Extrahováno 1:1 z `/dashboard/plans`.
+- `/dashboard/plans` přepnut na `<PlanCards>` (odstraněn inline grid + nepoužité helpery `getCta`, `currency`, `renewalDate`, `PLAN_TAGLINES`, `planPriceCzk`, `Link`). Porovnávací tabulka zůstává.
+- `/dashboard/account` sekce „Změna tarifu" (`id="zmena-tarifu"`) nově zobrazuje `<PlanCards>` místo select-based `SubscriptionManager`. Mirror layoutu `/dashboard/plans` (status karta + karty tarifů). Žádná změna platební logiky — CTA vede na stávající checkout/plan-change flow na `/dashboard/subscription`.
+
+### Pozn.
+- Na účtu tím zmizel select + správa automatické obnovy / čekající změny tarifu (ty zůstávají na dedikované stránce `/dashboard/subscription`, kam karty odkazují).
+- DOPLNĚNO: `SubscriptionManager` dostal prop `showPlanChange` (default true). Na `/dashboard/account` se pod kartami vykresluje s `showPlanChange={false}` (jen pro active/grace) → zůstává „Automatická obnova" + případné „Zrušit změnu tarifu", select-based změna tarifu skrytá (řeší karty). `id="zmena-tarifu"` na sekci jen když `showPlanChange` (na účtu nese kotvu kartová sekce).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK (39/39, jen pre-existující CSS warning).
+
+## 2026-06-20 — Reset hesla: blokovaný submit v sandboxovaném rámci
+
+### Bug & fix
+- **Symptom:** Na `/reset-password?...&type=recovery` klik na „Změnit heslo" nic neudělal; konzole: „Blocked form submission to '' because the form's frame is sandboxed and the 'allow-forms' permission is not set."
+- **Root cause:** Tlačítko bylo `type="submit"` ve `<form>`. V sandboxovaném rámci (preview iframe bez `allow-forms`) prohlížeč blokuje nativní odeslání formuláře (na prázdnou akci) — k němu dojde, když klik proběhne dřív než React hydratace stihne navázat `onSubmit` s `preventDefault`.
+- **Fix:** `ResetPasswordForm.tsx` — tlačítko změněno na `type="button"` s `onClick={submit}`; submit čte data přes `formRef` a volá `resetPasswordAction`. `onSubmit` na formuláři zůstává (Enter v poli) a vždy `preventDefault`uje. Tím se primární akce nikdy nespoléhá na nativní submit, takže sandbox ji neblokuje.
+
+### Verifikace
+- `pnpm lint` čistý; get_diagnostics bez nálezů.
+
+## 2026-06-20 — Reset hesla: verifikace v Route Handleru + odhlášení cizí session (záměna účtů)
+
+### Bug & fix
+- **Symptom:** Přihlášen účet A; v anonymním okně vyžádán reset pro účet B; B-čkový recovery odkaz vložen do okna s přihlášeným A → reset se přesto provedl a konzole hlásila chybu (blokovaný zápis cookies).
+- **Root cause:** Recovery token se verifikoval (`verifyOtp`) přímo v Server Componentě `/reset-password`. Server Componenta neumí v Next 15 zapsat cookies (`setAll` je v try/catch spolknut), takže session vlastníka odkazu (B) se neuložila a `resetPasswordAction` pak pracoval nad zbylou session (A) → změna hesla špatnému účtu + console error ze zápisu cookies.
+- **Fix:**
+  - Nový Route Handler `src/app/auth/confirm/route.ts` (GET) — verifikuje OTP/recovery (umí zapsat session cookies) a **před verifikací odhlásí případnou existující session** (`signOut({ scope: 'local' })`), takže obnova proběhne čistě pro vlastníka odkazu; úspěch → redirect `/reset-password`, neúspěch → `/reset-password?error=invalid_link`.
+  - `forgot-password/actions.ts`: recovery odkaz nově míří na `/auth/confirm` (místo `/reset-password`).
+  - `reset-password/page.tsx`: už neprovádí `verifyOtp`; odkazy s tokenem (i starší) přesměruje na `/auth/confirm`; bez tokenu zobrazí formulář jen při existující session, jinak „Odkaz nefunguje".
+  - Aktualizován test `forgot-password/__tests__/actions.test.ts` (redirectTo + URL na `/auth/confirm`).
+
+### Verifikace
+- `pnpm exec vitest run forgot-password` → 3 passed; `pnpm lint` čistý; `pnpm build` OK (nová route `/auth/confirm`).
+
+## 2026-06-20 — Auth formuláře: odstranění nativního submitu (sandbox „allow-forms")
+
+### Bug & fix
+- **Symptom:** Na `/forgot-password` (a stejně i login/register) konzole hlásila „Blocked form submission to '' because the form's frame is sandboxed and the 'allow-forms' permission is not set." Ostatní hlášky v logu (Bitwarden SDK, SignalR, „allow-scripts", fido2, back/forward cache) jsou šum z rozšíření prohlížeče / sandboxovaného preview rámce, ne z appky.
+- **Root cause:** Tlačítka byla `type="submit"`; v sandboxovaném rámci (preview iframe bez `allow-forms`) prohlížeč blokuje nativní odeslání formuláře (na prázdnou akci), které proběhne dřív, než React naváže `onSubmit`/`preventDefault`.
+- **Fix:** Stejný vzor jako u reset-password — `ForgotPasswordForm`, `LoginForm`, `RegisterForm`: tlačítko `type="button"` + `onClick={submit}`, submit čte data přes `formRef`; `onSubmit` zůstává (Enter) a `preventDefault`uje. Primární akce už nikdy nespoléhá na nativní submit.
+
+### Verifikace
+- `pnpm exec vitest run` login/register/forgot/reset → 5 passed; `pnpm lint` čistý; diagnostics bez nálezů.
+
+## 2026-06-20 — Pole hesla: přepínač zobrazit/skrýt (IconEye / IconEyeOff)
+
+### Nové funkce
+- Nová UI komponenta `src/components/ui/PasswordInput.tsx` — obal nad `Input` s přepínacím tlačítkem (IconEye/IconEyeOff) pro zobrazit/skrýt heslo. Stejné API jako `Input` (kromě `type`), `className` jde na vnější obal (margins), input má rezervu vpravo na ikonu; tlačítko `tabIndex={-1}`, `aria-label`/`aria-pressed`.
+- Nasazeno ve všech polích hesla: `LoginForm` (heslo), `RegisterForm` (heslo, controlled), `ResetPasswordForm` (nové heslo + potvrzení), `AccountCredentialsForm` (nové heslo + potvrzení). Demo `app/components/page.tsx` ponecháno beze změny.
+
+### Pozn.
+- Auth flow předtím nefungoval jen kvůli rozšíření prohlížeče (Grammarly měnil DOM → rozbitá hydratace); v anonymním okně vše funguje. Žádná změna v appce kvůli tomu nebyla potřeba (kód ověřen render testem `ForgotPasswordForm.test.tsx`).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm exec vitest run` auth → 7 passed; `pnpm build` OK.

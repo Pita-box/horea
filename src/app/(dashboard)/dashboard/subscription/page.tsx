@@ -86,6 +86,7 @@ export default async function SubscriptionPage({ searchParams }: SubscriptionPag
             plan={subscription.plan}
             periodStart={subscription.current_period_start}
             periodEnd={subscription.current_period_end}
+            id="stav-predplatneho"
           />
 
           <Card

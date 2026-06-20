@@ -3,9 +3,10 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { Notice } from '@/components/ui/notice';
 import { ResendVerificationForm } from '@/app/verify-email/ResendVerificationForm';
-import { useState, useTransition, type FormEvent } from 'react';
+import { useRef, useState, useTransition, type FormEvent } from 'react';
 
 import { loginAction } from './actions';
 import { INITIAL_LOGIN_STATE, type LoginActionState } from './state';
@@ -13,19 +14,30 @@ import { INITIAL_LOGIN_STATE, type LoginActionState } from './state';
 export function LoginForm() {
   const [state, setState] = useState<LoginActionState>(INITIAL_LOGIN_STATE);
   const [isPending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  function submit() {
+    const form = formRef.current;
+    if (!form) {
+      return;
+    }
+    const formData = new FormData(form);
 
     startTransition(() => {
       void loginAction(formData).then(setState);
     });
   }
 
+  // Odeslání přes Enter v poli — zabráníme nativnímu submitu (ten je v
+  // sandboxovaném rámci bez `allow-forms` blokován) a zpracujeme přes JS.
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submit();
+  }
+
   return (
     <div className="space-y-6">
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form ref={formRef} className="space-y-5" onSubmit={handleSubmit} noValidate>
         {state.message ? (
           <Notice role="alert" variant="error">
             {state.message}
@@ -53,10 +65,9 @@ export function LoginForm() {
 
         <label className="block text-sm font-semibold text-[var(--color-slate-text)]">
           Heslo
-          <Input
+          <PasswordInput
             className="mt-2"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
             aria-invalid={Boolean(state.fieldErrors.password)}
@@ -70,7 +81,7 @@ export function LoginForm() {
           <span>Zůstat přihlášen</span>
         </label>
 
-        <Button className="w-full" type="submit" disabled={isPending}>
+        <Button className="w-full" type="button" onClick={submit} disabled={isPending}>
           {isPending ? 'Přihlašuji...' : 'Přihlásit se'}
         </Button>
       </form>

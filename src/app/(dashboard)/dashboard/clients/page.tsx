@@ -139,7 +139,7 @@ export default async function ClientsPage() {
   const result = await loadClients();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div id="seznam-klientu" className="flex flex-col gap-6 scroll-mt-20">
       <div className="flex justify-end">
         <Link
           className="text-sm font-medium text-[var(--color-action-violet)] hover:underline"

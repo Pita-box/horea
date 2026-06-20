@@ -43,7 +43,10 @@ const DASHBOARD_FAQ = [
 export default function DashboardFaqPage() {
   return (
     <div className="flex flex-col gap-[var(--section-gap)]">
-      <Card className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]">
+      <Card
+        id="caste-dotazy"
+        className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
+      >
         <FaqAccordion items={DASHBOARD_FAQ} />
       </Card>
     </div>

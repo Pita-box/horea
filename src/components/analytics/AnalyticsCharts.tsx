@@ -20,13 +20,23 @@ function SectionCard({
   title,
   info,
   children,
+  id,
 }: {
   title: string;
   info?: string;
   children: React.ReactNode;
+  id?: string;
 }) {
   return (
-    <Card className="flex flex-col gap-4 border border-[var(--color-border-vychozi)] p-[var(--spacing-24)]">
+    <Card
+      id={id}
+      className={[
+        'flex flex-col gap-4 border border-[var(--color-border-vychozi)] p-[var(--spacing-24)]',
+        id ? 'scroll-mt-20' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div className="flex items-start justify-between gap-2">
         <h2 className="font-[var(--font-polysans)] text-base font-semibold text-[var(--color-rich-violet)]">
           {title}
@@ -49,7 +59,15 @@ const STATUS_SEGMENTS: { key: keyof StatusBreakdown; label: string; color: strin
   { key: 'upcoming', label: 'Naplánované', color: 'var(--color-action-violet)' },
 ];
 
-export function StatusDonut({ breakdown, info }: { breakdown: StatusBreakdown; info?: string }) {
+export function StatusDonut({
+  breakdown,
+  info,
+  id,
+}: {
+  breakdown: StatusBreakdown;
+  info?: string;
+  id?: string;
+}) {
   const total = STATUS_SEGMENTS.reduce((sum, segment) => sum + breakdown[segment.key], 0);
 
   let acc = 0;
@@ -61,7 +79,7 @@ export function StatusDonut({ breakdown, info }: { breakdown: StatusBreakdown; i
   });
 
   return (
-    <SectionCard title="Stav rezervací" info={info}>
+    <SectionCard title="Stav rezervací" info={info} id={id}>
       {total === 0 ? (
         <p className={`text-sm ${MUTED}`}>V tomto období nejsou žádné rezervace.</p>
       ) : (
@@ -102,7 +120,15 @@ export function StatusDonut({ breakdown, info }: { breakdown: StatusBreakdown; i
 // Heatmapa vytížení (den × hodina)
 // ---------------------------------------------------------------------------
 
-export function UtilizationHeatmap({ grid, info }: { grid: number[][]; info?: string }) {
+export function UtilizationHeatmap({
+  grid,
+  info,
+  id,
+}: {
+  grid: number[][];
+  info?: string;
+  id?: string;
+}) {
   // Zobrazujeme jen rozsah hodin s daty (rozšířený na 8–18 pro kontext).
   let minHour = 8;
   let maxHour = 18;
@@ -120,7 +146,7 @@ export function UtilizationHeatmap({ grid, info }: { grid: number[][]; info?: st
   const hours = Array.from({ length: maxHour - minHour }, (_, index) => minHour + index);
 
   return (
-    <SectionCard title="Špičky vytížení" info={info}>
+    <SectionCard title="Špičky vytížení" info={info} id={id}>
       {maxCount === 0 ? (
         <p className={`text-sm ${MUTED}`}>V tomto období nejsou žádné rezervace.</p>
       ) : (
@@ -183,7 +209,15 @@ export function UtilizationHeatmap({ grid, info }: { grid: number[][]; info?: st
 // Vývoj tržeb v čase
 // ---------------------------------------------------------------------------
 
-export function RevenueTrendChart({ points, info }: { points: RevenuePoint[]; info?: string }) {
+export function RevenueTrendChart({
+  points,
+  info,
+  id,
+}: {
+  points: RevenuePoint[];
+  info?: string;
+  id?: string;
+}) {
   const width = 720;
   const height = 200;
   const maxRevenue = Math.max(1, ...points.map((point) => point.revenue));
@@ -200,7 +234,7 @@ export function RevenueTrendChart({ points, info }: { points: RevenuePoint[]; in
   };
 
   return (
-    <SectionCard title="Vývoj tržeb v čase" info={info}>
+    <SectionCard title="Vývoj tržeb v čase" info={info} id={id}>
       <div className="flex items-baseline justify-between">
         <span className={`text-sm ${MUTED}`}>Tržby z uskutečněných rezervací</span>
         <span className="font-[var(--font-polysans)] text-lg font-semibold text-[var(--color-rich-violet)]">
@@ -262,14 +296,16 @@ export function RankingList({
   rows,
   emptyText,
   info,
+  id,
 }: {
   title: string;
   rows: RankingRow[];
   emptyText: string;
   info?: string;
+  id?: string;
 }) {
   return (
-    <SectionCard title={title} info={info}>
+    <SectionCard title={title} info={info} id={id}>
       {rows.length === 0 ? (
         <p className={`text-sm ${MUTED}`}>{emptyText}</p>
       ) : (
@@ -306,13 +342,13 @@ export function RankingList({
 // Noví vs. vracející se klienti
 // ---------------------------------------------------------------------------
 
-export function ClientMixCard({ mix, info }: { mix: ClientMix; info?: string }) {
+export function ClientMixCard({ mix, info, id }: { mix: ClientMix; info?: string; id?: string }) {
   const total = mix.newClients + mix.returningClients;
   const returningPct = total > 0 ? Math.round((mix.returningClients / total) * 100) : 0;
   const newPct = total > 0 ? 100 - returningPct : 0;
 
   return (
-    <SectionCard title="Noví vs. vracející se klienti" info={info}>
+    <SectionCard title="Noví vs. vracející se klienti" info={info} id={id}>
       {total === 0 ? (
         <p className={`text-sm ${MUTED}`}>V tomto období nejsou žádní klienti.</p>
       ) : (

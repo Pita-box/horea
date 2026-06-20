@@ -35,6 +35,12 @@ type SubscriptionManagerProps = {
   pendingPlanChange: SubscriptionPlan | null;
   /** Předvybraný tarif (po příchodu z /dashboard/plans přes `?plan=`). */
   initialPlan?: SubscriptionPlan | null;
+  /**
+   * Zobrazit select-based změnu tarifu. Na `/dashboard/account` je `false` —
+   * změnu tarifu tam řeší kartová mřížka (PlanCards), takže se nechá jen
+   * automatická obnova a případné zrušení čekající změny.
+   */
+  showPlanChange?: boolean;
 };
 
 function formatPrice(plan: SubscriptionPlan): string {
@@ -47,6 +53,7 @@ export function SubscriptionManager({
   plan,
   status,
   initialPlan = null,
+  showPlanChange = true,
 }: SubscriptionManagerProps) {
   if (status === 'free') {
     return <CheckoutSection initialPlan={initialPlan} />;
@@ -60,6 +67,7 @@ export function SubscriptionManager({
         autoRenew={autoRenew}
         pendingPlanChange={pendingPlanChange}
         initialPlan={initialPlan}
+        showPlanChange={showPlanChange}
       />
     );
   }
@@ -234,6 +242,7 @@ function ManageSection({
   plan,
   status,
   initialPlan = null,
+  showPlanChange = true,
 }: SubscriptionManagerProps) {
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
@@ -282,7 +291,10 @@ function ManageSection({
       ) : null}
 
       {canManage ? (
-        <section className="space-y-[var(--spacing-12)] border-b border-[var(--color-border-vychozi)] pb-[var(--spacing-24)]">
+        <section
+          id="automaticka-obnova"
+          className="scroll-mt-20 space-y-[var(--spacing-12)] border-b border-[var(--color-border-vychozi)] pb-[var(--spacing-24)]"
+        >
           <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
             Automatická obnova
           </h2>
@@ -314,9 +326,14 @@ function ManageSection({
         </section>
       ) : null}
 
-      {canManage ? (
-        <section className="space-y-[var(--spacing-12)]">
-          <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">Změna tarifu</h2>
+      {canManage && (showPlanChange || pendingPlanChange) ? (
+        <section
+          {...(showPlanChange ? { id: 'zmena-tarifu' } : {})}
+          className="scroll-mt-20 space-y-[var(--spacing-12)]"
+        >
+          {showPlanChange ? (
+            <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">Změna tarifu</h2>
+          ) : null}
 
           {pendingPlanChange ? (
             <div className="space-y-[var(--spacing-12)] rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] bg-[var(--color-soft-gray-fill)] p-[var(--spacing-16)]">
@@ -337,7 +354,7 @@ function ManageSection({
                 {isPending ? 'Ukládám...' : 'Zrušit změnu tarifu'}
               </Button>
             </div>
-          ) : planChangeOptions.length > 0 ? (
+          ) : showPlanChange && planChangeOptions.length > 0 ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <select
                 aria-label="Cílový tarif"
@@ -361,9 +378,11 @@ function ManageSection({
               </Button>
             </div>
           ) : null}
-          <p className="text-sm leading-6 text-[var(--color-slate-text)]">
-            Změna tarifu se uplatní až od dalšího období, bez poměrného doúčtování.
-          </p>
+          {showPlanChange ? (
+            <p className="text-sm leading-6 text-[var(--color-slate-text)]">
+              Změna tarifu se uplatní až od dalšího období, bez poměrného doúčtování.
+            </p>
+          ) : null}
         </section>
       ) : null}
     </div>

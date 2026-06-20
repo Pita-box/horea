@@ -65,8 +65,16 @@ export async function resetPasswordAction(formData: FormData): Promise<ResetPass
     return systemErrorState();
   }
 
+  // Po změně hesla odhlásíme VŠECHNY relace účtu (global revoke). Použijeme
+  // aktuální access token — `updateUser` mohl session zrotovat, takže původní
+  // token už nemusí být platný pro admin signOut.
+  const {
+    data: { session: freshSession },
+  } = await supabase.auth.getSession();
+  const accessToken = freshSession?.access_token ?? session.access_token;
+
   try {
-    await logoutAllSessions(session.access_token);
+    await logoutAllSessions(accessToken);
   } catch (error) {
     await serverLog.error('reset_password_logout_all_failed', { error });
     await supabase.auth.signOut();

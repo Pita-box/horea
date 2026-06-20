@@ -23,6 +23,7 @@ import { ToastProvider } from '@/components/ui/toast';
 import { DashboardFooter } from './DashboardFooter';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardSidebar, type DashboardNavItem } from './DashboardSidebar';
+import { ScrollToHashOnLoad } from './ScrollToHashOnLoad';
 
 export type DashboardVariant = 'owner' | 'admin';
 
@@ -117,6 +118,8 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
 
   return (
     <ToastProvider>
+      {/* Owner shell: po načtení odscrolluje na #hash kotvu z fulltextu (R12.1/R12.2). */}
+      {variant === 'owner' ? <ScrollToHashOnLoad /> : null}
       <div className="flex h-screen overflow-hidden bg-[var(--color-milky-gray)] text-[var(--color-slate-text)]">
         {/* Desktop sidebar */}
         <aside

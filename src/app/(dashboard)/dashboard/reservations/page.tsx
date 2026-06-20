@@ -414,7 +414,7 @@ function ReservationsShell({
   children,
 }: ReservationsShellProps) {
   return (
-    <div className="flex flex-col gap-6">
+    <div id="prehled-rezervaci" className="flex flex-col gap-6 scroll-mt-20">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Link
           className="text-sm font-medium text-[var(--color-action-violet)] hover:underline"
