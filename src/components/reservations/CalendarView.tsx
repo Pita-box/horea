@@ -359,7 +359,7 @@ export function CalendarView({
       <div className="flex flex-col gap-6">
         <MiniMonth anchor={anchor} days={days} mode={mode} filters={filters} today={today} />
         <NextEventCard reservations={reservations} />
-        <FilterBar filters={filters} services={services} />
+        <FilterBar filters={filters} services={services} showDateRange={false} />
       </div>
 
       {/* Pravý sloup: hlavička + časová mřížka. */}

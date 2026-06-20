@@ -18,6 +18,8 @@ import type { ServiceOption } from '@/lib/reservations/types';
 type FilterBarProps = {
   filters: ReservationFilters;
   services: ServiceOption[];
+  /** Zobrazit filtr časového rozsahu (od–do). V kalendáři se vypíná. */
+  showDateRange?: boolean;
 };
 
 /**
@@ -29,7 +31,7 @@ type FilterBarProps = {
  * o průnik se stará dotaz na serveru (R3.5). Změna jakéhokoli filtru vrací
  * stránkování na první stránku.
  */
-export function FilterBar({ filters, services }: FilterBarProps) {
+export function FilterBar({ filters, services, showDateRange = true }: FilterBarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -111,36 +113,38 @@ export function FilterBar({ filters, services }: FilterBarProps) {
         </fieldset>
       ) : null}
 
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-semibold text-[var(--color-rich-violet)]">
-          Časový rozsah
-        </legend>
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]">
-            <span>Od</span>
-            <Input
-              type="date"
-              value={filters.from ?? ''}
-              max={filters.to ?? undefined}
-              onChange={(event) => apply({ from: event.target.value || null })}
-              className="w-auto"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]">
-            <span>Do</span>
-            <Input
-              type="date"
-              value={filters.to ?? ''}
-              min={filters.from ?? undefined}
-              onChange={(event) => apply({ to: event.target.value || null })}
-              className="w-auto"
-            />
-          </label>
-        </div>
-        <p className="text-xs leading-5 text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]">
-          Zvolený rozsah přepíše výchozí zobrazení pouze budoucích rezervací.
-        </p>
-      </fieldset>
+      {showDateRange ? (
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-semibold text-[var(--color-rich-violet)]">
+            Časový rozsah
+          </legend>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]">
+              <span>Od</span>
+              <Input
+                type="date"
+                value={filters.from ?? ''}
+                max={filters.to ?? undefined}
+                onChange={(event) => apply({ from: event.target.value || null })}
+                className="w-auto"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]">
+              <span>Do</span>
+              <Input
+                type="date"
+                value={filters.to ?? ''}
+                min={filters.from ?? undefined}
+                onChange={(event) => apply({ to: event.target.value || null })}
+                className="w-auto"
+              />
+            </label>
+          </div>
+          <p className="text-xs leading-5 text-[color-mix(in_srgb,var(--color-slate-text)_65%,white)]">
+            Zvolený rozsah přepíše výchozí zobrazení pouze budoucích rezervací.
+          </p>
+        </fieldset>
+      ) : null}
 
       {hasActiveFilters() ? (
         <div className="flex justify-end">
