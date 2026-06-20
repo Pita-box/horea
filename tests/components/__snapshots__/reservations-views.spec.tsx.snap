@@ -549,16 +549,12 @@ exports[`CalendarView (R4.5, R4.6) > vizuálně odliší rejected/cancelled od a
             </label>
           </div>
         </fieldset>
-        <div
-          class="flex justify-end"
+        <button
+          class="inline-flex h-10 items-center justify-center text-sm font-normal leading-none transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] bg-transparent px-5 py-0 text-[var(--color-slate-text)] hover:bg-[var(--color-light-violet)] focus-visible:outline-[var(--color-cloud-mist)] w-full"
+          type="button"
         >
-          <button
-            class="inline-flex h-10 items-center justify-center text-sm font-normal leading-none transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] bg-transparent px-5 py-0 text-[var(--color-slate-text)] hover:bg-[var(--color-light-violet)] focus-visible:outline-[var(--color-cloud-mist)]"
-            type="button"
-          >
-            Zrušit filtry
-          </button>
-        </div>
+          Zrušit filtry
+        </button>
       </div>
     </div>
     <div

@@ -147,17 +147,14 @@ export function FilterBar({ filters, services, showDateRange = true }: FilterBar
       ) : null}
 
       {hasActiveFilters() ? (
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() =>
-              router.push(pathname)
-            }
-          >
-            Zrušit filtry
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full"
+          onClick={() => router.push(pathname)}
+        >
+          Zrušit filtry
+        </Button>
       ) : null}
     </Card>
   );
