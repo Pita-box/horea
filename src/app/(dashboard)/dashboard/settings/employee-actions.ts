@@ -5,11 +5,7 @@ import 'server-only';
 import { revalidatePublicPage } from '@/lib/revalidate';
 import { fromPragueInput } from '@/lib/datetime';
 import { todayPragueDate } from '@/lib/reservations/calendar';
-import {
-  buildMonthGrid,
-  openMinutesByWeekday,
-  pragueWeekdayIndex,
-} from '@/lib/reservations/occupancy';
+import { buildMonthGrid } from '@/lib/reservations/occupancy';
 import { processImageToWebp } from '@/lib/media/process-image';
 import { r2DeleteObject, r2PublicUrl, r2PutObject } from '@/lib/storage/r2';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -384,7 +380,7 @@ export async function setServiceEmployeesAction(
   return { ok: true };
 }
 
-/** Položka žebříčku „TOP zaměstnanci" — efektivita dle obsazenosti tento měsíc. */
+/** Položka žebříčku „TOP zaměstnanci" — podíl na odvedené práci tento měsíc. */
 export type TopEmployee = {
   id: string;
   name: string;
@@ -392,8 +388,8 @@ export type TopEmployee = {
   serviceCount: number;
   /** Celkový rezervovaný čas v minutách (součet délek přiřazených rezervací). */
   totalMinutes: number;
-  /** Obsazenost v procentech = rezervovaný čas / otevírací doba měsíce (cap 100). */
-  occupancyPct: number;
+  /** Podíl na celkové odvedené práci = čas zaměstnance / čas rezervací všech zaměstnanců (%). */
+  sharePct: number;
 };
 
 export type TopEmployeesResult =
@@ -401,11 +397,13 @@ export type TopEmployeesResult =
   | { ok: false; message: string };
 
 /**
- * Žebříček zaměstnanců podle obsazenosti (efektivity) v AKTUÁLNÍM měsíci
- * (Europe/Prague). Obsazenost = součet délek aktivních rezervací (pending/approved)
- * přiřazených zaměstnanci / otevírací doba podniku za měsíc, v procentech (cap 100).
+ * Žebříček zaměstnanců podle PODÍLU NA ODVEDENÉ PRÁCI v AKTUÁLNÍM měsíci
+ * (Europe/Prague). Podíl = součet délek aktivních rezervací (pending/approved)
+ * přiřazených zaměstnanci / součet délek rezervací VŠECH zaměstnanců (%). Tedy
+ * ne ku otevírací době podniku, ale ku reálně odvedené práci celého týmu.
  * Přiřazení se čte z `reservation_employees` (více lidí na rezervaci) s fallbackem
- * na denormalizovaný `reservations.employee_id`. Řadí sestupně dle obsazenosti.
+ * na denormalizovaný `reservations.employee_id`. U rezervace s více lidmi se čas
+ * započítá každému z nich. Řadí sestupně dle podílu.
  */
 export async function getTopEmployees(): Promise<TopEmployeesResult> {
   const owner = await getOwnerBusiness();
@@ -420,7 +418,7 @@ export async function getTopEmployees(): Promise<TopEmployeesResult> {
   const fromIso = fromPragueInput(`${firstDay}T00:00:00`).toISOString();
   const toIso = fromPragueInput(`${lastDay}T23:59:59`).toISOString();
 
-  const [employeesRes, hoursRes, reservationsRes] = await Promise.all([
+  const [employeesRes, reservationsRes] = await Promise.all([
     admin
       .from('employees')
       .select('id,name')
@@ -428,11 +426,6 @@ export async function getTopEmployees(): Promise<TopEmployeesResult> {
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
       .returns<{ id: string; name: string }[]>(),
-    admin
-      .from('opening_hours')
-      .select('day_of_week,opens_at,closes_at')
-      .eq('business_id', owner.business.id)
-      .returns<{ day_of_week: number; opens_at: string; closes_at: string }[]>(),
     admin
       .from('reservations')
       .select('id,starts_at,ends_at,employee_id')
@@ -449,13 +442,6 @@ export async function getTopEmployees(): Promise<TopEmployeesResult> {
 
   const employees = employeesRes.data ?? [];
   const reservations = reservationsRes.data ?? [];
-
-  // Otevírací doba měsíce = součet otevřených minut přes všechny dny měsíce.
-  const openMin = openMinutesByWeekday(hoursRes.data ?? []);
-  const monthOpenMinutes = grid.monthDates.reduce(
-    (sum, dateISO) => sum + (openMin[pragueWeekdayIndex(dateISO)] ?? 0),
-    0,
-  );
 
   const reservationIds = reservations.map((r) => r.id);
 
@@ -515,22 +501,24 @@ export async function getTopEmployees(): Promise<TopEmployeesResult> {
     }
   }
 
+  const totalAssignedMinutes = [...aggregate.values()].reduce((sum, agg) => sum + agg.minutes, 0);
+
   const ranked: TopEmployee[] = employees
     .map((employee) => {
       const agg = aggregate.get(employee.id) ?? { minutes: 0, services: 0 };
-      const occupancyPct =
-        monthOpenMinutes > 0 ? Math.min(100, Math.round((agg.minutes / monthOpenMinutes) * 100)) : 0;
+      const sharePct =
+        totalAssignedMinutes > 0 ? Math.round((agg.minutes / totalAssignedMinutes) * 100) : 0;
       return {
         id: employee.id,
         name: employee.name,
         serviceCount: agg.services,
         totalMinutes: agg.minutes,
-        occupancyPct,
+        sharePct,
       };
     })
     .sort(
       (a, b) =>
-        b.occupancyPct - a.occupancyPct ||
+        b.sharePct - a.sharePct ||
         b.totalMinutes - a.totalMinutes ||
         a.name.localeCompare(b.name, 'cs'),
     );

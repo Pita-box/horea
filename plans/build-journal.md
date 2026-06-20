@@ -2,6 +2,14 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-16 — TOP zaměstnanci: metrika = podíl na odvedené práci (ne obsazenost)
+
+### Změna chování
+- `getTopEmployees` počítá `sharePct` = čas rezervací zaměstnance ÷ součet času rezervací VŠECH zaměstnanců (dříve ÷ otevírací doba podniku). Lépe vystihuje „kdo odvedl jakou část reálné práce týmu". Odstraněn dotaz na `opening_hours` i výpočet otevírací doby. Pole `occupancyPct` přejmenováno na `sharePct`; `TopEmployees.tsx` aktualizován (podtitulek, info tooltip s příkladem 10/50 h → 20 %).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK.
+
 ## 2026-06-16 — Sdílený DatePicker (rozbalovací kalendář) místo nativního `type="date"`
 
 ### Nové funkce

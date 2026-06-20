@@ -44,9 +44,9 @@ export function TopEmployees({ employees }: { employees: TopEmployee[] }) {
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-1">
           <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">TOP zaměstnanci</h2>
-          <p className={`text-sm ${MUTED}`}>Obsazenost tento měsíc dle přiřazení k rezervacím.</p>
+          <p className={`text-sm ${MUTED}`}>Podíl na odvedené práci tento měsíc.</p>
         </div>
-        <InfoTooltip text="Obsazenost = součet délek rezervací přiřazených danému zaměstnanci za tento měsíc děleno otevírací dobou podniku za měsíc (max 100 %). U rezervace s více zaměstnanci se čas započítá každému z nich." />
+        <InfoTooltip text="Podíl na odvedené práci = čas rezervací zaměstnance ÷ čas rezervací všech zaměstnanců tento měsíc. Např. Jana odbavila 10 h z celkových 50 h týmu → 20 %. U rezervace s více lidmi se čas započítá každému." />
       </div>
 
       {employees.length === 0 ? (
@@ -71,7 +71,7 @@ export function TopEmployees({ employees }: { employees: TopEmployee[] }) {
                 </div>
               </div>
               <span className="shrink-0 text-sm font-semibold text-[var(--color-action-violet)]">
-                {employee.occupancyPct} %
+                {employee.sharePct} %
               </span>
             </li>
           ))}
