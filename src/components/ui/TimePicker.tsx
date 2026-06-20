@@ -9,6 +9,8 @@ type TimePickerProps = {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  /** Text při prázdné hodnotě. */
+  placeholder?: string;
   'aria-label'?: string;
 };
 
@@ -29,6 +31,7 @@ export function TimePicker({
   value,
   onChange,
   disabled = false,
+  placeholder = 'Vyberte čas',
   'aria-label': ariaLabel,
 }: TimePickerProps) {
   const [open, setOpen] = useState(false);
@@ -107,7 +110,9 @@ export function TimePicker({
         onClick={() => setOpen((current) => !current)}
         className="flex w-full items-center justify-between gap-2 rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] bg-[var(--color-canvas-white)] px-[var(--input-padding-x)] py-[var(--input-padding-y)] text-base tabular-nums text-[var(--color-slate-text)] outline-none transition-colors hover:border-[var(--color-action-violet)] focus-visible:border-[var(--color-action-violet)] focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--color-action-violet)_18%,transparent)] disabled:opacity-50"
       >
-        <span>{value}</span>
+        <span className={value ? '' : 'text-[color-mix(in_srgb,var(--color-slate-text)_55%,white)]'}>
+          {value || placeholder}
+        </span>
         <IconClock
           size={18}
           stroke={2}
