@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/analytics/AnalyticsKpis';
 
 import type { TopEmployee } from '../settings/employee-actions';
 
@@ -40,9 +41,12 @@ export function TopEmployees({ employees }: { employees: TopEmployee[] }) {
       as="section"
       className="flex max-h-full flex-col border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
     >
-      <div className="space-y-1">
-        <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">TOP zaměstnanci</h2>
-        <p className={`text-sm ${MUTED}`}>Obsazenost tento měsíc dle přiřazení k rezervacím.</p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-1">
+          <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">TOP zaměstnanci</h2>
+          <p className={`text-sm ${MUTED}`}>Obsazenost tento měsíc dle přiřazení k rezervacím.</p>
+        </div>
+        <InfoTooltip text="Obsazenost = součet délek rezervací přiřazených danému zaměstnanci za tento měsíc děleno otevírací dobou podniku za měsíc (max 100 %). U rezervace s více zaměstnanci se čas započítá každému z nich." />
       </div>
 
       {employees.length === 0 ? (
