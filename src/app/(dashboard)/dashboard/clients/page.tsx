@@ -160,41 +160,53 @@ export default async function ClientsPage() {
             </p>
           </Card>
         ) : (
-          <Card className="overflow-hidden border border-[var(--color-border-vychozi)]">
-            <table className="w-full border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-[var(--color-border-vychozi)] text-[var(--color-rich-violet)]">
-                  <th className="px-4 py-3 font-semibold">Jméno</th>
-                  <th className="px-4 py-3 font-semibold">Telefon</th>
-                  <th className="px-4 py-3 font-semibold">E-mail</th>
-                  <th className="px-4 py-3 font-semibold">Počet rezervací</th>
-                  <th className="px-4 py-3 font-semibold">Poslední rezervace</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.clients.map((client) => (
-                  <tr
-                    key={client.id}
-                    className="border-b border-[var(--color-border-vychozi)] last:border-b-0"
-                  >
-                    <td className="px-4 py-3">
-                      <Link
-                        className="font-medium text-[var(--color-action-violet)] hover:underline"
-                        href={`/dashboard/clients/${client.id}`}
-                      >
-                        {client.name ?? '—'}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">{client.phone ?? '—'}</td>
-                    <td className="px-4 py-3">{client.email ?? '—'}</td>
-                    <td className="px-4 py-3">{client.reservationCount}</td>
-                    <td className="px-4 py-3">
-                      {client.lastReservationAt ? pragueDateOnly(client.lastReservationAt) : '—'}
-                    </td>
+          <Card className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]">
+            <div className="overflow-x-auto">
+              <table data-no-row-hover className="w-full border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--color-border-vychozi)] text-[var(--color-rich-violet)]">
+                    <th className="py-3 pr-4 font-semibold">Jméno</th>
+                    <th className="py-3 pr-4 font-semibold">Telefon</th>
+                    <th className="py-3 pr-4 font-semibold">E-mail</th>
+                    <th className="py-3 pr-4 font-semibold">Počet rezervací</th>
+                    <th className="py-3 pr-4 font-semibold">Poslední rezervace</th>
+                    <th className="py-3 font-semibold">Akce</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {result.clients.map((client) => (
+                    <tr
+                      key={client.id}
+                      className="border-b border-[var(--color-border-vychozi)] align-top last:border-b-0"
+                    >
+                      <td className="py-3 pr-4 font-medium text-[var(--color-slate-text)]">
+                        {client.name ?? '—'}
+                      </td>
+                      <td className="py-3 pr-4 text-[var(--color-slate-text)]">
+                        {client.phone ?? '—'}
+                      </td>
+                      <td className="py-3 pr-4 text-[var(--color-slate-text)]">
+                        {client.email ?? '—'}
+                      </td>
+                      <td className="py-3 pr-4 text-[var(--color-slate-text)]">
+                        {client.reservationCount}
+                      </td>
+                      <td className="py-3 pr-4 text-[var(--color-slate-text)]">
+                        {client.lastReservationAt ? pragueDateOnly(client.lastReservationAt) : '—'}
+                      </td>
+                      <td className="py-3">
+                        <Link
+                          href={`/dashboard/clients/${client.id}`}
+                          className="inline-flex h-10 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] px-5 text-sm font-normal leading-none text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-cloud-mist)]"
+                        >
+                          Zobrazit detail
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </Card>
         )}
     </div>
