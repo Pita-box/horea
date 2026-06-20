@@ -216,7 +216,10 @@ function NextEventCard({ reservations }: { reservations: ReservationListItem[] }
   const [y, m, d] = datePart.split('-');
 
   return (
-    <Card className="bg-[var(--color-action-violet)] p-[var(--spacing-20)] text-white">
+    <Card
+      className="p-[var(--spacing-20)] text-white"
+      style={{ backgroundColor: 'var(--color-action-violet)' }}
+    >
       <p className="text-xs font-medium text-[color-mix(in_srgb,white_80%,var(--color-action-violet))]">
         Nejbližší rezervace
       </p>

@@ -365,7 +365,8 @@ exports[`CalendarView (R4.5, R4.6) > vizuálně odliší rejected/cancelled od a
         </div>
       </div>
       <div
-        class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] bg-[var(--color-action-violet)] p-[var(--spacing-20)] text-white"
+        class="rounded-[var(--radius-cards)] bg-[var(--color-canvas-white)] text-[var(--color-slate-text)] p-[var(--spacing-20)] text-white"
+        style="background-color: var(--color-action-violet);"
       >
         <p
           class="text-xs font-medium text-[color-mix(in_srgb,white_80%,var(--color-action-violet))]"
