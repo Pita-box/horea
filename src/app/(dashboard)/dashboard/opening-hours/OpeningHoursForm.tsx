@@ -1,9 +1,9 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import { Switch } from '@/components/ui/switch';
+import { TimePicker } from '@/components/ui/TimePicker';
 import { useToast } from '@/components/ui/toast';
 import { WEEK_DAYS } from '@/lib/onboarding/data';
 import type { OpeningHoursWeek } from '@/lib/opening-hours/schema';
@@ -124,13 +124,13 @@ export function OpeningHoursForm({ initialWeek }: OpeningHoursFormProps) {
                 >
                   Otevřeno od
                 </label>
-                <Input
+                <TimePicker
                   id={`opens-at-${dayOfWeek}`}
-                  type="time"
+                  name={`opens-at-${dayOfWeek}`}
                   value={day?.opensAt ?? DEFAULT_OPEN_TIME}
-                  onChange={(event) => updateDay(dayOfWeek, { opensAt: event.target.value })}
-                  aria-invalid={Boolean(error)}
+                  onChange={(next) => updateDay(dayOfWeek, { opensAt: next })}
                   disabled={isPending || closed}
+                  aria-label="Otevřeno od"
                 />
               </div>
 
@@ -141,13 +141,13 @@ export function OpeningHoursForm({ initialWeek }: OpeningHoursFormProps) {
                 >
                   Otevřeno do
                 </label>
-                <Input
+                <TimePicker
                   id={`closes-at-${dayOfWeek}`}
-                  type="time"
+                  name={`closes-at-${dayOfWeek}`}
                   value={day?.closesAt ?? DEFAULT_CLOSE_TIME}
-                  onChange={(event) => updateDay(dayOfWeek, { closesAt: event.target.value })}
-                  aria-invalid={Boolean(error)}
+                  onChange={(next) => updateDay(dayOfWeek, { closesAt: next })}
                   disabled={isPending || closed}
+                  aria-label="Otevřeno do"
                 />
               </div>
 

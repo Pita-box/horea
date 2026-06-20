@@ -8,6 +8,7 @@ import { IconCheck, IconSearch } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
+import { TimePicker } from '@/components/ui/TimePicker';
 import { toPragueDisplay } from '@/lib/datetime';
 import type { ReservationStatus } from '@/lib/reservations/labels';
 import type { ServiceOption } from '@/lib/reservations/types';
@@ -413,12 +414,12 @@ export function ReservationActions({
             <label className="text-sm font-medium" htmlFor="edit-time">
               Čas
             </label>
-            <Input
+            <TimePicker
               id="edit-time"
-              type="time"
+              name="edit-time"
               value={editTime}
-              onChange={(event) => setEditTime(event.target.value)}
-              className="min-h-[44px]"
+              onChange={setEditTime}
+              aria-label="Čas rezervace"
             />
           </div>
 

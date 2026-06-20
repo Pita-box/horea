@@ -61,9 +61,14 @@ test('majitel ručně vytvoří kombinovanou rezervaci a ta je v seznamu „Schv
   // Vybrané služby nesou pořadové odznaky „Vybráno" odpovídající pořadí výběru.
   await expect(dialog.locator('button[aria-pressed="true"]')).toHaveCount(selectCount);
 
-  // Vyplň formulář; čas záměrně „02:00" vynutí nabídku dostupných slotů (R12.6).
+  // Vyplň formulář; čas záměrně „02:xx" vynutí nabídku dostupných slotů (R12.6).
   await page.locator('#create-date').fill(reservationDate);
-  await page.locator('#create-time').fill('02:00');
+  await page.locator('#create-time').click();
+  await page
+    .getByRole('dialog', { name: 'Čas rezervace' })
+    .getByRole('button', { name: '02', exact: true })
+    .click();
+  await page.keyboard.press('Escape');
   await page.locator('#create-name').fill(clientName);
   await page.locator('#create-phone').fill('+420704344177');
 

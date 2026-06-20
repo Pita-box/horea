@@ -3,13 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { Notice } from '@/components/ui/notice';
 import { Switch } from '@/components/ui/switch';
+import { TimePicker } from '@/components/ui/TimePicker';
 import { WEEK_DAYS, type HoursDraft } from '@/lib/onboarding/data';
 import { useState, useTransition, type FormEvent } from 'react';
 
 import { StepBackLink } from '../StepBackLink';
 import { submitHoursAction } from './actions';
 import { INITIAL_HOURS_STEP_STATE, type HoursStepState } from './state';
-import { TimePicker } from './TimePicker';
 
 type HoursFormProps = {
   initialHours: HoursDraft[];

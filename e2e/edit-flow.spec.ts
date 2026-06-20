@@ -56,7 +56,12 @@ test('majitel upraví službu a čas rezervace na dostupný slot a uloží změn
 
   // Vynutíme nabídku dostupných slotů: nepravděpodobný čas → 409 + „Dostupné časy"
   // (R9.3/R9.4). Z nabídky pak vybereme reálně dostupný slot a uložíme.
-  await page.locator('#edit-time').fill('02:00');
+  await page.locator('#edit-time').click();
+  await page
+    .getByRole('dialog', { name: 'Čas rezervace' })
+    .getByRole('button', { name: '02', exact: true })
+    .click();
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Uložit' }).click();
 
   const editDialogHeading = page.getByRole('heading', { name: 'Upravit rezervaci' });

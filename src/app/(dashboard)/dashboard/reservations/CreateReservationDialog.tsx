@@ -6,6 +6,7 @@ import { useEffect, useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
+import { TimePicker } from '@/components/ui/TimePicker';
 import { toggleService } from '@/lib/reservation/selection';
 import type { ServiceOption } from '@/lib/reservations/types';
 import { createManualReservation } from '@/server/ManualReservationCreator';
@@ -214,12 +215,12 @@ export function CreateReservationDialog({ services }: CreateReservationDialogPro
                 <label className="text-sm font-medium" htmlFor="create-time">
                   Čas
                 </label>
-                <Input
+                <TimePicker
                   id="create-time"
-                  type="time"
+                  name="create-time"
                   value={time}
-                  onChange={(event) => setTime(event.target.value)}
-                  className="min-h-[44px]"
+                  onChange={setTime}
+                  aria-label="Čas rezervace"
                 />
               </div>
             </div>

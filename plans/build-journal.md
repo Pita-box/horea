@@ -2,6 +2,16 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-16 — Sdílený TimePicker napříč projektem (místo nativního `type="time"`)
+
+### Nové funkce
+- Onboarding TimePicker (dropdown hodina/minuta, klik na celé pole rozbalí výběr) přesunut do sdílené UI: `src/app/onboarding/5/TimePicker.tsx` → `src/components/ui/TimePicker.tsx`.
+- Nativní `<input type="time">` nahrazen `TimePicker`em v: `dashboard/reservations/CreateReservationDialog` (`create-time`), `dashboard/reservations/[id]/ReservationActions` (edit modal `edit-time`), `dashboard/opening-hours/OpeningHoursForm` (opens/closes). Onboarding krok 5 (`HoursForm`) ho používá dál (jen aktualizovaný import).
+- e2e (`edit-flow`, `manual-creation`) aktualizovány: místo `#…-time.fill('02:00')` otevřou TimePicker a vyberou hodinu „02" (dialog `Čas rezervace`).
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run` → 541 passed / 57 skipped.
+
 ## 2026-06-16 — Nová stránka „Analytika podniku" (`/dashboard/analytics`)
 
 ### Nové funkce
