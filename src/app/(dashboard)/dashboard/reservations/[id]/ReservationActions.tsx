@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, useTransition, type ReactNode } from 'rea
 import { IconCheck, IconSearch } from '@tabler/icons-react';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Notice } from '@/components/ui/notice';
 import { TimePicker } from '@/components/ui/TimePicker';
 import { toPragueDisplay } from '@/lib/datetime';
@@ -401,12 +401,11 @@ export function ReservationActions({
             <label className="text-sm font-medium" htmlFor="edit-date">
               Datum
             </label>
-            <Input
+            <DatePicker
               id="edit-date"
-              type="date"
               value={editDate}
-              onChange={(event) => setEditDate(event.target.value)}
-              className="min-h-[44px]"
+              onChange={setEditDate}
+              aria-label="Datum rezervace"
             />
           </div>
 

@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { reservationStatusLabel } from '@/lib/reservations/labels';
 import {
   buildReservationQuery,
@@ -121,22 +121,24 @@ export function FilterBar({ filters, services, showDateRange = true }: FilterBar
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]">
               <span>Od</span>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.from ?? ''}
                 max={filters.to ?? undefined}
-                onChange={(event) => apply({ from: event.target.value || null })}
-                className="w-auto"
+                onChange={(next) => apply({ from: next || null })}
+                allowClear
+                placeholder="Od"
+                aria-label="Datum od"
               />
             </label>
             <label className="flex flex-col gap-1 text-sm text-[var(--color-slate-text)]">
               <span>Do</span>
-              <Input
-                type="date"
+              <DatePicker
                 value={filters.to ?? ''}
                 min={filters.from ?? undefined}
-                onChange={(event) => apply({ to: event.target.value || null })}
-                className="w-auto"
+                onChange={(next) => apply({ to: next || null })}
+                allowClear
+                placeholder="Do"
+                aria-label="Datum do"
               />
             </label>
           </div>

@@ -62,7 +62,13 @@ test('majitel ručně vytvoří kombinovanou rezervaci a ta je v seznamu „Schv
   await expect(dialog.locator('button[aria-pressed="true"]')).toHaveCount(selectCount);
 
   // Vyplň formulář; čas záměrně „02:xx" vynutí nabídku dostupných slotů (R12.6).
-  await page.locator('#create-date').fill(reservationDate);
+  await page.locator('#create-date').click();
+  const datePanel = page.getByRole('dialog', { name: 'Datum rezervace' });
+  const dayButton = page.locator(`[data-date="${reservationDate}"]`);
+  for (let i = 0; i < 3 && (await dayButton.count()) === 0; i += 1) {
+    await datePanel.getByRole('button', { name: 'Další měsíc' }).click();
+  }
+  await dayButton.click();
   await page.locator('#create-time').click();
   await page
     .getByRole('dialog', { name: 'Čas rezervace' })

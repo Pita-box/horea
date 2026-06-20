@@ -2,6 +2,16 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-16 — Sdílený DatePicker (rozbalovací kalendář) místo nativního `type="date"`
+
+### Nové funkce
+- Nová UI komponenta `src/components/ui/DatePicker.tsx` — rozbalovací výběr data (trigger + měsíční kalendář v panelu, ikona kalendáře, zavírání klik mimo/Escape). Funguje řízeně (`value`+`onChange`) i neřízeně (`defaultValue`+`name` pro GET formuláře), podporuje `min`/`max`, `allowClear`, „dnešek" zvýraznění. Sdílí mřížku přes `buildMonthGrid`/`addMonths`.
+- Nahrazen nativní `<input type="date">` v: rezervace create dialog (`create-date`), edit modal (`edit-date`), `FilterBar` (Od/Do), admin kupóny (Platnost do), admin podnik detail (konec období, free-trial), admin audit a admin podniky (filtry od/do — neřízené přes `name`+`defaultValue`). Rezervační krok 2 (`DatePickerCalendar`) zůstává inline (dedikovaný krok).
+- e2e `manual-creation` upraven: `#create-date` se otevře a vybere den přes `[data-date]` (s fallbackem „Další měsíc").
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK; `pnpm test:run` → 541 passed / 57 skipped.
+
 ## 2026-06-16 — Sdílený TimePicker napříč projektem (místo nativního `type="time"`)
 
 ### Nové funkce

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Notice } from '@/components/ui/notice';
 import type { SubscriptionPlan, SubscriptionStatus } from '@/lib/admin/business-manager';
 
@@ -263,13 +263,14 @@ export function BusinessActions({
             <span className="text-sm font-medium text-[var(--color-slate-text)]">
               Konec období
             </span>
-            <Input
-              type="date"
-              className="min-h-[44px]"
+            <DatePicker
               value={overrideForm.currentPeriodEnd}
-              onChange={(event) =>
-                setOverrideForm((prev) => ({ ...prev, currentPeriodEnd: event.target.value }))
+              onChange={(next) =>
+                setOverrideForm((prev) => ({ ...prev, currentPeriodEnd: next }))
               }
+              allowClear
+              placeholder="Konec období"
+              aria-label="Konec období"
             />
           </label>
         </div>
@@ -292,12 +293,11 @@ export function BusinessActions({
             <span className="text-sm font-medium text-[var(--color-slate-text)]">
               Konec zkušebního období
             </span>
-            <Input
-              type="date"
-              required
-              className="min-h-[44px]"
+            <DatePicker
               value={trialEnd}
-              onChange={(event) => setTrialEnd(event.target.value)}
+              onChange={setTrialEnd}
+              placeholder="Konec zkušebního období"
+              aria-label="Konec zkušebního období"
             />
           </label>
           <Button type="submit" className={ACTION_BUTTON_CLASS} disabled={isPending}>

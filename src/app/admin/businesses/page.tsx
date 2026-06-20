@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import {
@@ -122,14 +123,14 @@ export default async function AdminBusinessesPage({ searchParams }: BusinessesPa
               <span className="text-sm font-medium text-[var(--color-slate-text)]">
                 Registrace od
               </span>
-              <Input type="date" name="od" defaultValue={registeredFrom ?? ''} />
+              <DatePicker name="od" defaultValue={registeredFrom ?? ''} allowClear placeholder="Registrace od" aria-label="Registrace od" />
             </label>
 
             <label className="flex flex-col gap-2">
               <span className="text-sm font-medium text-[var(--color-slate-text)]">
                 Registrace do
               </span>
-              <Input type="date" name="do" defaultValue={registeredTo ?? ''} />
+              <DatePicker name="do" defaultValue={registeredTo ?? ''} allowClear placeholder="Registrace do" aria-label="Registrace do" />
             </label>
 
             <div className="flex items-center gap-3 md:col-span-2 lg:col-span-4">

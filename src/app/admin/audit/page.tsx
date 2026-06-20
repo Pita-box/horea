@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import type { AuditActionType, AuditTargetType } from '@/lib/admin/audit-logger';
@@ -148,12 +149,12 @@ export default async function AdminAuditPage({ searchParams }: AuditPageProps) {
 
             <label className="flex flex-col gap-2">
               <span className="text-sm font-medium text-[var(--color-slate-text)]">Od</span>
-              <Input type="date" name="od" defaultValue={createdFrom ?? ''} />
+              <DatePicker name="od" defaultValue={createdFrom ?? ''} allowClear placeholder="Od" aria-label="Od" />
             </label>
 
             <label className="flex flex-col gap-2">
               <span className="text-sm font-medium text-[var(--color-slate-text)]">Do</span>
-              <Input type="date" name="do" defaultValue={createdTo ?? ''} />
+              <DatePicker name="do" defaultValue={createdTo ?? ''} allowClear placeholder="Do" aria-label="Do" />
             </label>
 
             <div className="flex items-center gap-3 md:col-span-2 lg:col-span-3">

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import { TimePicker } from '@/components/ui/TimePicker';
@@ -203,12 +204,11 @@ export function CreateReservationDialog({ services }: CreateReservationDialogPro
                 <label className="text-sm font-medium" htmlFor="create-date">
                   Datum
                 </label>
-                <Input
+                <DatePicker
                   id="create-date"
-                  type="date"
                   value={date}
-                  onChange={(event) => setDate(event.target.value)}
-                  className="min-h-[44px]"
+                  onChange={setDate}
+                  aria-label="Datum rezervace"
                 />
               </div>
               <div className="flex flex-1 flex-col gap-2">

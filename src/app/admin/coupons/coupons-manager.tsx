@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import type { CouponManagerRecord } from '@/lib/admin/coupon-manager';
@@ -175,10 +176,12 @@ export function CouponsManager({ coupons }: CouponsManagerProps) {
             <span className="text-sm font-medium text-[var(--color-slate-text)]">
               Platnost do
             </span>
-            <Input
-              type="date"
+            <DatePicker
               value={form.validUntil}
-              onChange={(event) => setForm((prev) => ({ ...prev, validUntil: event.target.value }))}
+              onChange={(next) => setForm((prev) => ({ ...prev, validUntil: next }))}
+              allowClear
+              placeholder="Platnost do"
+              aria-label="Platnost do"
             />
           </label>
 
