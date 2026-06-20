@@ -34,8 +34,8 @@ const NAV_BY_VARIANT: Record<DashboardVariant, DashboardNavItem[]> = {
     { href: '/dashboard/clients', label: 'Klienti', icon: IconUsers },
     { href: '/dashboard/employees', label: 'Zaměstnanci', icon: IconUsersGroup },
     { href: '/dashboard/opening-hours', label: 'Otevírací doba', icon: IconClock },
-    { href: '/dashboard/settings', label: 'Nastavení', icon: IconSettings },
     { href: '/dashboard/analytics', label: 'Analytika', icon: IconChartHistogram },
+    { href: '/dashboard/settings', label: 'Nastavení', icon: IconSettings },
   ],
   admin: [
     { href: '/admin', label: 'Přehled', icon: IconLayoutDashboard, exact: true },
