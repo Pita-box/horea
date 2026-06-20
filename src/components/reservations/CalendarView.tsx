@@ -231,7 +231,7 @@ function NextEventCard({ reservations }: { reservations: ReservationListItem[] }
       </p>
       <Link
         href={`/dashboard/reservations/${next.id}`}
-        className="mt-3 inline-flex h-9 items-center rounded-[var(--radius-buttons)] bg-white px-4 text-sm font-semibold text-[var(--color-action-violet)] transition-opacity hover:opacity-90"
+        className="mt-3 inline-flex h-9 items-center rounded-[var(--radius-buttons)] bg-white px-4 text-sm font-semibold text-[var(--color-action-violet)] transition-colors hover:bg-[var(--color-light-violet)]"
       >
         Otevřít detail
       </Link>
