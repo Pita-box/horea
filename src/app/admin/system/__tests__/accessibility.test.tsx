@@ -98,8 +98,11 @@ describe('HealthRecheckButton — přístupnost stavů a re-check (R14.1, R14.2,
     expect(within(liveRegion).getByText('zhoršené')).toBeTruthy();
 
     // R14.2 — tlačítko lze zaměřit Tabem (focus) a aktivovat Enterem (klávesnice).
-    await user.tab();
+    // V hlavičce je i fokusovatelná ikona tooltipu, takže Tabujeme až k tlačítku.
     const button = screen.getByRole('button', { name: 'Zkontrolovat znovu' });
+    for (let i = 0; i < 5 && document.activeElement !== button; i += 1) {
+      await user.tab();
+    }
     expect(document.activeElement).toBe(button);
 
     await user.keyboard('{Enter}');

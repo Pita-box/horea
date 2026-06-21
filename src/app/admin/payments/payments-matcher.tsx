@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 import type { PendingPaymentItem } from '@/lib/admin/payment-matcher';
 import { toPragueDisplay } from '@/lib/datetime';
@@ -71,6 +72,12 @@ export function PaymentsMatcher({ payments }: PaymentsMatcherProps) {
         className="overflow-hidden border border-[var(--color-border-vychozi)]"
         aria-label="Čekající platby"
       >
+        <div className="flex items-start justify-between gap-2 p-[var(--card-padding)] pb-4">
+          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+            Čekající platby
+          </h2>
+          <InfoTooltip text="Příchozí bankovní platby, které ještě nejsou spárované s předplatným. Tlačítkem Spárovat přiřadíš platbu k předplatnému podle variabilního symbolu a aktivuješ ho." />
+        </div>
         <div className="overflow-x-auto">
           <table data-no-row-hover className="w-full border-collapse text-left text-sm">
             <thead>

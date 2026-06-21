@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 import { requireAdmin } from '@/lib/admin/require-admin';
 import { toPragueDisplay } from '@/lib/datetime';
@@ -79,10 +80,21 @@ async function loadHealthReport(): Promise<HealthReport | null> {
 }
 
 /** Společný nadpis sekce. */
-function SectionHeading({ title, description }: { title: string; description?: string }) {
+function SectionHeading({
+  title,
+  description,
+  info,
+}: {
+  title: string;
+  description?: string;
+  info?: string;
+}) {
   return (
     <div className="space-y-1">
-      <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">{title}</h2>
+      <div className="flex items-start justify-between gap-2">
+        <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">{title}</h2>
+        {info ? <InfoTooltip text={info} /> : null}
+      </div>
       {description ? (
         <p className="text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
           {description}
@@ -164,7 +176,10 @@ export default async function AdminSystemPage() {
           className="space-y-4 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
           aria-label="Stav služeb"
         >
-          <SectionHeading title="Stav služeb" />
+          <SectionHeading
+            title="Stav služeb"
+            info="Rychlá kontrola, jestli odpovídají klíčové externí služby (databáze, e-maily, platby, úložiště). Zelená = v pořádku, žlutá = pomalé/částečné, červená = nedostupné."
+          />
           <Notice variant="warning" role="status">
             Stav služeb je momentálně nedostupný.
           </Notice>
@@ -177,7 +192,10 @@ export default async function AdminSystemPage() {
         className="flex flex-col gap-[var(--spacing-16)] border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Informace o nasazení"
       >
-        <SectionHeading title="Informace o nasazení" />
+        <SectionHeading
+          title="Informace o nasazení"
+          info="Která verze kódu právě běží — git commit, větev, prostředí a verze Node. Hodí se při ladění, ať víš, co je nasazené."
+        />
         <dl className="flex flex-col">
           <InfoRow label="Commit (SHA)" value={deployInfo.commitSha} />
           <InfoRow label="Git větev / ref" value={deployInfo.gitRef} />
@@ -196,6 +214,7 @@ export default async function AdminSystemPage() {
         <SectionHeading
           title="Stav e-mailové fronty"
           description="Fronta odchozích e-mailů (email_outbox). Opakované odeslání zajišťuje cron úloha email-retry (/api/cron/email-retry)."
+          info="Kolik e-mailů čeká na odeslání, kolik se odeslalo a kolik selhalo. Čekající doženeme cronem email-retry."
         />
         {outbox ? (
           <dl className="flex flex-col">
@@ -221,7 +240,10 @@ export default async function AdminSystemPage() {
         className="flex flex-col gap-[var(--spacing-16)] border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Stav záloh"
       >
-        <SectionHeading title="Stav záloh" />
+        <SectionHeading
+          title="Stav záloh"
+          info="Jestli je nastavené zálohování na Google Drive. Automatický zálohovací job zatím není, jde jen o stav konfigurace."
+        />
         <dl className="flex flex-col">
           <InfoRow
             label="Konfigurace (Google)"
@@ -246,6 +268,7 @@ export default async function AdminSystemPage() {
         <SectionHeading
           title="Čerstvost GoPay webhooku"
           description={`Hranice čerstvosti je ${WEBHOOK_FRESHNESS_THRESHOLD_HOURS} hodin.`}
+          info="Kdy naposled dorazila platebně řízená aktivita. Je to odhad (proxy) z plateb a předplatných — když je staré, může být problém s webhookem."
         />
         {webhook === null ? (
           <Notice variant="warning" role="status">
@@ -280,7 +303,10 @@ export default async function AdminSystemPage() {
         className="flex flex-col gap-[var(--spacing-16)] border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Provozní metriky"
       >
-        <SectionHeading title="Provozní metriky" />
+        <SectionHeading
+          title="Provozní metriky"
+          info="Souhrnné počty v systému (podniky, rezervace, klienti). Velikost úložiště se nezjišťuje, aby to nebylo náročné."
+        />
         {metrics.db ? (
           <dl className="flex flex-col">
             <InfoRow label="Počet podniků" value={String(metrics.db.businesses)} />
@@ -309,6 +335,7 @@ export default async function AdminSystemPage() {
         <SectionHeading
           title="Konfigurace"
           description="Zobrazuje pouze přítomnost proměnných prostředí, nikdy jejich hodnoty."
+          info="Přehled, které proměnné prostředí jsou nastavené (ne jejich hodnoty). Pomáhá odhalit chybějící konfiguraci."
         />
         <dl className="flex flex-col">
           <InfoRow label="Úroveň logování" value={configReport.logLevel} />
@@ -349,7 +376,10 @@ export default async function AdminSystemPage() {
         className="flex flex-col gap-[var(--spacing-16)] border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Logy a auditní stopa"
       >
-        <SectionHeading title="Logy a auditní stopa" />
+        <SectionHeading
+          title="Logy a auditní stopa"
+          info="Auditní stopa akcí adminů je trvalá a nejde mazat. Aplikační logy běží do konzole (Vercel), neukládají se."
+        />
         <p className="text-sm text-[var(--color-slate-text)]">
           Auditní stopa administrátorských akcí je <strong>append-only</strong> — záznamy nelze
           z rozhraní upravovat ani mazat. Aplikační logy nejsou perzistentní: odcházejí do výstupu
@@ -374,7 +404,10 @@ export default async function AdminSystemPage() {
         className="flex flex-col gap-[var(--spacing-16)] border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Monitor cron úloh"
       >
-        <SectionHeading title="Monitor cron úloh" />
+        <SectionHeading
+          title="Monitor cron úloh"
+          info="Poslední běh každé naplánované úlohy, její rozvrh a příští spuštění. Můžeš je i ručně spustit nebo promazat staré záznamy."
+        />
 
         <Notice variant={hasDrift ? 'warning' : 'neutral'} role="status">
           {hasDrift

@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 import {
   ALLOWED_PATHS,
@@ -80,9 +81,12 @@ export function RevalidatePanel() {
   return (
     <Card as="section" className="flex flex-col gap-[var(--spacing-16)] p-[var(--card-padding)]">
       <div className="space-y-1">
-        <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
-          Revalidace cache
-        </h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
+            Revalidace cache
+          </h2>
+          <InfoTooltip text="Ručně zneplatní cache pro vybranou stránku, aby se hned promítly změny. Vybírat lze jen z povolených cílů." />
+        </div>
         <p className="text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
           Cíleně zneplatní cache pro vybraný povolený cíl. Vybírat lze pouze
           z předem schválených cest a tagů.

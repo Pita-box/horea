@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 import {
   getBusinessDetail,
@@ -129,9 +130,12 @@ export default async function AdminBusinessDetailPage({ params }: BusinessDetail
         className="space-y-4 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Profil podniku a vlastníka"
       >
-          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-            Profil
-          </h2>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+              Profil
+            </h2>
+            <InfoTooltip text="Základní údaje podniku a jeho vlastníka — název, slug, typ, zda je profil publikovaný, data registrace podniku i vlastníka a popis." />
+          </div>
           <dl className="grid gap-4 sm:grid-cols-2">
             <DetailRow label="Název" value={business.name} />
             <DetailRow label="Slug" value={business.slug} />
@@ -154,9 +158,12 @@ export default async function AdminBusinessDetailPage({ params }: BusinessDetail
           className="space-y-4 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
           aria-label="Předplatné"
         >
-          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-            Předplatné
-          </h2>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+              Předplatné
+            </h2>
+            <InfoTooltip text="Aktuální stav předplatného podniku: stav (free, aktivní, grace period, vypršelo, smazaná data), zvolený tarif a datum konce aktuálního období." />
+          </div>
           <dl className="grid gap-4 sm:grid-cols-3">
             <DetailRow label="Stav" value={subscriptionStatus} />
             <DetailRow label="Tarif" value={subscriptionPlan} />
@@ -169,9 +176,12 @@ export default async function AdminBusinessDetailPage({ params }: BusinessDetail
           className="space-y-4 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
           aria-label="Rezervace"
         >
-          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-            Rezervace
-          </h2>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+              Rezervace
+            </h2>
+            <InfoTooltip text="Celkový počet rezervací, které podnik dosud přijal napříč celou svou historií." />
+          </div>
           <p className="text-base text-[var(--color-slate-text)]">
             Celkový počet rezervací:{' '}
             <span className="font-[var(--font-polysans)] font-semibold text-[var(--color-rich-violet)]">
@@ -185,9 +195,12 @@ export default async function AdminBusinessDetailPage({ params }: BusinessDetail
           className="space-y-4 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
           aria-label="Historie plateb"
         >
-          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-            Historie plateb
-          </h2>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+              Historie plateb
+            </h2>
+            <InfoTooltip text="Seznam všech plateb podniku za předplatné — datum, částka, stav platby, způsob úhrady a variabilní symbol." />
+          </div>
           {business.payments.length === 0 ? (
             <Notice role="status">Podnik zatím nemá žádné platby.</Notice>
           ) : (

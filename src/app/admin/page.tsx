@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { computeAdminOverviewStats, type StatsPeriod } from '@/lib/admin/stats';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -88,10 +89,23 @@ function formatCzk(value: number): string {
   }).format(value);
 }
 
-function MetricCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function MetricCard({
+  label,
+  value,
+  hint,
+  info,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  info: string;
+}) {
   return (
     <Card className="space-y-2 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]">
-      <p className="text-sm font-medium text-[var(--color-slate-text)]">{label}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-sm font-medium text-[var(--color-slate-text)]">{label}</p>
+        <InfoTooltip text={info} />
+      </div>
       <p className="font-[var(--font-polysans)] text-2xl font-semibold text-[var(--color-rich-violet)]">
         {value}
       </p>
@@ -136,13 +150,24 @@ export default async function AdminOverviewPage({ searchParams }: OverviewPagePr
             label="Nové registrace"
             value={formatCount(stats.newRegistrations)}
             hint="ve zvoleném období"
+            info="Počet nově vytvořených podniků (dokončený onboarding) za zvolené období. Mění se podle vybraného filtru nahoře."
           />
-          <MetricCard label="Aktivní předplatná" value={formatCount(stats.activeSubscriptions)} />
-          <MetricCard label="Churn" value={formatCount(stats.churn)} hint="ve zvoleném období" />
+          <MetricCard
+            label="Aktivní předplatná"
+            value={formatCount(stats.activeSubscriptions)}
+            info="Kolik podniků má právě teď aktivní placené předplatné. Je to aktuální stav, nezávisí na zvoleném období."
+          />
+          <MetricCard
+            label="Churn"
+            value={formatCount(stats.churn)}
+            hint="ve zvoleném období"
+            info="Počet předplatných, která za zvolené období vypršela nebo skončila (odešli zákazníci). Čím nižší, tím lépe."
+          />
           <MetricCard
             label="Tržby"
             value={formatCzk(stats.paidRevenueCzk)}
             hint="zaplacené platby v období"
+            info="Součet skutečně zaplacených plateb za předplatné ve zvoleném období. Nezahrnuje nezaplacené ani čekající platby."
           />
         </section>
 
@@ -153,9 +178,12 @@ export default async function AdminOverviewPage({ searchParams }: OverviewPagePr
         >
           <div className="space-y-2">
             <Badge>Podniky</Badge>
-            <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-              Rozpad podle stavu předplatného
-            </h2>
+            <div className="flex items-start justify-between gap-2">
+              <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+                Rozpad podle stavu předplatného
+              </h2>
+              <InfoTooltip text="Kolik podniků je právě v jakém stavu předplatného: Free (bez platby), Aktivní (platí), Grace period (po splatnosti, ještě s přístupem) a Vypršelo (přístup pozastaven). Aktuální stav, nezávislý na zvoleném období." />
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {(Object.keys(STATUS_LABELS) as Array<keyof typeof STATUS_LABELS>).map((status) => (

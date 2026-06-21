@@ -1,35 +1,14 @@
 import Link from 'next/link';
-import { IconInfoCircle } from '@tabler/icons-react';
 
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { PERIOD_OPTIONS, formatPercent, type ResolvedPeriod } from '@/lib/analytics/analytics';
 
 const MUTED = 'text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]';
 
-/**
- * Informační ikona s tooltipem (CSS-only: hover i fokus). Tooltip je vpravo
- * nahoře u karty a vysvětluje metriku lidskou řečí.
- */
-export function InfoTooltip({ text }: { text: string }) {
-  return (
-    <span className="group relative inline-flex shrink-0">
-      <IconInfoCircle
-        size={16}
-        stroke={2}
-        tabIndex={0}
-        role="img"
-        aria-label="Vysvětlení"
-        className="cursor-help text-[color-mix(in_srgb,var(--color-slate-text)_45%,white)] outline-none transition-colors hover:text-[var(--color-action-violet)] focus-visible:text-[var(--color-action-violet)]"
-      />
-      <span
-        role="tooltip"
-        className="pointer-events-none absolute right-0 top-6 z-30 hidden w-56 rounded-[var(--radius-lg)] bg-[var(--color-rich-violet)] px-3 py-2 text-xs font-medium leading-snug text-white shadow-lg group-hover:block group-focus-within:block"
-      >
-        {text}
-      </span>
-    </span>
-  );
-}
+// Re-export pro zpětnou kompatibilitu — `InfoTooltip` se přesunul do sdílené UI
+// komponenty (`@/components/ui/info-tooltip`), aby šel použít i v admin dashboardu.
+export { InfoTooltip };
 
 /** Přepínač období (URL `?period=`). Zachovává se jen tento parametr. */
 export function PeriodTabs({ period }: { period: ResolvedPeriod }) {

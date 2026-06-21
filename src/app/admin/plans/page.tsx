@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { loadPlanFeatureMatrix } from '@/lib/plans/feature-matrix';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Metadata } from 'next';
@@ -23,6 +24,12 @@ export default async function AdminPlansPage() {
   return (
     <div className="flex flex-col gap-[var(--section-gap)]">
       <Card className="overflow-hidden border border-[var(--color-border-vychozi)] p-[var(--card-padding)]">
+        <div className="mb-4 flex items-start justify-between gap-2">
+          <h1 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+            Matice funkcí a tarifů
+          </h1>
+          <InfoTooltip text="Která funkce je dostupná v kterém tarifu (Start, Pokročilý, Max). Přepínačem u dané funkce zapneš nebo vypneš její dostupnost pro vybraný tarif; změna se ukládá okamžitě." />
+        </div>
         <PlanFeaturesMatrix initialMatrix={matrix} />
       </Card>
     </div>

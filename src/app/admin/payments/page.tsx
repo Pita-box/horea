@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Input } from '@/components/ui/input';
 import {
   listPendingPayments,
@@ -52,6 +53,12 @@ export default async function AdminPaymentsPage({ searchParams }: PaymentsPagePr
         className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Vyhledání podle variabilního symbolu"
       >
+          <div className="mb-4 flex items-start justify-between gap-2">
+            <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+              Vyhledání podle variabilního symbolu
+            </h2>
+            <InfoTooltip text="Najde čekající platby podle variabilního symbolu z bankovního příkazu. Když pole necháš prázdné a dáš Zobrazit vše, uvidíš všechny dosud nespárované platby." />
+          </div>
           <form method="get" className="flex flex-col gap-4 sm:flex-row sm:items-end">
             <label className="flex flex-1 flex-col gap-2">
               <span className="text-sm font-medium text-[var(--color-slate-text)]">

@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import {
@@ -94,6 +95,9 @@ export default async function AdminBusinessesPage({ searchParams }: BusinessesPa
         className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Filtry seznamu podniků"
       >
+          <div className="mb-4 flex justify-end">
+            <InfoTooltip text="Filtry pro zúžení seznamu podniků. Hledejte podle e-mailu vlastníka, názvu nebo slugu a omezte výpis podle stavu předplatného a data registrace." />
+          </div>
           <form method="get" className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:items-end">
             <label className="flex flex-col gap-2">
               <span className="text-sm font-medium text-[var(--color-slate-text)]">Vyhledávání</span>
@@ -158,6 +162,9 @@ export default async function AdminBusinessesPage({ searchParams }: BusinessesPa
             className="overflow-hidden border border-[var(--color-border-vychozi)]"
             aria-label="Seznam podniků"
           >
+            <div className="flex justify-end px-5 pt-4">
+              <InfoTooltip text="Přehled všech registrovaných podniků s jejich vlastníkem, stavem a tarifem předplatného a datem registrace. Kliknutím na název otevřete detail podniku." />
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-sm">
                 <thead>

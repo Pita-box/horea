@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 import { CRON_SCHEDULE_MAP, type CronJobName } from '@/lib/system/cron-schedule';
 
@@ -63,9 +64,12 @@ export function CronTriggerPanel() {
   return (
     <Card as="section" className="flex flex-col gap-[var(--spacing-16)] p-[var(--card-padding)]">
       <div className="space-y-1">
-        <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
-          Ruční spuštění cronu
-        </h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
+            Ruční spuštění cronu
+          </h2>
+          <InfoTooltip text="Spustí naplánovanou úlohu hned teď, mimo její rozvrh — užitečné pro test nebo dohnání zameškaného běhu." />
+        </div>
         <p className="text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
           Spustí vybranou cron úlohu mimo plánovaný čas pro ověření funkčnosti.
         </p>

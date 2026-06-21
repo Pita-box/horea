@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 import type { ServiceStatus } from '@/lib/system/status';
 import type { HealthReport } from '@/lib/system/health';
@@ -61,9 +62,12 @@ export function HealthRecheckButton({ initialReport }: { initialReport: HealthRe
       aria-label="Stav služeb"
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-          Stav služeb
-        </h2>
+        <div className="flex items-start gap-2">
+          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+            Stav služeb
+          </h2>
+          <InfoTooltip text="Rychlá kontrola, jestli odpovídají klíčové externí služby (databáze, e-maily, platby, úložiště). Zelená = v pořádku, žlutá = pomalé/částečné, červená = nedostupné." />
+        </div>
         <Button onClick={handleRecheck} disabled={isPending}>
           {isPending ? 'Kontroluji…' : 'Zkontrolovat znovu'}
         </Button>

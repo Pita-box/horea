@@ -2,6 +2,16 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — admin-system-tools: Informační tooltipy ke kartám stránky `/admin/system`
+
+### Nové funkce
+- InfoTooltipy v hlavičkách všech karet stránky `/admin/system` (feature parita s user dashboardem). `SectionHeading` v `src/app/admin/system/page.tsx` nově přijímá volitelný `info?: string` a renderuje `<InfoTooltip>` vpravo nahoře vedle titulku; doplněn `info` u sekcí Stav služeb (fallback), Informace o nasazení, Stav e-mailové fronty, Stav záloh, Čerstvost GoPay webhooku, Provozní metriky, Konfigurace, Logy a auditní stopa, Monitor cron úloh. Tooltip ručně přidán i do hlaviček klientských panelů: `HealthRecheckButton.tsx` (Stav služeb), `RevalidatePanel.tsx`, `CronTriggerPanel.tsx`, `PruneCronRunsPanel.tsx`, `TestEmailPanel.tsx`. Sdílená komponenta `@/components/ui/info-tooltip`. Ověřeno `pnpm exec eslint` (exit 0) a get_diagnostics (bez chyb); `pnpm exec tsc --noEmit` bez nových chyb v upravených souborech (pre-existující chyby jen v test souborech).
+
+## 2026-06-21 — admin-dashboard: Informační tooltipy ke kartám stránek podniků
+
+### Nové funkce
+- InfoTooltipy v hlavičkách karet admin stránek podniků (`src/app/admin/businesses/page.tsx`, `src/app/admin/businesses/[id]/page.tsx`, `src/app/admin/businesses/[id]/BusinessActions.tsx`) — vpravo nahoře u každé karty, lidsky vysvětlují obsah sekce. Pokrývá: filtry seznamu, seznam podniků, profil, předplatné, rezervace, historii plateb a administrátorské akce. Ověřeno `pnpm exec eslint` (exit 0) a get_diagnostics (bez chyb).
+
 ## 2026-06-21 — admin-system-tools: Task 31 — Závěrečný checkpoint (kompletní funkce)
 
 ### Hotové tasky
@@ -3201,3 +3211,9 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 
 ### Nové funkce
 - Property test (`src/lib/system/__tests__/config-report.pbt.test.ts`) — ověřuje, že `buildConfigReport` nikdy neemituje hodnoty env proměnných, `isSet` koresponduje s truthy přítomností a `logLevel` se odvozuje z `LOG_LEVEL` (default `info`).
+
+
+## 2026-… — admin-system-tools (DB migrace aplikovány)
+
+### Nové funkce
+- Aplikovány migrace `0052_create_cron_runs.sql` a `0053_create_system_settings.sql` proti sdílené Supabase DB přes `pnpm dlx supabase db push` (potvrzeno uživatelem). `migration list` potvrzuje sync (local i remote 0052/0053). Tím se zprovoznily runtime části `/admin/system`: cron monitor + záznam běhů (`cron_runs`), cooldown testovacího e-mailu a prune (`system_settings`).

@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 
 import { sendTestEmail, type SendTestEmailResult } from './actions';
@@ -46,9 +47,12 @@ export function TestEmailPanel() {
   return (
     <Card as="section" className="flex flex-col gap-[var(--spacing-16)] p-[var(--card-padding)]">
       <div className="space-y-1">
-        <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
-          Testovací e-mail
-        </h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
+            Testovací e-mail
+          </h2>
+          <InfoTooltip text="Odešle zkušební e-mail na administrátorskou adresu pro ověření, že odesílání e-mailů funguje. Má krátký cooldown." />
+        </div>
         <p className="text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
           Odešle testovací e-mail na administrátorskou adresu pro ověření doručitelnosti.
         </p>

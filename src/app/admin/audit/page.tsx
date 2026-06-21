@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import type { AuditActionType, AuditTargetType } from '@/lib/admin/audit-logger';
@@ -113,6 +114,9 @@ export default async function AdminAuditPage({ searchParams }: AuditPageProps) {
         className="border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label="Filtry auditní stopy"
       >
+          <div className="flex justify-end">
+            <InfoTooltip text="Filtry zúží auditní záznamy podle typu akce, typu a ID cílového objektu a časového rozsahu (Od–Do). Po odeslání se seznam dole aktualizuje, „Zrušit filtry“ je vymaže. Filtry nemění data, jen zobrazení." />
+          </div>
           <form method="get" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:items-end">
             <label className="flex flex-col gap-2">
               <span className="text-sm font-medium text-[var(--color-slate-text)]">Typ akce</span>
@@ -182,6 +186,9 @@ export default async function AdminAuditPage({ searchParams }: AuditPageProps) {
             className="overflow-hidden border border-[var(--color-border-vychozi)]"
             aria-label="Auditní záznamy"
           >
+            <div className="flex justify-end px-5 pt-5">
+              <InfoTooltip text="Auditní stopa zaznamenává citlivé akce administrátorů (kdo, co, kdy a nad jakým objektem). Záznamy jsou trvalé (append-only), řazené od nejnovějších a z tohoto rozhraní je nelze upravovat ani mazat." />
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-sm">
                 <thead>

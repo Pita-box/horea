@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Notice } from '@/components/ui/notice';
 import type { SubscriptionPlan, SubscriptionStatus } from '@/lib/admin/business-manager';
 
@@ -193,9 +194,12 @@ export function BusinessActions({
       aria-label="Administrátorské akce"
     >
       <div className="space-y-2">
-        <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-          Administrátorské akce
-        </h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+            Administrátorské akce
+          </h2>
+          <InfoTooltip text="Citlivé administrátorské akce nad podnikem a jeho předplatným: úprava předplatného, zkušební období, comp účet, pozastavení, opětovné odeslání faktury a vynucené smazání. Každá akce se zapisuje do auditní stopy." />
+        </div>
         <p className="text-sm leading-6 text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
           Citlivé akce nad podnikem a jeho předplatným. Každá akce je zaznamenána do
           auditní stopy.

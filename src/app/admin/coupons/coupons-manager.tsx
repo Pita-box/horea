@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import type { CouponManagerRecord } from '@/lib/admin/coupon-manager';
@@ -123,9 +124,12 @@ export function CouponsManager({ coupons }: CouponsManagerProps) {
         className="space-y-4 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         aria-label={isEditing ? 'Úprava kupónu' : 'Vytvoření kupónu'}
       >
-        <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
-          {isEditing ? 'Upravit kupón' : 'Nový kupón'}
-        </h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+            {isEditing ? 'Upravit kupón' : 'Nový kupón'}
+          </h2>
+          <InfoTooltip text="Vytvoř nebo uprav slevový kupón: zadej kód, typ slevy (procenta, pevná částka v Kč, zkušební dny nebo comp účet), hodnotu, platnost do a maximální počet použití. Hodnota se u comp účtu nepoužívá; max. použití prázdné znamená neomezeně." />
+        </div>
         <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:items-end">
           <label className="flex flex-col gap-2">
             <span className="text-sm font-medium text-[var(--color-slate-text)]">Kód</span>
@@ -219,6 +223,12 @@ export function CouponsManager({ coupons }: CouponsManagerProps) {
           className="overflow-hidden border border-[var(--color-border-vychozi)]"
           aria-label="Seznam kupónů"
         >
+          <div className="flex items-start justify-between gap-2 px-4 py-3">
+            <h2 className="font-[var(--font-polysans)] text-xl font-semibold text-[var(--color-rich-violet)]">
+              Seznam kupónů
+            </h2>
+            <InfoTooltip text="Přehled všech kupónů: kód, typ a hodnota slevy, počet použití (a limit, pokud je nastaven) a stav (aktivní/neaktivní). U každého kupónu můžeš spustit úpravu, deaktivaci nebo smazání." />
+          </div>
           <div className="overflow-x-auto">
             <table data-no-row-hover className="w-full border-collapse text-left text-sm">
               <thead>

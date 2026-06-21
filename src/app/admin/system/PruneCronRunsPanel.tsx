@@ -4,6 +4,7 @@ import { useId, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Input } from '@/components/ui/input';
 import { Notice } from '@/components/ui/notice';
 import { DEFAULT_CRON_RETENTION_DAYS } from '@/lib/system/prune-cutoff';
@@ -53,9 +54,12 @@ export function PruneCronRunsPanel() {
   return (
     <Card as="section" className="flex flex-col gap-[var(--spacing-16)] p-[var(--card-padding)]">
       <div className="space-y-1">
-        <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
-          Retence běhů cronů
-        </h2>
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="text-base font-semibold text-[var(--color-rich-violet)]">
+            Retence běhů cronů
+          </h2>
+          <InfoTooltip text="Nevratně smaže staré záznamy běhů cronů starší než zadaný počet dní. Týká se jen historie běhů, ne auditní stopy." />
+        </div>
         <p className="text-sm text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
           Nevratně smaže staré záznamy běhů cronů starší než zadaný počet dní. Bez zadání se použije
           výchozí retence {DEFAULT_CRON_RETENTION_DAYS} dní.
