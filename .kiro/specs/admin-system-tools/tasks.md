@@ -187,14 +187,14 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Skládat výsledky přes čisté `mapProbeStatus`/`aggregateStatus`; běží výhradně server-side (`server-only`).
     - _Requirements: 3.1, 3.4, 3.5, 4.1, 4.3, 4.4, 6.1, 6.4_
 
-  - [ ]* 13.2 Property test — výsledek health checku bez tajné hodnoty
+  - [x]* 13.2 Property test — výsledek health checku bez tajné hodnoty
     - **Property 3: Výsledek health checku nikdy neobsahuje tajnou hodnotu**
     - Soubor `src/lib/system/__tests__/health-redaction.pbt.test.ts`, fast-check `numRuns: 100`.
     - Tag: `// Feature: admin-system-tools, Property 3: Výsledek health checku nikdy neobsahuje tajnou hodnotu`.
     - Generovat chybové outcomes se „secret-like" řetězci; ověřit, že `JSON.stringify(ServiceProbeResult)` neobsahuje žádný tajný token (nese jen `service`, `label`, `status`, `latencyMs`, `errorKind`).
     - **Validates: Requirements 6.1, 6.4**
 
-  - [ ]* 13.3 Integrační test orchestrace health checku
+  - [x]* 13.3 Integrační test orchestrace health checku
     - Mock probe s řízenými delays/výsledky; ověřit pokrytí všech 6 služeb, paralelismus (čas ≪ součet), tvrdý strop 6 s (fake timers), izolaci selhání jedné probe.
     - _Requirements: 3.1, 3.4, 4.1, 4.3, 4.4_
 
@@ -203,7 +203,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Doplnit do `config-report.ts` tenký I/O wrapper: předá `process.env` a `EXPECTED_ENV_KEYS` čisté funkci; `logLevel` z `process.env.LOG_LEVEL` (default `info`); `logLocationInfo` český text (Vercel logs / log drains, neperzistence). `server-only`.
     - _Requirements: 7.1, 7.3, 8.1, 8.2, 8.3_
 
-  - [ ]* 14.2 Unit testy `getConfigReport`
+  - [x]* 14.2 Unit testy `getConfigReport`
     - Mock `process.env`; ověřit `logLevel`, `Log_Location_Info`, absenci hodnot, příznaky set/unset.
     - _Requirements: 7.1, 7.3, 8.1, 8.2, 8.3_
 
@@ -212,7 +212,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Doplnit do `build-info.ts` tenký I/O wrapper: předá `process.env` (jen `VERCEL_GIT_COMMIT_SHA`, `VERCEL_GIT_COMMIT_REF`, `VERCEL_ENV`, `VERCEL_DEPLOYMENT_ID`/`VERCEL_DEPLOY_ID`) a `process.version` čisté funkci. `server-only`.
     - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5, 16.6_
 
-  - [ ]* 15.2 Unit testy `getDeployInfo`
+  - [x]* 15.2 Unit testy `getDeployInfo`
     - Mock `process.env`/`process.version`; ověřit mapování, `'nedostupné'` pro chybějící údaje, žádnou hodnotu tajného klíče.
     - _Requirements: 16.6, 16.7_
 
@@ -221,7 +221,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Doplnit do `outbox-status.ts` I/O wrapper: přes service-role klienta načíst z `email_outbox` **jen ne-PII sloupce** `status, created_at, next_attempt_at` (potvrzeno dle `src/lib/email/outbox.ts` / migrace 0041) a předat `summarizeOutbox`. NIKDY nečíst `to_email`/`subject`/`html_body`/`text_body`. Nedostupný zdroj → signál pro „stav e-mailové fronty je momentálně nedostupný". `server-only`.
     - _Requirements: 17.1, 17.5, 17.6, 17.7_
 
-  - [ ]* 16.2 Unit testy `getOutboxStatus`
+  - [x]* 16.2 Unit testy `getOutboxStatus`
     - Mock čtení `email_outbox`; ověřit, že dotaz vybírá jen `status,created_at,next_attempt_at` (žádné PII), korektní agregaci a fallback při nedostupnosti.
     - _Requirements: 17.5, 17.6, 17.7_
 
@@ -230,7 +230,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Doplnit do `backup-status.ts` I/O wrapper: předá `process.env` a Google `Service_Status` z `Health_Checker` čisté funkci. `server-only`.
     - _Requirements: 18.1, 18.2, 18.3_
 
-  - [ ]* 17.2 Unit testy `getBackupStatus`
+  - [x]* 17.2 Unit testy `getBackupStatus`
     - Mock `process.env` + `driveStatus`; ověřit `configured` dle přítomnosti `GOOGLE_*`, převzetí `driveStatus`, informativní text, absenci hodnot.
     - _Requirements: 18.1, 18.2, 18.3_
 
@@ -239,7 +239,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Doplnit do `webhook-freshness.ts` I/O wrapper: zjistit proxy čas `max(nejnovější subscriptions.updated_at, nejnovější payments.created_at)` (`payments` má jen `created_at`), předat `computeWebhookFreshness` s `isProxy=true`. Nedostupný zdroj → signál pro „čerstvost webhooku je momentálně nedostupná". `server-only`.
     - _Requirements: 20.1, 20.7_
 
-  - [ ]* 18.2 Unit testy `getWebhookFreshness`
+  - [x]* 18.2 Unit testy `getWebhookFreshness`
     - Mock čtení `subscriptions`/`payments`; ověřit proxy čas (max), `isProxy=true`, fallback při nedostupnosti, absenci PII.
     - _Requirements: 20.1, 20.7_
 
@@ -249,7 +249,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Přes service-role `count` (`select('*', { count: 'exact', head: true })`) zjistit počty `businesses`, `reservations`, `clients`; jen agregované počty, žádná data řádků/PII. `storage` → `{ available: false }` (`'nedostupné'`), pokud velikost není levně zjistitelná — žádné nákladné volání. Selhání DB count → `db: null`.
     - _Requirements: 23.1, 23.2, 23.3, 23.4, 23.5_
 
-  - [ ]* 19.2 Příkladové testy `getOperationalMetrics`
+  - [x]* 19.2 Příkladové testy `getOperationalMetrics`
     - Mock service-role `count`; ověřit počty, `storage` „nedostupné" bez nákladného volání, `db: null` fallback při selhání, žádná data řádků. (I/O — nikoli PBT.)
     - _Requirements: 23.1, 23.2, 23.3, 23.4, 23.5_
 
@@ -276,7 +276,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Obalí běh: zapíše start do `cron_runs`, spustí handler, doplní `finished_at` + `status` + `detail` (jen číselné metriky, BEZ Secret_Value). Zápis je best-effort (chyba zápisu nesmí shodit job, jen se zaloguje). Service-role klient.
     - _Requirements: 11.4, 15.4_
 
-  - [ ]* 23.2 Unit testy `recordCronRun`
+  - [x]* 23.2 Unit testy `recordCronRun`
     - Mock DB klient; ověřit zápis start+finish, best-effort chování (selhání zápisu nezhodí job), absenci tajemství v `detail`.
     - _Requirements: 11.4, 15.4_
 
@@ -285,7 +285,7 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Pro každý ze 4 jobů poslední `cron_runs` (`order by started_at desc limit 1`); chybí-li → `lastRun: null`; nedostupný zdroj → signál pro „stav cronů je momentálně nedostupný".
     - _Requirements: 11.1, 11.2, 11.3, 13.4_
 
-  - [ ]* 23.4 Unit testy `getCronStatuses`
+  - [x]* 23.4 Unit testy `getCronStatuses`
     - Mock čtení `cron_runs`; ověřit poslední běh per job, „bez zaznamenaného běhu", fallback při nedostupnosti zdroje.
     - _Requirements: 11.1, 11.2, 11.3, 13.4_
 

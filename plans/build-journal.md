@@ -2,6 +2,76 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — admin-system-tools: Task 23.4 — Unit testy getCronStatuses
+
+### Hotové tasky
+- 23.4 `src/lib/system/__tests__/cron-monitor.test.ts` — ověřeno `pnpm test:run` (7 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/cron-monitor.test.ts` — příkladové unit testy I/O funkce `getCronStatuses()`. Mock `@/lib/supabase/admin` (`createAdminClient().from('cron_runs').select().eq('job',name).order('started_at',{ascending:false}).limit(1)`) jako chainovatelný builder; per-job řízený `{ data, error }` v mapě podle jobu zachyceného z `.eq('job', …)`, argumenty zaznamenané přes `vi.hoisted`. Pokrytí: tvar dotazu (4× `cron_runs`, order desc, limit 1, R11.1); mapování posledního běhu na ne-PII `CronRunRecord` vč. neznámý status/trigger → `ok`/`scheduled` (R11.1, R11.2); job bez záznamu (`data: []`) → `lastRun: null` (R11.3); chyba kteréhokoli dotazu → celé `null` (fallback R13.4); rekurzivní kontrola, že serializovaný výsledek nese jen ne-PII klíče.
+
+## 2026-06-21 — admin-system-tools: Task 23.2 — Unit testy recordCronRun
+
+### Hotové tasky
+- 23.2 `src/lib/cron/__tests__/record-run.test.ts` — ověřeno `pnpm test:run` (9 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/cron/__tests__/record-run.test.ts` — unit testy obalu `recordCronRun(job, trigger, run)`. Mock `@/lib/supabase/admin` (`createAdminClient().from().insert().select().single()` pro start, `update().eq()` pro finish) s konfigurovatelným chováním (`ok`/`error`/`throw`) a záznamem argumentů přes `vi.hoisted`; mock `@/lib/log-server` jako spy. Pokrytí: úspěch zapíše start (status `running`) i finish (finální status z výsledku + detail jen čísla) a vrátí výsledek handleru; best-effort — selhání insertu/update (vrácený `error` i vyhozená výjimka) job neshodí a zaloguje `serverLog.warn`; výjimka handleru → re-throw + finish status `error`; `sanitizeDetail` propustí jen konečná čísla (NaN/Infinity/string/PII se zahodí, prázdný detail → null) (R11.4, R15.4).
+
+## 2026-06-21 — admin-system-tools: Task 19.2 — Příkladové testy getOperationalMetrics
+
+### Hotové tasky
+- 19.2 `src/lib/system/__tests__/metrics.test.ts` — ověřeno `pnpm test:run` (8 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/metrics.test.ts` — příkladové unit testy I/O funkce `getOperationalMetrics()`. Mock `@/lib/supabase/admin` (`createAdminClient().from(table).select(columns, options)`) vrací per-tabulku řízený `{ count, error }` a zaznamenává argumenty přes `vi.hoisted`. Pokrytí: úspěch → `db` s počty z mock countů (a `null` count → 0); ověření, že select je volán s `{ count: 'exact', head: true }` (head → žádná data řádků, R23.4) a výstup neobsahuje PII; storage vždy `{ available: false }` bez extra dotazu (R23.2, R23.3); selhání jednoho countu (`error`) → `db: null` a selhání `createAdminClient` (throw, chybějící env) → `db: null` (R23.5).
+
+### Hotové tasky
+- 17.2 `src/lib/system/__tests__/backup-status.test.ts` — ověřeno `pnpm test:run` (5 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/backup-status.test.ts` — příkladové unit testy I/O wrapperu `getBackupStatus(driveStatus)`. Mock `process.env` přes `vi.stubEnv` (úklid `vi.unstubAllEnvs` v `afterEach`). Pokrytí: všechny GOOGLE_* klíče nastavené → `configured=true`; chybí jeden klíč (smazán přes `vi.stubEnv(key, undefined)`) → `configured=false`; `driveStatus` se věrně převezme z parametru (ok/degraded/down); `info` je neprázdný string; hodnoty env proměnných se neobjeví v `JSON.stringify` výsledku (R18.1, R18.2, R18.3, R18.5).
+
+## 2026-06-21 — admin-system-tools: Task 13.3 — Integrační test orchestrace health checku
+
+### Hotové tasky
+- 13.3 `src/lib/system/__tests__/health.orchestration.test.ts` — ověřeno `pnpm test:run` (4 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/health.orchestration.test.ts` — integrační testy `runHealthChecks()` se třemi mock kanály (žádná reálná síť): `@/lib/supabase/admin` (`createAdminClient().from().select()`), `aws4fetch` (`AwsClient.fetch` pro R2) a routovaný globální `fetch` (resend/smtp2go/gopay/google podle hostitele v URL). Sdílené, per-test přenastavitelné chování probe (`delayMs` + `mode: ok|httpError|throw|hang`) drženo ve `vi.hoisted`, aby na něj dosáhly hoistnuté `vi.mock` factory. Determinismus přes **fake timers**: mock odpovědi se vyřeší přes `setTimeout(delayMs)`, čas posouván `vi.advanceTimersByTimeAsync` (latence uvnitř probe běží z `Date.now()`, které fake timers řídí). Pokrytí: (1) všech 6 služeb ve fixním pořadí + aggregate/checkedAt; (2) paralelismus — báze 1000 ms/probe, ověřeno že report NENÍ hotový v 999 ms ale je hotový v 1000 ms (sériově by trval 6000 ms); (3) tvrdý strop — všechny probe „visí", po posunu o 6 s se běh přesto vrátí a služby jsou `down`/`timeout`/`latencyMs=null`; (4) izolace selhání — `throw` u resend → resend `down`, ostatní `ok`, běh se nevyhodí.
+
+### Pozn. k implementaci
+- Tvrdý strop 6 s je v `health.ts` defenzivní backstop: každá probe je obalena `withTimeout` (5 s), takže `Promise.allSettled` se vždy vyřeší ≤ 5 s a větev `raced === 'capped'` je za normálního provozu nedosažitelná. Test proto ověřuje pozorovatelnou garanci (ohraničený návrat + `down`/`timeout`), nikoli interní větev stropu.
+
+## 2026-06-21 — admin-system-tools: Task 16.2 — Unit testy getOutboxStatus
+
+### Hotové tasky
+- 16.2 `src/lib/system/__tests__/outbox-status.test.ts` — ověřeno `pnpm test:run` (6 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/outbox-status.test.ts` — příkladové unit testy pro `getOutboxStatus()`: mock `@/lib/supabase/admin` (`createAdminClient`) zachytává argumenty `from`/`select` a vrací řízená data. Ověřuje, že se čte jen z `email_outbox` a vybírá přesně `status, created_at, next_attempt_at` (žádné `to_email`/`subject`/`html_body`/`text_body`, R17.5); korektní agregaci counts/oldestPendingAt/readyToRetry z mock řádků (R17.1–R17.4, deterministický `now` přes `vi.setSystemTime`); ignorování neznámých stavů; fallback `null` při `{ error }` i při chybějících datech (R17.7).
+
+## 2026-06-21 — admin-system-tools: Task 15.2 — Unit testy getDeployInfo
+
+### Hotové tasky
+- 15.2 `src/lib/system/__tests__/build-info.test.ts` — ověřeno `pnpm test:run` (6 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/build-info.test.ts` — příkladové unit testy pro `getDeployInfo()`: mapování VERCEL_* na pole, fallback `VERCEL_DEPLOY_ID`, `'nedostupné'` pro chybějící i neplatné `VERCEL_ENV`, ořez bílých znaků, ověření že hodnota tajného klíče (`SUPABASE_SERVICE_ROLE_KEY`) není v `JSON.stringify` výstupu (R16.6, R16.7). Mock `process.env` přes `vi.stubEnv`, úklid `vi.unstubAllEnvs`; `nodeVersion` se porovnává proti `process.version`.
+
+### Bug & fix
+- **Symptom:** Test fallbacku selhal — `expected 'nedostupné' to be 'dpl_fallback'`.
+- **Root cause:** `getDeployInfo` používá `??`, takže prázdný řetězec u `VERCEL_DEPLOYMENT_ID` není „missing" a fallback se neaktivuje; test ho nastavoval na `''`.
+- **Fix:** Test nastavuje primární proměnnou na `undefined` (`vi.stubEnv('VERCEL_DEPLOYMENT_ID', undefined)`), což odpovídá skutečnému scénáři „proměnná není nastavena". Kód beze změny.
+
+## 2026-06-21 — admin-system-tools: Task 14.2 — Unit testy getConfigReport
+
+### Hotové tasky
+- 14.2 `src/lib/system/__tests__/config-report.test.ts` — ověřeno `pnpm test:run` (8 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/config-report.test.ts` — příkladové unit testy pro `getConfigReport()`: odvození `logLevel` z `LOG_LEVEL` (i default `info`), příznaky set/unset (truthy/undefined/prázdná hodnota), záznam pro každý očekávaný klíč, absence jakékoli hodnoty proměnné v serializaci reportu a neprázdný `logLocationInfo`. Mock `process.env` přes `vi.stubEnv`, úklid `vi.unstubAllEnvs` v `afterEach`.
+
 ## 2026-06-21 — admin-system-tools: Task 28.1 — Stránka /admin/system
 
 ### Hotové tasky
