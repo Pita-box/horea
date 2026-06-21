@@ -9,6 +9,7 @@ import {
   activateSubscription,
   transitionToGracePeriod,
 } from '@/lib/subscription/transitions';
+import { notifyPaymentConfirmed } from '@/lib/telegram/notifications';
 import { serverLog } from '@/lib/log-server';
 
 /**
@@ -208,6 +209,9 @@ async function applyPaid(
   // Faktura — přidělí se jen jednou (guarded flip nás sem pustí jen jednou,
   // a jen pokud platba dosud číslo faktury nemá). Selhání generování fakturu
   // nezablokuje úspěch webhooku; zaloguje se k pozdějšímu řešení.
+  // Název podniku — pro fakturu i pro notifikaci operátorovi (R4.2).
+  let businessName = 'Podnik';
+
   if (payment.invoice_number === null) {
     const { data: business } = await supabase
       .from('businesses')
@@ -215,10 +219,12 @@ async function applyPaid(
       .eq('id', payment.business_id)
       .maybeSingle();
 
+    businessName = (business as { name: string } | null)?.name ?? 'Podnik';
+
     const invoice = await generateAndStoreInvoice(supabase, {
       paymentId: payment.id,
       issuedAt: now,
-      businessName: (business as { name: string } | null)?.name ?? 'Podnik',
+      businessName,
       description: planDescription(sub.plan),
       amountCzk: payment.amount_czk,
       variableSymbol: payment.variable_symbol,
@@ -227,6 +233,19 @@ async function applyPaid(
     if (!invoice.ok) {
       await serverLog.error('webhook_invoice_failed', { reason: invoice.error });
     }
+  }
+
+  // Best-effort notifikace operátorovi o potvrzené platbě — výhradně na cestě
+  // paid_applied (guarded flip skutečně překlopil status), tím je zajištěn dedup
+  // (R6.1). Selhání jen zalogujeme; výsledek webhooku se nemění (R4.1, R5.2).
+  try {
+    await notifyPaymentConfirmed({
+      businessName,
+      plan: sub.plan,
+      amountCzk: payment.amount_czk,
+    });
+  } catch {
+    // best-effort: notifikace nesmí ovlivnit výsledek webhooku (R5.2)
   }
 
   return { ok: true, outcome: 'paid_applied' };

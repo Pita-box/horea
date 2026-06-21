@@ -102,7 +102,7 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
     - (orchestraci `handleTelegramUpdate` doplní task 9.1 do téhož souboru)
     - _Requirements: 7.1, 7.2, 7.3, 8.1, 8.2_
 
-  - [ ]* 3.7 Property test pro autorizaci secretu
+  - [x]* 3.7 Property test pro autorizaci secretu
     - **Property 7: Autorizace webhook secretu**
     - **Validates: Requirements 7.1, 7.2, 7.3**
     - fast-check `{ numRuns: 100 }`, tag `// Feature: telegram-operator-notifications, Property 7: ...`
@@ -127,7 +127,7 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
     - **Validates: Requirements 14.1, 14.2**
     - fast-check `{ numRuns: 100 }`, tag `// Feature: telegram-operator-notifications, Property 10: ...`
 
-  - [ ]* 4.3 Property test pro obsah notifikačních zpráv
+  - [x]* 4.3 Property test pro obsah notifikačních zpráv
     - **Property 11: Notifikační zprávy obsahují požadovaná pole**
     - **Validates: Requirements 3.2, 3.3, 4.2, 4.3**
     - fast-check `{ numRuns: 100 }`, tag `// Feature: telegram-operator-notifications, Property 11: ...`
@@ -173,7 +173,7 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
       `auto_renew=true` a `current_period_end` v období, předat do `estimateNextMonthRevenueCzk`
     - _Requirements: 10.1, 10.2_
 
-  - [ ] 7.3 Doplnit `runServiceProbes()` do `src/lib/telegram/health.ts`
+  - [x] 7.3 Doplnit `runServiceProbes()` do `src/lib/telegram/health.ts`
     - `import 'server-only'`; paralelní read-only probe šesti služeb (Supabase, Resend, SMTP2GO,
       GoPay, Cloudflare R2, Google) přes `Promise.allSettled`; selhání/timeout → `status: 'down'`
       u dané služby a pokračovat; výsledek bez Secret_Value
@@ -214,28 +214,28 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
 - [x] 10. Checkpoint — server-only moduly
   - Spustit `pnpm test:run` a `pnpm lint`. Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 11. Integrace do existujících toků (surgical hooky)
-  - [ ] 11.1 Napojit notifikaci nového podniku v `src/app/onboarding/6/actions.ts`
+- [x] 11. Integrace do existujících toků (surgical hooky)
+  - [x] 11.1 Napojit notifikaci nového podniku v `src/app/onboarding/6/actions.ts`
     - Po `result.ok` a **před** `redirect('/dashboard')` načíst název nově vzniklého podniku
       a zavolat `await notifyBusinessCreated(...)` v `try/catch`; selhání nezmění výsledek ani
       redirect (dedup odvozen z unikátnosti slugu — notifikace jen po `{ ok: true }`)
     - _Requirements: 3.1, 5.1, 6.2_
 
-  - [ ] 11.2 Napojit notifikaci platby v `src/lib/webhooks/handler.ts`
+  - [x] 11.2 Napojit notifikaci platby v `src/lib/webhooks/handler.ts`
     - Ve větvi `applyPaid` v místě úspěšného `return { ok: true, outcome: 'paid_applied' }`
       zavolat `await notifyPaymentConfirmed({ businessName, plan: sub.plan, amountCzk:
       payment.amount_czk })` v `try/catch`; selhání jen zalogovat, výsledek webhooku nezměnit
       (dedup odvozen z guarded flip na `paid` — notifikace jen z `paid_applied`)
     - _Requirements: 4.1, 5.2, 6.1_
 
-  - [ ]* 11.3 Integrační testy hooků (mock Notifieru)
+  - [x]* 11.3 Integrační testy hooků (mock Notifieru)
     - `notifyBusinessCreated` se volá po `commitOnboarding` ok; `notifyPaymentConfirmed` ve větvi
       `paid_applied`; dvojí doručení webhooku → notify právě jednou; selhání notifikace nezmění
       výsledek toku ani redirect
     - _Requirements: 3.1, 4.1, 5.1, 5.2, 6.1, 6.2_
 
-- [ ] 12. Příchozí Route Handler
-  - [ ] 12.1 Vytvořit `src/app/api/telegram/webhook/route.ts`
+- [x] 12. Příchozí Route Handler
+  - [x] 12.1 Vytvořit `src/app/api/telegram/webhook/route.ts`
     - Tenký adaptér dle vzoru `app/api/webhooks/gopay/route.ts`: `resolveWebhookSecret` → `null` →
       HTTP 401 + log `telegram_webhook_secret_missing` bez Secret_Value; `isAuthorizedSecret`
       nad hlavičkou `x-telegram-bot-api-secret-token` → neshoda/chybí → HTTP 401 bez business
@@ -243,18 +243,18 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
       `handleTelegramUpdate(update)` a HTTP 200
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-  - [ ]* 12.2 Unit testy Route Handleru
+  - [x]* 12.2 Unit testy Route Handleru
     - Nenastavený/neshodný/chybějící secret → 401 bez dispatch; neplatné tělo → 200 bez příkazu;
       validní ověřený update → 200 a volání `handleTelegramUpdate`
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 13. Wiring konfigurace
-  - [ ] 13.1 Doplnit nové proměnné do `.env.example`
+- [x] 13. Wiring konfigurace
+  - [x] 13.1 Doplnit nové proměnné do `.env.example`
     - Přidat `TELEGRAM_BOT_TOKEN`, `TELEGRAM_OPERATOR_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET`
       s krátkým českým komentářem (server-only, bez nich je feature no-op / webhook odmítá vše)
     - _Requirements: 1.1, 1.4, 7.3_
 
-- [ ] 14. Finální checkpoint
+- [x] 14. Finální checkpoint
   - Spustit `pnpm test:run`, `pnpm lint` a `pnpm build`. Ensure all tests pass, ask the user if
     questions arise.
 

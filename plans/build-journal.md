@@ -2,6 +2,55 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — telegram-operator-notifications: Finální checkpoint (Task 14)
+
+### Hotové tasky
+- 14. Finální checkpoint — ověřeno: `pnpm test:run` (603 passed | 57 skipped, 0 failed), `pnpm lint` (exit 0, jen neškodný engine warning), `pnpm build` (✓ Compiled successfully). Bez oprav — vše prošlo na první pokus.
+
+### Ověřeno buildem
+- Produkční Next.js build zkompiloval nový Route Handler `/api/telegram/webhook` (`src/app/api/telegram/webhook/route.ts`) i `import 'server-only'` moduly v `src/lib/telegram/` bez chyb. Route je v build outputu jako dynamická (ƒ) funkce.
+
+## 2026-06-21 — telegram-operator-notifications: Integrační testy hooků (Task 11.3)
+
+### Hotové tasky
+- 11.3 Integrační testy hooků notifikací (mock Notifieru) — ověřeno (`pnpm test:run` 5/5 passed, eslint exit 0)
+
+### Nové funkce
+- **Integrační test webhook hooku** (`src/lib/webhooks/__tests__/handler.notifications.test.ts`) — pokrývá R4.1/R6.1/R5.2 pro `processGopayWebhook`: PAID → `notifyPaymentConfirmed` právě jednou s `{ businessName, plan, amountCzk }`; dvojí doručení → notify CELKEM jednou (druhé `noop`); selhání notifikace (mock vyhodí) → stále `{ ok: true, outcome: 'paid_applied' }`. Guarded flip je nasimulován **stavovým** mock Supabase klientem (`QueryBuilder` třída): `payments.update(status:'paid')` překlopí sdílený stav řádku jen pokud `status !== 'paid'` a vrátí `{id}`/`null`; při druhém doručení úvodní `select` vidí `status='paid'` → handler skončí na idempotentní `noop` větvi ještě před `applyPaid`. Builder je zároveň thenable (`then`) i `maybeSingle`, aby pokryl chainy `update().eq()` (subscriptions) i `...maybeSingle()` (payments/businesses). `notifyPaymentConfirmed`, `generateAndStoreInvoice`, `activateSubscription`, `serverLog` jsou mocky; `extendPeriod` zůstává reálná.
+- **Integrační test onboarding hooku** (`src/app/onboarding/6/__tests__/actions.notifications.test.ts`) — pokrývá R3.1/R5.1 pro `commitAction`: po `commitOnboarding` ok je `notifyBusinessCreated` volán PŘED `redirect('/dashboard')` (ověřeno přes `mock.invocationCallOrder`); i když notifikace vyhodí, `redirect('/dashboard')` se přesto provede. Mockovány `@/lib/onboarding/commit`, `@/lib/supabase/server` (auth.getUser + `from().select().eq().single()` → název podniku), `next/navigation` (`redirect` vyhazuje `NEXT_REDIRECT`) a Notifier.
+
+## 2026-06-21 — telegram-operator-notifications: Unit testy Route Handleru (Task 12.2)
+
+### Hotové tasky
+- 12.2 Unit testy Route Handleru `POST /api/telegram/webhook` — ověřeno (`pnpm test:run` 5/5 passed, eslint exit 0)
+
+### Nové funkce
+- **Unit testy Route Handleru** (`src/app/api/telegram/webhook/__tests__/route.test.ts`) — pokrývají R7.1–R7.4: nenastavený secret → 401 bez dispatch + log `telegram_webhook_secret_missing`; chybějící/neshodná hlavička → 401 bez dispatch; shodná hlavička + neplatné JSON tělo → 200 bez příkazu; shodná hlavička + validní JSON → 200 a `handleTelegramUpdate` volán právě jednou s naparsovaným updatem. `handleTelegramUpdate` je spy (přes `vi.importActual`, aby `isAuthorizedSecret` zůstala reálná), secret se řídí přes `vi.stubEnv('TELEGRAM_WEBHOOK_SECRET', …)`, `serverLog` je spy (odpojí `next/headers`). Request se konstruuje jako standardní `Request` přetypovaný na `NextRequest`.
+
+## 2026-06-21 — telegram-operator-notifications: Napojení notifikace platby (Task 11.2)
+
+### Hotové tasky
+- 11.2 Napojit `notifyPaymentConfirmed` v `src/lib/webhooks/handler.ts` — ověřeno (eslint exit 0, tsc bez chyb v souboru, `pnpm test:run src/lib/webhooks` 6/6 passed)
+
+### Nové funkce
+- **Integrace notifikace potvrzené platby ve `applyPaid`** (`src/lib/webhooks/handler.ts`) — TĚSNĚ PŘED `return { ok: true, outcome: 'paid_applied' }` se v `try/catch` (best-effort, R5.2) volá `notifyPaymentConfirmed({ businessName, plan: sub.plan, amountCzk: payment.amount_czk })` (R4.1). `businessName` je vytaženo do proměnné scope funkce (`let businessName = 'Podnik'`) a naplněno z již existujícího dotazu `businesses.select('name')` uvnitř bloku `payment.invoice_number === null` (na cestě paid_applied je `invoice_number` vždy `null`, protože fakturu přiděluje až tento flow). Žádný nový DB dotaz. Dedup je odvozen z guarded flip na `paid` — sem se dostaneme jen když flip skutečně překlopil status (R6.1); idempotentní `noop` větev notifikaci nevolá. Selhání notifikace neovlivní výsledek webhooku.
+
+## 2026-06-21 — telegram-operator-notifications: Napojení notifikace nového podniku (Task 11.1)
+
+### Hotové tasky
+- 11.1 Napojit `notifyBusinessCreated` v `src/app/onboarding/6/actions.ts` — ověřeno (eslint exit 0, tsc bez chyb v souboru)
+
+### Nové funkce
+- **Integrace notifikace vzniku podniku v `commitAction`** (`src/app/onboarding/6/actions.ts`) — po `result.ok` a PŘED `redirect('/dashboard')` se v `try/catch` (best-effort, R5.1) dohledá název nového podniku přes `businesses.select('name').eq('owner_user_id', user.id).single()` (název není v `CommitOnboardingResult`, který nese jen `{ ok: true }`) a zavolá `notifyBusinessCreated({ businessName, createdAt: new Date() })` (R3.1). `redirect()` je až za `try/catch`, mimo něj — aby `try` nezachytil interní `NEXT_REDIRECT`. Dedup je odvozen z unikátnosti slugu: do větve se dostaneme jen po `{ ok: true }` (R6.2).
+
+## 2026-06-21 — telegram-operator-notifications: Route Handler webhooku (Task 12.1)
+
+### Hotové tasky
+- 12.1 Vytvořit `src/app/api/telegram/webhook/route.ts` — ověřeno (eslint exit 0, tsc bez chyb v souboru)
+
+### Nové funkce
+- **`POST /api/telegram/webhook`** (`src/app/api/telegram/webhook/route.ts`) — tenký adaptér dle vzoru gopay route (R7.1–R7.4). Pořadí: (1) `resolveWebhookSecret(process.env)` → `null` ⇒ HTTP 401 + log `telegram_webhook_secret_missing` bez Secret_Value (R7.3); (2) `isAuthorizedSecret` nad hlavičkou `x-telegram-bot-api-secret-token` v konstantním čase → neshoda/chybí ⇒ HTTP 401 bez business logiky (R7.2); (3) `await request.json()` v `try/catch` → neplatné tělo ⇒ HTTP 200 bez příkazu (Telegram neretry-uje, R7.4); (4) `handleTelegramUpdate(update)` + HTTP 200. Token/secret/tělo se nelogují. Bez `runtime`/`dynamic` exportu (vzor gopay route je rovněž nemá).
+
 ## 2026-06-21 — telegram-operator-notifications: Property test Notifier (Task 8.2)
 
 ### Hotové tasky
