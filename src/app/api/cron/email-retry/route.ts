@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { verifyCronAuthorization } from '@/lib/cron/auth';
+import { recordCronRun, type CronTrigger } from '@/lib/cron/record-run';
 import { drainEmailOutbox, purgeOldOutbox } from '@/lib/email/outbox';
 import { serverLog } from '@/lib/log-server';
 
@@ -35,19 +36,42 @@ async function handle(request: NextRequest): Promise<Response> {
     return NextResponse.json({ error: auth.reason }, { status });
   }
 
-  const result = await drainEmailOutbox(BATCH_LIMIT);
-  const purged = await purgeOldOutbox(7);
+  // Ruční spuštění z Cron_Trigger přidá `?trigger=manual`; jinak plánovaný běh.
+  const trigger: CronTrigger =
+    new URL(request.url).searchParams.get('trigger') === 'manual' ? 'manual' : 'scheduled';
 
-  await serverLog.info('cron_email_retry_completed', {
-    job: 'email-retry',
-    processed: result.processed,
-    sent: result.sent,
-    requeued: result.requeued,
-    dead: result.dead,
-    purged,
+  // Doménová logika je beze změny; jen ji obalíme záznamem běhu do `cron_runs`.
+  // Záznam je best-effort a NEMĚNÍ návratovou hodnotu ani HTTP status (R11.4).
+  const run = await recordCronRun('email-retry', trigger, async () => {
+    const result = await drainEmailOutbox(BATCH_LIMIT);
+    const purged = await purgeOldOutbox(7);
+
+    await serverLog.info('cron_email_retry_completed', {
+      job: 'email-retry',
+      processed: result.processed,
+      sent: result.sent,
+      requeued: result.requeued,
+      dead: result.dead,
+      purged,
+    });
+
+    return {
+      status: 'ok' as const,
+      // detail nese pouze číselné metriky běhu (BEZ Secret_Value ani PII).
+      detail: {
+        processed: result.processed,
+        sent: result.sent,
+        requeued: result.requeued,
+        dead: result.dead,
+        purged,
+      },
+      // Payload pro nezměněnou HTTP odpověď.
+      result,
+      purged,
+    };
   });
 
-  return NextResponse.json({ ...result, purged }, { status: 200 });
+  return NextResponse.json({ ...run.result, purged: run.purged }, { status: 200 });
 }
 
 export async function GET(request: NextRequest): Promise<Response> {

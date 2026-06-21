@@ -4,6 +4,7 @@ import { chargeMonthly } from '@/lib/billing/charge';
 import type { SubscriptionPlan } from '@/lib/checkout/pricing';
 import { notifyAdminCronFailure } from '@/lib/cron/admin-notify';
 import { verifyCronAuthorization } from '@/lib/cron/auth';
+import { recordCronRun, type CronRunResult, type CronTrigger } from '@/lib/cron/record-run';
 import { serverLog } from '@/lib/log-server';
 import { createGopayClient } from '@/lib/payments/gopay/client';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -48,6 +49,14 @@ type DueSubscriptionRow = {
   gopay_schedule_id: string | null;
 };
 
+/**
+ * Výsledek doménové části billing běhu. Rozšiřuje {@link CronRunResult} (status +
+ * číselné `detail` metriky pro `cron_runs`) o samotnou HTTP `response`, kterou
+ * route vrátí beze změny. Wrapper `recordCronRun` tak může zapsat metriky, aniž by
+ * jakkoli ovlivnil návratovou hodnotu nebo HTTP status routy (R11.4).
+ */
+type BillingRunResult = CronRunResult & { response: Response };
+
 async function handle(request: NextRequest): Promise<Response> {
   const auth = verifyCronAuthorization(request);
   if (!auth.ok) {
@@ -60,103 +69,128 @@ async function handle(request: NextRequest): Promise<Response> {
     return NextResponse.json({ error: auth.reason }, { status });
   }
 
-  const supabase = createAdminClient();
-  const gopay = createGopayClient();
-  const nowIso = new Date().toISOString();
+  // Odvození způsobu spuštění (R11.4): ruční spuštění z `Cron_Trigger` (admin UI,
+  // task 26.2) volá tentýž endpoint s rozlišovacím query parametrem `?trigger=manual`;
+  // plánovaný běh Vercel Cronu parametr nenese → `scheduled`. Doménová logika je na
+  // triggeru nezávislá.
+  const trigger: CronTrigger =
+    new URL(request.url).searchParams.get('trigger') === 'manual' ? 'manual' : 'scheduled';
 
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('id, business_id, plan, gopay_schedule_id')
-    .eq('status', 'active')
-    .eq('auto_renew', true)
-    .lte('current_period_end', nowIso);
+  // Best-effort záznam běhu do `cron_runs` (R11.4). Wrapper nemění návratovou hodnotu
+  // ani HTTP status routy — doménová logika beze změny vrací svou `response`, k níž jen
+  // přibalí číselné metriky pro `detail`. Selhání zápisu běhu samotný job neshodí.
+  const { response } = await recordCronRun(
+    'billing',
+    trigger,
+    async (): Promise<BillingRunResult> => {
+      const supabase = createAdminClient();
+      const gopay = createGopayClient();
+      const nowIso = new Date().toISOString();
 
-  if (error) {
-    await serverLog.error('cron_billing_query_failed', { job: 'billing' });
-    return NextResponse.json({ error: 'query_failed' }, { status: 500 });
-  }
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('id, business_id, plan, gopay_schedule_id')
+        .eq('status', 'active')
+        .eq('auto_renew', true)
+        .lte('current_period_end', nowIso);
 
-  const due = (data ?? []) as DueSubscriptionRow[];
-  let charged = 0;
-  let graced = 0;
-  let kept = 0;
-  let failed = 0;
-
-  for (const sub of due) {
-    try {
-      // Aktivní předplatné bez tarifu / schedule nelze strhnout — per-business
-      // selhání: log + admin + pokračuj (R10.6).
-      if (sub.plan === null || sub.gopay_schedule_id === null) {
-        failed += 1;
-        await notifyAdminCronFailure({
-          job: 'billing',
-          stage: 'missing_plan_or_schedule',
-          subscriptionId: sub.id,
-          businessId: sub.business_id,
-        });
-        continue;
+      if (error) {
+        await serverLog.error('cron_billing_query_failed', { job: 'billing' });
+        return {
+          status: 'error',
+          response: NextResponse.json({ error: 'query_failed' }, { status: 500 }),
+        };
       }
 
-      const result = await chargeMonthly(supabase, gopay, {
-        subscriptionId: sub.id,
-        businessId: sub.business_id,
-        scheduleId: sub.gopay_schedule_id,
-        plan: sub.plan,
-      });
+      const due = (data ?? []) as DueSubscriptionRow[];
+      let charged = 0;
+      let graced = 0;
+      let kept = 0;
+      let failed = 0;
 
-      if (result.ok) {
-        // Iniciace OK — výsledek (paid/failed) doručí webhook.
-        charged += 1;
-        continue;
+      for (const sub of due) {
+        try {
+          // Aktivní předplatné bez tarifu / schedule nelze strhnout — per-business
+          // selhání: log + admin + pokračuj (R10.6).
+          if (sub.plan === null || sub.gopay_schedule_id === null) {
+            failed += 1;
+            await notifyAdminCronFailure({
+              job: 'billing',
+              stage: 'missing_plan_or_schedule',
+              subscriptionId: sub.id,
+              businessId: sub.business_id,
+            });
+            continue;
+          }
+
+          const result = await chargeMonthly(supabase, gopay, {
+            subscriptionId: sub.id,
+            businessId: sub.business_id,
+            scheduleId: sub.gopay_schedule_id,
+            plan: sub.plan,
+          });
+
+          if (result.ok) {
+            // Iniciace OK — výsledek (paid/failed) doručí webhook.
+            charged += 1;
+            continue;
+          }
+
+          if (result.error === 'initiation_failed') {
+            // R2.5: GoPay nedostupné, chargeMonthly už notifikoval admina; ponech
+            // `active` pro opakování v dalším běhu.
+            kept += 1;
+            continue;
+          }
+
+          // Ostatní selhání iniciace → přechod do grace_period (R10.2 / R4.1).
+          const transition = await transitionToGracePeriod(supabase, sub.id);
+          if (!transition.ok) {
+            // R10.3: přechod do grace selhal → log + admin + pokračuj (bez opakování).
+            failed += 1;
+            await notifyAdminCronFailure({
+              job: 'billing',
+              stage: 'grace_transition_failed',
+              subscriptionId: sub.id,
+              businessId: sub.business_id,
+            });
+            continue;
+          }
+
+          graced += 1;
+        } catch {
+          // Neočekávané selhání zpracování podniku → continue-on-error (R10.6).
+          failed += 1;
+          await notifyAdminCronFailure({
+            job: 'billing',
+            stage: 'unexpected_error',
+            subscriptionId: sub.id,
+            businessId: sub.business_id,
+          });
+        }
       }
 
-      if (result.error === 'initiation_failed') {
-        // R2.5: GoPay nedostupné, chargeMonthly už notifikoval admina; ponech
-        // `active` pro opakování v dalším běhu.
-        kept += 1;
-        continue;
-      }
-
-      // Ostatní selhání iniciace → přechod do grace_period (R10.2 / R4.1).
-      const transition = await transitionToGracePeriod(supabase, sub.id);
-      if (!transition.ok) {
-        // R10.3: přechod do grace selhal → log + admin + pokračuj (bez opakování).
-        failed += 1;
-        await notifyAdminCronFailure({
-          job: 'billing',
-          stage: 'grace_transition_failed',
-          subscriptionId: sub.id,
-          businessId: sub.business_id,
-        });
-        continue;
-      }
-
-      graced += 1;
-    } catch {
-      // Neočekávané selhání zpracování podniku → continue-on-error (R10.6).
-      failed += 1;
-      await notifyAdminCronFailure({
+      await serverLog.info('cron_billing_completed', {
         job: 'billing',
-        stage: 'unexpected_error',
-        subscriptionId: sub.id,
-        businessId: sub.business_id,
+        processed: due.length,
+        charged,
+        graced,
+        kept,
+        failed,
       });
-    }
-  }
 
-  await serverLog.info('cron_billing_completed', {
-    job: 'billing',
-    processed: due.length,
-    charged,
-    graced,
-    kept,
-    failed,
-  });
-
-  return NextResponse.json(
-    { processed: due.length, charged, graced, kept, failed },
-    { status: 200 },
+      return {
+        status: 'ok',
+        detail: { processed: due.length, charged, graced, kept, failed },
+        response: NextResponse.json(
+          { processed: due.length, charged, graced, kept, failed },
+          { status: 200 },
+        ),
+      };
+    },
   );
+
+  return response;
 }
 
 export async function GET(request: NextRequest): Promise<Response> {

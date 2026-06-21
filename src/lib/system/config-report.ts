@@ -1,9 +1,14 @@
+// Pouze pro server — zabraňuje importu I/O wrapperu do klientského bundlu.
+// Ve vitestu je 'server-only' aliasováno na stub, takže import čisté funkce
+// `buildConfigReport`/`EXPECTED_ENV_KEYS` v property testu zůstává funkční.
+import 'server-only';
+
 /**
- * Config_Inspector — čisté jádro inspekce provozní konfigurace.
+ * Config_Inspector — jádro inspekce provozní konfigurace.
  *
- * Tento modul obsahuje VÝHRADNĚ čistou funkci, typy a konstanty. Nečte
- * `process.env`, nepoužívá `server-only` ani žádné I/O — tenký I/O wrapper
- * `getConfigReport()` (předá `process.env`) je samostatný task.
+ * Modul obsahuje čistou funkci `buildConfigReport`, typy a konstanty, plus
+ * tenký I/O wrapper `getConfigReport()`, který předá `process.env` a
+ * `EXPECTED_ENV_KEYS` čisté funkci.
  *
  * Bezpečnostní invariant (R6.2, R6.3, R7.2, R7.4): pro každý očekávaný klíč
  * se vyhodnocuje POUZE přítomnost (truthy → `isSet=true`). Samotná hodnota
@@ -70,4 +75,14 @@ export function buildConfigReport(
     env: presence,
     logLocationInfo: LOG_LOCATION_INFO,
   };
+}
+
+/**
+ * Tenký I/O wrapper (R7.1, R7.3, R8.1, R8.2, R8.3): předá `process.env`
+ * a `EXPECTED_ENV_KEYS` čisté funkci `buildConfigReport`. Veškerá logika
+ * (vyhodnocení přítomnosti, odvození `logLevel`, text o umístění logů)
+ * je v čisté funkci.
+ */
+export function getConfigReport(): ConfigReport {
+  return buildConfigReport(process.env, EXPECTED_ENV_KEYS);
 }

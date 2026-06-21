@@ -1,6 +1,11 @@
-// Čistá funkce odvození čerstvosti GoPay webhooku (bez I/O, deterministická).
-// Tento modul je přímo pokrytý property-based testem (úkol 9.2).
-// Záměrně neobsahuje žádné `server-only`, DB přístup ani jiné I/O.
+import 'server-only';
+
+import { createAdminClient } from '@/lib/supabase/admin';
+
+// Čistá funkce odvození čerstvosti GoPay webhooku (bez I/O, deterministická) +
+// I/O wrapper `getWebhookFreshness` (úkol 18.1).
+// Čistá `computeWebhookFreshness` je přímo pokrytá property-based testem (úkol 9.2);
+// `server-only` je ve vitestu stubnuté, takže import čisté funkce projde.
 // Výstup nikdy nenese Secret_Value ani Personal_Data — jen časové razítko a příznaky (R20.5).
 
 /** Hranice čerstvosti webhooku v hodinách (R20.3). */
@@ -47,4 +52,64 @@ export function computeWebhookFreshness(
   const stale = ageMs > thresholdHours * MS_PER_HOUR;
 
   return { hasActivity: true, lastActivityAt, stale, isProxy };
+}
+
+/**
+ * I/O wrapper: přes service-role klienta zjistí proxy čas poslední platebně
+ * řízené aktivity jako `max(nejnovější subscriptions.updated_at,
+ * nejnovější payments.created_at)` a předá ho čisté `computeWebhookFreshness`
+ * s `isProxy = true` (R20.1, R20.2). Čte jen ne-PII časové sloupce.
+ * Vrací `null`, pokud je zdroj nedostupný (chyba dotazu) — volající pak zobrazí
+ * „čerstvost webhooku je momentálně nedostupná" místo pádu stránky (R20.7).
+ */
+export async function getWebhookFreshness(): Promise<WebhookFreshness | null> {
+  try {
+    const supabase = createAdminClient();
+
+    // Nejnovější změna předplatného (subscriptions.updated_at).
+    const { data: subData, error: subError } = await supabase
+      .from('subscriptions')
+      .select('updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(1);
+
+    if (subError) {
+      return null;
+    }
+
+    // Nejnovější platba (payments má jen created_at).
+    const { data: payData, error: payError } = await supabase
+      .from('payments')
+      .select('created_at')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (payError) {
+      return null;
+    }
+
+    const latestSubscriptionAt = subData?.[0]?.updated_at ?? null;
+    const latestPaymentAt = payData?.[0]?.created_at ?? null;
+
+    // Proxy = pozdější z obou ISO časů; null, pokud oba chybí.
+    let proxyAt: string | null = null;
+    for (const candidate of [latestSubscriptionAt, latestPaymentAt]) {
+      if (candidate === null) {
+        continue;
+      }
+      if (proxyAt === null || new Date(candidate).getTime() > new Date(proxyAt).getTime()) {
+        proxyAt = candidate;
+      }
+    }
+
+    return computeWebhookFreshness(
+      proxyAt,
+      new Date(),
+      WEBHOOK_FRESHNESS_THRESHOLD_HOURS,
+      true,
+    );
+  } catch {
+    // Např. chybějící service-role env nebo síťová chyba → nedostupné (R20.7).
+    return null;
+  }
 }

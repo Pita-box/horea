@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { notifyAdminCronFailure } from '@/lib/cron/admin-notify';
 import { verifyCronAuthorization } from '@/lib/cron/auth';
+import { recordCronRun, type CronRunResult, type CronTrigger } from '@/lib/cron/record-run';
 import { serverLog } from '@/lib/log-server';
 import { DELETED_DATA_SECONDS } from '@/lib/subscription/state-machine';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -35,6 +36,14 @@ type ExpiredSubscriptionRow = {
   business_id: string;
 };
 
+/**
+ * Výsledek doménové části cleanup běhu. Rozšiřuje {@link CronRunResult} (status +
+ * číselné `detail` metriky pro `cron_runs`) o samotnou HTTP `response`, kterou
+ * route vrátí beze změny. Wrapper `recordCronRun` tak může zapsat metriky, aniž by
+ * jakkoli ovlivnil návratovou hodnotu nebo HTTP status routy (R11.4).
+ */
+type CleanupRunResult = CronRunResult & { response: Response };
+
 async function handle(request: NextRequest): Promise<Response> {
   const auth = verifyCronAuthorization(request);
   if (!auth.ok) {
@@ -47,67 +56,95 @@ async function handle(request: NextRequest): Promise<Response> {
     return NextResponse.json({ error: auth.reason }, { status });
   }
 
-  const supabase = createAdminClient();
-  const cutoffIso = new Date(Date.now() - DELETED_DATA_SECONDS * 1000).toISOString();
+  // Odvození způsobu spuštění (R11.4): ruční spuštění z `Cron_Trigger` (admin UI,
+  // task 26.2) volá tentýž endpoint s rozlišovacím query parametrem `?trigger=manual`;
+  // plánovaný běh Vercel Cronu parametr nenese → `scheduled`. Doménová logika je na
+  // triggeru nezávislá.
+  const trigger: CronTrigger =
+    new URL(request.url).searchParams.get('trigger') === 'manual' ? 'manual' : 'scheduled';
 
-  // Kandidáti: kotva ≥ 90 dní v minulosti a předplatné ještě není smazané.
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('id, business_id')
-    .not('first_failed_charge_at', 'is', null)
-    .lte('first_failed_charge_at', cutoffIso)
-    .neq('status', 'deleted_data');
+  // Best-effort záznam běhu do `cron_runs` (R11.4). Wrapper nemění návratovou hodnotu
+  // ani HTTP status routy — doménová logika beze změny vrací svou `response`, k níž jen
+  // přibalí číselné metriky pro `detail`. Selhání zápisu běhu samotný job neshodí.
+  const { response } = await recordCronRun(
+    'cleanup',
+    trigger,
+    async (): Promise<CleanupRunResult> => {
+      const supabase = createAdminClient();
+      const cutoffIso = new Date(Date.now() - DELETED_DATA_SECONDS * 1000).toISOString();
 
-  if (error) {
-    await serverLog.error('cron_cleanup_query_failed', { job: 'cleanup' });
-    return NextResponse.json({ error: 'query_failed' }, { status: 500 });
-  }
+      // Kandidáti: kotva ≥ 90 dní v minulosti a předplatné ještě není smazané.
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('id, business_id')
+        .not('first_failed_charge_at', 'is', null)
+        .lte('first_failed_charge_at', cutoffIso)
+        .neq('status', 'deleted_data');
 
-  const candidates = (data ?? []) as ExpiredSubscriptionRow[];
-  let deleted = 0;
-  let failed = 0;
-
-  for (const sub of candidates) {
-    try {
-      const { data: rpcData, error: rpcError } = await supabase.rpc('delete_business_tenant_data', {
-        p_business_id: sub.business_id,
-      });
-
-      const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as
-        | { business_id: string; subscription_id: string }
-        | undefined;
-
-      if (rpcError || !row) {
-        failed += 1;
-        await notifyAdminCronFailure({
-          job: 'cleanup',
-          stage: rpcError ? 'delete_rpc_failed' : 'subscription_not_found',
-          subscriptionId: sub.id,
-          businessId: sub.business_id,
-        });
-        continue;
+      if (error) {
+        await serverLog.error('cron_cleanup_query_failed', { job: 'cleanup' });
+        return {
+          status: 'error',
+          response: NextResponse.json({ error: 'query_failed' }, { status: 500 }),
+        };
       }
 
-      deleted += 1;
-    } catch {
-      failed += 1;
-      await notifyAdminCronFailure({
+      const candidates = (data ?? []) as ExpiredSubscriptionRow[];
+      let deleted = 0;
+      let failed = 0;
+
+      for (const sub of candidates) {
+        try {
+          const { data: rpcData, error: rpcError } = await supabase.rpc('delete_business_tenant_data', {
+            p_business_id: sub.business_id,
+          });
+
+          const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as
+            | { business_id: string; subscription_id: string }
+            | undefined;
+
+          if (rpcError || !row) {
+            failed += 1;
+            await notifyAdminCronFailure({
+              job: 'cleanup',
+              stage: rpcError ? 'delete_rpc_failed' : 'subscription_not_found',
+              subscriptionId: sub.id,
+              businessId: sub.business_id,
+            });
+            continue;
+          }
+
+          deleted += 1;
+        } catch {
+          failed += 1;
+          await notifyAdminCronFailure({
+            job: 'cleanup',
+            stage: 'unexpected_error',
+            subscriptionId: sub.id,
+            businessId: sub.business_id,
+          });
+        }
+      }
+
+      await serverLog.info('cron_cleanup_completed', {
         job: 'cleanup',
-        stage: 'unexpected_error',
-        subscriptionId: sub.id,
-        businessId: sub.business_id,
+        processed: candidates.length,
+        deleted,
+        failed,
       });
-    }
-  }
 
-  await serverLog.info('cron_cleanup_completed', {
-    job: 'cleanup',
-    processed: candidates.length,
-    deleted,
-    failed,
-  });
+      return {
+        status: 'ok',
+        detail: { processed: candidates.length, deleted, failed },
+        response: NextResponse.json(
+          { processed: candidates.length, deleted, failed },
+          { status: 200 },
+        ),
+      };
+    },
+  );
 
-  return NextResponse.json({ processed: candidates.length, deleted, failed }, { status: 200 });
+  return response;
 }
 
 export async function GET(request: NextRequest): Promise<Response> {

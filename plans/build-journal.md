@@ -2,6 +2,86 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — admin-system-tools: Task 24.2 — integrace recordCronRun do billing route
+
+### Hotové tasky
+- 24.2 Obalit `billing` route — ověřeno `pnpm exec eslint src/app/api/cron/billing/route.ts` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru; existující chyby jsou jen v nesouvisejících test fixtures `charge.test.ts` / `reservation-emails.test.ts`).
+
+### Nové funkce
+- `src/app/api/cron/billing/route.ts` — po úspěšném `verifyCronAuthorization` obalena doménová logika `recordCronRun('billing', trigger, …)` (R11.4), shodným vzorem jako cleanup route (24.1). Trigger inline z query parametru: `?trigger=manual` → `'manual'`, jinak `'scheduled'`. Inner `run()` vrací `BillingRunResult = CronRunResult & { response: Response }`, route vrací `response` → návratová hodnota i HTTP status (200/500/401) beze změny. `detail` = číselné metriky `{ processed, charged, graced, kept, failed }`; query-error větev `status:'error'` bez detailu. Doménová logika (chargeMonthly / grace transition / continue-on-error) beze změny.
+
+## 2026-06-21 — admin-system-tools: Task 24.3 — integrace recordCronRun do warnings route
+
+### Hotové tasky
+- 24.3 Obalit `warnings` route — ověřeno `pnpm exec eslint src/app/api/cron/warnings/route.ts` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `src/app/api/cron/warnings/route.ts` — po úspěšném `verifyCronAuthorization` obalena doménová logika `recordCronRun('warnings', trigger, …)` (R11.4), shodným vzorem jako cleanup (task 24.1). Trigger inline z query parametru: `?trigger=manual` → `'manual'`, jinak `'scheduled'`. Inner `run()` vrací `WarningsRunResult = CronRunResult & { response: Response }`, route vrací `response` → návratová hodnota i HTTP status (200/500/401) beze změny. Do `detail` jdou číselné metriky `{ processed, due, sent, skipped, failed }`; obě query-error větve vrací `status:'error'` bez detailu. Doménová logika (predikát `warningKindFor`, dohledání e-mailů, per-business continue-on-error, odeslání) beze změny. Zápis běhu best-effort (řeší `recordCronRun`).
+
+## 2026-06-21 — admin-system-tools: Task 24.1 — integrace recordCronRun do cleanup route
+
+### Hotové tasky
+- 24.1 Obalit `cleanup` route — ověřeno `pnpm exec eslint src/app/api/cron/cleanup/route.ts` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `src/app/api/cron/cleanup/route.ts` — po úspěšném `verifyCronAuthorization` obalena doménová logika `recordCronRun('cleanup', trigger, …)` (R11.4). Trigger se odvozuje z query parametru: `?trigger=manual` → `'manual'`, jinak `'scheduled'` (konvence pro ruční spuštění z `Cron_Trigger`, task 26.2, přes tentýž endpoint). Doménová logika beze změny; inner `run()` vrací `CleanupRunResult = CronRunResult & { response: Response }`, route vrací `response` → návratová hodnota i HTTP status (200/500/401) zůstaly identické. Do `detail` jdou číselné metriky `{ processed, deleted, failed }`; query-error větev vrací `status:'error'` bez detailu. Zápis běhu je best-effort (řeší `recordCronRun`).
+
+## 2026-06-21 — admin-system-tools: Task 23.1 — recordCronRun() helper
+
+### Hotové tasky
+- 23.1 `recordCronRun()` — ověřeno `pnpm exec eslint src/lib/cron/record-run.ts` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `recordCronRun<T extends CronRunResult>(job, trigger, run)` + typy `CronJobName`/`CronTrigger`/`CronRunResult` (`src/lib/cron/record-run.ts`, `import 'server-only'`) — obalí běh cron jobu: přes service-role klienta (`createAdminClient`) vloží start řádek do `cron_runs` (`started_at=now`, přechodný `status='running'`, `trigger`), spustí `run()`, po doběhnutí UPDATE `finished_at` + finální `status` (`ok`/`error`) + `detail`. Detail prochází `sanitizeDetail()` — ponechá jen konečné číselné metriky (žádný Secret_Value/PII, žádné NaN/Infinity, R15.4). VŠECHNY zápisy do `cron_runs` jsou best-effort v `try/catch` (selhání jen `serverLog.warn`, nikdy neshodí job, R11.4). Při výjimce z `run()` zapíše `status='error'` (bez detailu) a chybu re-throw → chování routy se nemění. Start zápis přes `.select('id').single()`; když selže, finální UPDATE se přeskočí. Bez unit testů (task 23.2).
+
+## 2026-06-21 — admin-system-tools: Task 18.1 — Webhook_Freshness_Monitor (getWebhookFreshness)
+
+### Hotové tasky
+- 18.1 `getWebhookFreshness()` — ověřeno `pnpm exec eslint src/lib/system/webhook-freshness.ts` (exit 0), `pnpm exec tsc --noEmit` (žádné chyby v souboru) a `pnpm test:run` PBT testu čisté funkce (3 passed).
+
+### Nové funkce
+- `getWebhookFreshness(): Promise<WebhookFreshness | null>` (`src/lib/system/webhook-freshness.ts`, doplněn `import 'server-only'`) — přes service-role klienta (`createAdminClient`) zjistí proxy čas `max(nejnovější subscriptions.updated_at, nejnovější payments.created_at)` (každý přes `order(desc).limit(1)`; `payments` má jen `created_at`), předá čisté `computeWebhookFreshness(proxy, new Date(), WEBHOOK_FRESHNESS_THRESHOLD_HOURS, true)`. Obě časová razítka chybí → proxy `null` (`hasActivity: false`). Chyba dotazu / nedostupný zdroj → `null` (UI: „čerstvost webhooku je momentálně nedostupná", konzistentní s `getOutboxStatus`). Čistá funkce zachována, `server-only` je ve vitestu stub. Bez unit testů (task 18.2). Ověřené sloupce: `subscriptions.updated_at` (migrace 0005), `payments.created_at` (migrace 0005, bez `updated_at`).
+
+## 2026-06-21 — admin-system-tools: Task 23.3 — Cron_Monitor (getCronStatuses)
+
+### Hotové tasky
+- 23.3 `getCronStatuses()` — ověřeno `pnpm exec eslint src/lib/system/cron-monitor.ts` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `getCronStatuses(): Promise<CronJobStatus[] | null>` + typy `CronRunRecord`/`CronJobStatus` (`src/lib/system/cron-monitor.ts`, `import 'server-only'`) — čte poslední běh každého ze 4 cron jobů (`cleanup`/`billing`/`warnings`/`email-retry`) z `cron_runs` přes service-role klienta (`createAdminClient`). Pro každý job `select` ne-PII sloupců (`id, job, started_at, finished_at, status, trigger, detail`) + `eq('job', name)` + `order('started_at', desc)` + `limit(1)`; chybí-li záznam → `lastRun: null` (R11.3). Při chybě/nedostupnosti zdroje vrací `null` (UI: „stav cronů je momentálně nedostupný", konzistentní s `getOutboxStatus`). `CronJobName` importován z `cron-schedule.ts`. Bez unit testů (ty jsou task 23.4).
+
+## 2026-06-21 — admin-system-tools: Task 13.1 — Health_Checker (orchestrace + I/O)
+
+### Hotové tasky
+- 13.1 `runHealthChecks()` — ověřeno `pnpm exec eslint src/lib/system/health.ts` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru; zbylé chyby jsou jen v pre-existujících `tests/properties/*`).
+
+### Nové funkce
+- `runHealthChecks(): Promise<HealthReport>` + typy `ServiceName`/`ServiceProbeResult`/`HealthReport` (`src/lib/system/health.ts`, `import 'server-only'`) — I/O vrstva health checků. Reuse čistého `mapProbeStatus`/`aggregateStatus`/`ProbeOutcome` z `./status`. 6 read-only/non-mutating probe měřících latenci: Supabase (service-role HEAD `count` na `businesses`), Resend (GET `/domains`), SMTP2GO (POST `/v3/stats/email_summary` — jen stats, neodesílá), GoPay (OAuth `client_credentials` token, žádná platba), R2 (podepsaný `ListObjectsV2` `max-keys=1` přes `aws4fetch`), Google (refresh OAuth tokenu). `withTimeout` (Promise.race, 5 s → `{kind:'timeout'}` + `abort`), `Promise.allSettled` paralelně, tvrdý strop 6 s, `checkedAt` ISO UTC. `errorKind` je jen bezpečná kategorie (`http_error`/`network_error`/`timeout`/`unexpected`), NIKDY tajemství/původní zpráva. Měkká hranice latence `degraded` = 2000 ms.
+
+## 2026-06-21 — admin-system-tools: Task 17.1 — I/O wrapper getBackupStatus
+
+### Hotové tasky
+- 17.1 `getBackupStatus()` — ověřeno `pnpm exec eslint src/lib/system/backup-status.ts` (exit 0), `pnpm exec tsc --noEmit` (žádné chyby v souboru) a `pnpm test:run src/lib/system/__tests__/backup-status.pbt.test.ts` (1 passed).
+
+### Nové funkce
+- `getBackupStatus(driveStatus: ServiceStatus): BackupStatus` (`src/lib/system/backup-status.ts`) — tenký I/O wrapper, který předá `process.env` a předaný Google `Service_Status` (volající ho získá z Health_Checker, wrapper health nevolá duplicitně) čisté funkci `buildBackupStatus`. Modul nově `import 'server-only'` (ve vitestu stub) — čistá funkce `buildBackupStatus`/`GOOGLE_BACKUP_ENV_KEYS` zůstala beze změny a property test prochází.
+
+## 2026-06-21 — admin-system-tools: Task 16.1 — I/O wrapper getOutboxStatus
+
+### Hotové tasky
+- 16.1 `getOutboxStatus()` — ověřeno `pnpm exec eslint src/lib/system/outbox-status.ts` (exit 0), `pnpm exec tsc --noEmit` (žádné chyby v souboru) a `pnpm test:run src/lib/system/__tests__/outbox-status.pbt.test.ts` (1 passed).
+
+### Nové funkce
+- `getOutboxStatus()` (`src/lib/system/outbox-status.ts`) — I/O wrapper přes service-role klienta (`createAdminClient`), který z `email_outbox` čte POUZE ne-PII sloupce `status, created_at, next_attempt_at` (nikdy `to_email`/`subject`/`html_body`/`text_body`) a předá je čisté `summarizeOutbox`. Návratový typ `Promise<OutboxStatus | null>`, kde `null` = nedostupný zdroj (UI „stav e-mailové fronty je momentálně nedostupný", R17.7) — konzistentní s `metrics.ts` (`db: DbMetrics | null`). DB stavy `pending`/`sent`/`dead` mapují 1:1 na `OutboxRowMeta['status']`, neznámé stavy se bezpečně ignorují. Modul nově `import 'server-only'` (ve vitestu stub); čistá `summarizeOutbox` beze změny a property test prochází.
+
+## 2026-06-21 — admin-system-tools: Task 15.1 — I/O wrapper getDeployInfo
+
+### Hotové tasky
+- 15.1 `getDeployInfo()` — ověřeno `pnpm exec eslint src/lib/system/build-info.ts` (exit 0) a `pnpm test:run src/lib/system/__tests__/build-info.pbt.test.ts` (1 passed).
+
+### Nové funkce
+- `getDeployInfo()` (`src/lib/system/build-info.ts`) — tenký I/O wrapper, který předá neutajené `VERCEL_*` proměnné (SHA, REF, ENV, DEPLOYMENT_ID s fallbackem DEPLOY_ID) a `process.version` čisté funkci `buildDeployInfo`. Modul nově `import 'server-only'` (ve vitestu stub) — čistá funkce `buildDeployInfo`/`UNAVAILABLE` zůstala beze změny a property test prochází.
+
 ## 2026-06-21 — admin-system-tools: Checkpoint (Task 12) — stabilizace property testů čistého jádra
 
 ### Hotové tasky

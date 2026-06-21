@@ -1,9 +1,13 @@
-// src/lib/system/build-info.ts — ČISTÁ funkce (bez I/O)
+// src/lib/system/build-info.ts — ČISTÁ funkce (bez I/O) + tenký I/O wrapper
 //
 // Sestavuje informace o nasazení (Build_Inspector, R16) výhradně z neutajených
-// proměnných prostředí a verze Node.js. Tento modul záměrně neobsahuje žádné
-// I/O — nečte `process.env` ani `process.version`; tenký wrapper `getDeployInfo`
-// (task 15.1) předá hodnoty jako parametry.
+// proměnných prostředí a verze Node.js. Čistá funkce `buildDeployInfo` záměrně
+// neobsahuje žádné I/O — nečte `process.env` ani `process.version`. Tenký
+// wrapper `getDeployInfo` (task 15.1) předá běhové hodnoty jako parametry.
+
+// Server-only: tento modul (kvůli wrapperu nad `process`) nesmí proniknout do
+// klientského bundlu. Ve vitestu je `server-only` nahrazeno stubem.
+import 'server-only';
 
 /** Prostředí nasazení odvozené z `VERCEL_ENV` (R16.3). */
 export type DeployEnvironment = 'production' | 'preview' | 'development';
@@ -68,4 +72,23 @@ export function buildDeployInfo(
     deployId: valueOrUnavailable(deployIdRaw),
     nodeVersion,
   };
+}
+
+/**
+ * Tenký I/O wrapper (task 15.1): přečte běhové hodnoty z `process` a předá je
+ * čisté funkci `buildDeployInfo`. Předává pouze neutajené proměnné prostředí
+ * (VERCEL_GIT_COMMIT_SHA, VERCEL_GIT_COMMIT_REF, VERCEL_ENV, VERCEL_DEPLOYMENT_ID
+ * s fallbackem VERCEL_DEPLOY_ID) a `process.version` (R16.1–R16.6).
+ */
+export function getDeployInfo(): DeployInfo {
+  return buildDeployInfo(
+    {
+      VERCEL_GIT_COMMIT_SHA: process.env.VERCEL_GIT_COMMIT_SHA,
+      VERCEL_GIT_COMMIT_REF: process.env.VERCEL_GIT_COMMIT_REF,
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      VERCEL_DEPLOYMENT_ID: process.env.VERCEL_DEPLOYMENT_ID,
+      VERCEL_DEPLOY_ID: process.env.VERCEL_DEPLOY_ID,
+    },
+    process.version,
+  );
 }
