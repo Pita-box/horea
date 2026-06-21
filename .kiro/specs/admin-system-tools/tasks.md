@@ -313,24 +313,24 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
 - [ ] 25. Checkpoint — perzistence a monitoring cronů
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 26. Server actions (`src/app/admin/system/actions.ts`)
+- [x] 26. Server actions (`src/app/admin/system/actions.ts`)
   - [x] 26.1 Implementovat `revalidateTarget`
     - `server-only` action: `requireAdmin()` re-check; `isAllowedTarget` — mimo allowlist → `{ ok:false }` bez dotčení cache; jinak `revalidatePath`/`revalidateTag`; vrátit výsledek s názvem cíle.
     - _Requirements: 2.4, 10.1, 10.2, 10.5, 10.6, 15.1, 15.3_
 
-  - [ ] 26.2 Implementovat `triggerCron`
+  - [x] 26.2 Implementovat `triggerCron`
     - `server-only` action: `requireAdmin()` re-check; chybějící `CRON_SECRET` → „cron tajemství není nastaveno" (žádný fetch); jinak server-side `fetch` cron endpointu s `Authorization: Bearer <CRON_SECRET>` a příznakem ručního spuštění; vrátit výsledek. `CRON_SECRET` se nikdy neodešle klientovi ani nezaloguje.
     - _Requirements: 2.4, 12.1, 12.3, 12.4, 12.5, 15.1, 15.3, 15.4_
 
-  - [ ] 26.3 Implementovat `pruneCronRuns`
+  - [x] 26.3 Implementovat `pruneCronRuns`
     - `server-only` action: `requireAdmin()` re-check (Non_Admin_User → 403, žádné smazání); bez `days` → `DEFAULT_CRON_RETENTION_DAYS`; přes service-role `delete from cron_runs where started_at < computePruneCutoff(now, days)`; vrátit počet smazaných. Maže **výhradně** `cron_runs`, NIKDY `audit_log`.
     - _Requirements: 2.4, 19.1, 19.2, 19.4, 19.5, 19.6, 15.1, 15.3_
 
-  - [ ] 26.4 Implementovat `recheckHealth`
+  - [x] 26.4 Implementovat `recheckHealth`
     - `server-only` action: `requireAdmin()` re-check (Non_Admin_User → 403, žádná kontrola); znovu spustí `runHealthChecks()`; vrátí nový `HealthReport` včetně `checkedAt`. Žádná nová čistá funkce (reuse health).
     - _Requirements: 2.4, 21.1, 21.2, 21.4, 15.1, 15.3_
 
-  - [ ] 26.5 Implementovat `sendTestEmail`
+  - [x] 26.5 Implementovat `sendTestEmail`
     - `server-only` action **bez parametru cíle** (cíl se nikdy nebere od klienta): `requireAdmin()` re-check (Non_Admin_User → 403, žádné odeslání); chybějící `HOREA_ADMIN_EMAIL` → „administrátorská adresa není nastavena"; načíst `test_email_last_sent_at` ze `system_settings`, `computeCooldownState` → při zákazu vrátit zbývající dobu; jinak odeslat výhradně na `HOREA_ADMIN_EMAIL` (`sendEmail`), při úspěchu zapsat nový `last_sent_at`. Výsledek bez PII nad rámec adresy.
     - _Requirements: 2.4, 22.1, 22.3, 22.4, 22.5, 22.6, 22.7, 15.1, 15.3_
 
@@ -358,29 +358,29 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Soubor `src/app/admin/system/__tests__/recheck-health.test.ts`. Mock admin session + `runHealthChecks`; ověřit, že akce znovu spustí health check a vrátí nový `HealthReport` včetně aktualizovaného `checkedAt`; výsledek nese jen `service`/`label`/`status`/`latencyMs`/`errorKind` (žádná Secret_Value).
     - _Requirements: 21.1, 21.2_
 
-- [ ] 27. Klientské panely `/admin/system`
-  - [ ] 27.1 Panel revalidace cache (`RevalidatePanel`)
+- [x] 27. Klientské panely `/admin/system`
+  - [x] 27.1 Panel revalidace cache (`RevalidatePanel`)
     - Client komponenta s explicitním potvrzením, `aria-live="polite"` regionem, textovými labely stavů (ne jen barva), klávesovou ovladatelností; volá `revalidateTarget`. Reuse `Card`/`Notice`/`Button`.
     - _Requirements: 10.3, 14.1, 14.2, 14.3, 15.2_
 
-  - [ ] 27.2 Panel ručního spuštění cronu (`CronTriggerPanel`)
+  - [x] 27.2 Panel ručního spuštění cronu (`CronTriggerPanel`)
     - Client komponenta s potvrzením, `aria-live` regionem, klávesovou ovladatelností; volá `triggerCron` a zobrazí výsledek.
     - _Requirements: 12.2, 12.3, 14.2, 14.3, 15.2_
 
-  - [ ] 27.3 Panel retence `cron_runs` (`PruneCronRunsPanel`)
+  - [x] 27.3 Panel retence `cron_runs` (`PruneCronRunsPanel`)
     - Client komponenta s **explicitním potvrzením** (destruktivní), `aria-live` regionem, klávesovou ovladatelností; volá `pruneCronRuns` a zobrazí počet smazaných.
     - _Requirements: 19.3, 19.4, 14.2, 14.3, 15.2_
 
-  - [ ] 27.4 Panel testovacího e-mailu (`TestEmailPanel`)
+  - [x] 27.4 Panel testovacího e-mailu (`TestEmailPanel`)
     - Client komponenta s **explicitním potvrzením**, `aria-live` regionem, klávesovou ovladatelností; volá `sendTestEmail` (bez cíle od klienta) a zobrazí výsledek/cooldown bez PII nad rámec adresy.
     - _Requirements: 22.2, 22.6, 14.2, 14.3, 15.2_
 
-  - [ ] 27.5 Tlačítko re-checku health (`HealthRecheckButton`)
+  - [x] 27.5 Tlačítko re-checku health (`HealthRecheckButton`)
     - Client komponenta „Zkontrolovat znovu" s `aria-live="polite"` regionem a klávesovou ovladatelností; volá `recheckHealth`, aktualizuje výsledek a `checkedAt`.
     - _Requirements: 21.1, 21.2, 21.3, 14.2, 14.3_
 
-- [ ] 28. Stránka `/admin/system`
-  - [ ] 28.1 Implementovat stránku `src/app/admin/system/page.tsx`
+- [x] 28. Stránka `/admin/system`
+  - [x] 28.1 Implementovat stránku `src/app/admin/system/page.tsx`
     - Server komponenta, `export const dynamic = 'force-dynamic'`, na začátku `requireAdmin()` re-check (jinak 403/odmítnutí).
     - Skládá sekce: agregovaný stav + health tabulka (`runHealthChecks` + `HealthRecheckButton` s `checkedAt`), informace o nasazení (`getDeployInfo`), stav e-mailové fronty (`getOutboxStatus`, souvislost s `/api/cron/email-retry`), stav záloh (`getBackupStatus`), čerstvost GoPay webhooku (`getWebhookFreshness`, explicitní „proxy"), provozní metriky (`getOperationalMetrics`), konfigurace (`getConfigReport`), logy & hranice auditu (odkaz `/admin/audit`, text append-only/neperzistence), revalidace cache (`RevalidatePanel`), cron monitor (`getCronStatuses`) + rozvrh/příští běh/drift (`CRON_SCHEDULE_MAP`, `computeNextRun`, `detectScheduleDrift`) + retence (`PruneCronRunsPanel`) + ruční spuštění (`CronTriggerPanel`), test e-mail (`TestEmailPanel`).
     - Všechny stavy textovým labelem (ne jen barvou); chybové stavy: české hlášky + „Zkusit znovu"; fallbacky pro nedostupný cron monitor/outbox/webhook/metriky.

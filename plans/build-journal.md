@@ -2,6 +2,66 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — admin-system-tools: Task 28.1 — Stránka /admin/system
+
+### Hotové tasky
+- 28.1 `src/app/admin/system/page.tsx` — ověřeno `pnpm exec eslint` (exit 0), `pnpm exec tsc --noEmit` (žádné chyby v souboru) a `pnpm build` (route `ƒ /admin/system`, dynamicky renderovaná).
+
+### Nové funkce
+- `src/app/admin/system/page.tsx` — server komponenta (`export const dynamic = 'force-dynamic'`) skládající všechny provozní sekce Správy systému (R13, R14). Na začátku **nezávislý `requireAdmin()` re-check** (defense in depth, R2.4); při neúspěchu vykreslí `Notice variant="error"` a žádný nástroj nenačte. Sekce: stav služeb (`runHealthChecks` → `HealthRecheckButton`, s warning fallbackem když health hodí výjimku), informace o nasazení (`getDeployInfo`), stav e-mailové fronty (`getOutboxStatus`, odkaz na `/api/cron/email-retry`), stav záloh (`getBackupStatus` se stavem Google z health reportu: `services.find(s=>s.service==='google')?.status ?? 'down'`), čerstvost GoPay webhooku (`getWebhookFreshness`, explicitní „proxy" hláška, prahová hodnota z `WEBHOOK_FRESHNESS_THRESHOLD_HOURS`), provozní metriky (`getOperationalMetrics`), konfigurace (`getConfigReport` — jen přítomnost klíčů, nikdy hodnoty), logy & hranice auditu (odkaz `/admin/audit`, append-only/neperzistence text), revalidace cache (`RevalidatePanel`), cron monitor (`getCronStatuses` + rozvrh `CRON_SCHEDULE_MAP` + příští běh `computeNextRun` per-job v try/catch + drift `detectScheduleDrift` self-check), retence (`PruneCronRunsPanel`), ruční spuštění (`CronTriggerPanel`), test e-mail (`TestEmailPanel`). Každá I/O sekce má český fallback „… je momentálně nedostupné" (R13.4); všechny stavy textovým labelem (ne jen barvou, R14.1); žádné Secret_Value/PII na stránce.
+
+## 2026-06-21 — admin-system-tools: Task 27.2 — Panel ručního spuštění cronu (CronTriggerPanel)
+
+### Hotové tasky
+- 27.2 `CronTriggerPanel` — ověřeno `pnpm exec eslint src/app/admin/system/CronTriggerPanel.tsx` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `src/app/admin/system/CronTriggerPanel.tsx` — `'use client'` komponenta (R12.2, R12.3, R14.2, R14.3, R15.2). Vypisuje 4 registrované joby z `CRON_SCHEDULE_MAP` (cleanup/billing/warnings/email-retry) s českým labelem a rozvrhem. Per-job **explicitní potvrzení** („Spustit" → „Potvrdit" / „Zrušit"), pak volá `triggerCron(job)`. Výsledek v `aria-live="polite"` regionu textovým labelem přes `Notice`: úspěšný HTTP běh → `neutral` (label + „úspěch (HTTP …)"), neúspěch/chyba → `error` (text z akce, vč. stavu „cron tajemství není nastaveno"). Nativní `<button>` → klávesová ovladatelnost; během potvrzení/běhu jsou ostatní spouštěče disabled. Reuse `Card`/`Notice`/`Button`. Žádné tajemství na klientu.
+
+## 2026-06-21 — admin-system-tools: Task 27.3 — Panel retence cron_runs (PruneCronRunsPanel)
+
+### Hotové tasky
+- 27.3 `PruneCronRunsPanel` — ověřeno `pnpm exec eslint src/app/admin/system/PruneCronRunsPanel.tsx` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `src/app/admin/system/PruneCronRunsPanel.tsx` — `'use client'` komponenta (R19.2–R19.4, R14.2, R14.3, R15.2). **Destruktivní** akce s dvoufázovým explicitním potvrzením („Smazat staré běhy" → `Notice variant="warning"` „Opravdu smazat?" + „Opravdu smazat" / „Zrušit"). Volitelné pole retence (dní); prázdná hodnota → akce dostane `undefined` a server použije `DEFAULT_CRON_RETENTION_DAYS` (90). Volá `pruneCronRuns(days)`; výsledek (počet smazaných řádků nebo česká chyba) v `aria-live="polite"` regionu textovým labelem přes `Notice` (úspěch → `neutral`, chyba → `error`). Nativní `<input>`/`<button>` → klávesová ovladatelnost. Reuse `Card`/`Notice`/`Button`/`Input`.
+
+## 2026-06-21 — admin-system-tools: Task 27.1 — Panel revalidace cache (RevalidatePanel)
+
+### Hotové tasky
+- 27.1 `RevalidatePanel` — ověřeno `pnpm exec eslint src/app/admin/system/RevalidatePanel.tsx` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `src/app/admin/system/RevalidatePanel.tsx` — `'use client'` komponenta (R10.3, R14.1–R14.3, R15.2). Cíl revalidace se vybírá **výhradně z allowlistu** přes nativní `<select>` (`ALLOWED_PATHS` jako `path`, `ALLOWED_TAGS` jako `tag`) — žádný volný text (R10.5). Dvoukrokové **explicitní potvrzení** („Revalidovat cache" → „Potvrdit revalidaci" / „Zrušit"), pak volá `revalidateTarget(target)`. Výsledek v `aria-live="polite"` regionu textovým labelem přes `Notice`: úspěch → `neutral` (vč. názvu cíle), chyba → `error` (text z akce). Když je allowlist prázdný, zobrazí `warning` hlášku místo výběru. Nativní `<select>`/`<button>` → klávesová ovladatelnost (R14.2). Reuse `Card`/`Notice`/`Button`.
+
+## 2026-06-21 — admin-system-tools: Task 27.5 — Tlačítko re-checku health (HealthRecheckButton)
+
+### Hotové tasky
+- 27.5 `HealthRecheckButton` — ověřeno `pnpm exec eslint src/app/admin/system/HealthRecheckButton.tsx` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `src/app/admin/system/HealthRecheckButton.tsx` — `'use client'` komponenta (R21.1–R21.3, R14.2, R14.3). Bere `initialReport: HealthReport` ze server renderu a vykresluje agregovaný stav + tabulku služeb (stav i latence). Tlačítko „Zkontrolovat znovu" volá `recheckHealth()`; po úspěchu aktualizuje stavy služeb i `checkedAt`, při chybě zobrazí českou hlášku přes `Notice variant="error"`. Stavy textovým labelem (`v pořádku`/`zhoršené`/`nedostupné`, ne jen barva); agregace a `checkedAt` v `aria-live="polite"` regionu. `checkedAt` formátováno pevně v `Europe/Prague` (deterministicky SSR↔klient). Nativní `<button>` → klávesová ovladatelnost. Reuse `Card`/`Notice`/`Button`.
+
+## 2026-06-21 — admin-system-tools: Task 27.4 — Panel testovacího e-mailu (TestEmailPanel)
+
+### Hotové tasky
+- 27.4 `TestEmailPanel` — ověřeno `pnpm exec eslint src/app/admin/system/TestEmailPanel.tsx` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru).
+
+### Nové funkce
+- `src/app/admin/system/TestEmailPanel.tsx` — `'use client'` komponenta (R22, R14, R15). Dvoukrokové **explicitní potvrzení** (tlačítko „Odeslat testovací e-mail" odhalí krok „Potvrdit odeslání" / „Zrušit"), pak volá `sendTestEmail()` **bez cíle od klienta** (R22.5). Výsledek v `aria-live="polite"` regionu textovým labelem přes `Notice`: úspěch → `neutral`, `cooldown` → `warning` (text vč. `retryAfterSeconds` z akce), ostatní (`not_authorized`/`no_admin_email`/`send_failed`) → `error`. Zobrazuje pouze text vrácený akcí — žádné PII nad rámec adresy. Nativní `<button>` prvky → klávesová ovladatelnost. Reuse `Card`/`Notice`/`Button`.
+
+## 2026-06-21 — admin-system-tools: Tasky 26.2–26.5 — server actions (triggerCron, pruneCronRuns, recheckHealth, sendTestEmail)
+
+### Hotové tasky
+- 26.2 `triggerCron`, 26.3 `pruneCronRuns`, 26.4 `recheckHealth`, 26.5 `sendTestEmail` — ověřeno `pnpm exec eslint src/app/admin/system/actions.ts` (exit 0) a `pnpm exec tsc --noEmit` (žádné chyby v souboru; přetrvávají jen nesouvisející chyby v test fixtures `charge.test.ts`, `reservation-emails.test.ts`, `tests/properties/*`).
+
+### Nové funkce
+- `src/app/admin/system/actions.ts` — rozšíření existujícího souboru (zachován `revalidateTarget`) o čtyři server actions. Všechny začínají `requireAdmin()` re-checkem (defense in depth R2.4); při `!ok` vrací `{ ok:false, message }` bez side-effectu.
+  - `triggerCron(job)`: validace `job in CRON_SCHEDULE_MAP` (anti-SSRF), chybějící `CRON_SECRET` → `{ ok:false, message:'cron tajemství není nastaveno' }` bez fetch; jinak server-side `fetch` `/api/cron/<job>?trigger=manual` s `Authorization: Bearer <CRON_SECRET>`. Base URL přes `resolveCronBaseUrl()` (`NEXT_PUBLIC_SITE_URL` → `VERCEL_URL` → localhost). Secret jen v hlavičce, nikdy do logu/výsledku.
+  - `pruneCronRuns(days?)`: `days ?? DEFAULT_CRON_RETENTION_DAYS`; service-role `delete from cron_runs where started_at < computePruneCutoff(now, days)` + `.select('id')` → počet smazaných. Maže výhradně `cron_runs`.
+  - `recheckHealth()`: reuse `runHealthChecks()`, vrací nový `HealthReport` vč. `checkedAt`.
+  - `sendTestEmail()`: bez parametru cíle; chybějící `HOREA_ADMIN_EMAIL` → `no_admin_email`; cooldown ze `system_settings` klíče `test_email_last_sent_at` přes `computeCooldownState` (perzistence kvůli serverless caveatu) → při zákazu `reason:'cooldown'` + `retryAfterSeconds`; jinak `sendEmail` výhradně na env adresu, po úspěchu upsert `last_sent_at` (best-effort). Diskriminovaná unie s `reason`; výsledek/logy bez PII.
+
 ## 2026-06-21 — admin-system-tools: Task 24.2 — integrace recordCronRun do billing route
 
 ### Hotové tasky
