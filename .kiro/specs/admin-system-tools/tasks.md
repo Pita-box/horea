@@ -306,11 +306,11 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Analogicky v `src/app/api/cron/email-retry/route.ts`.
     - _Requirements: 11.4_
 
-  - [ ]* 24.5 Test neměnnosti návratových hodnot rout
+  - [x]* 24.5 Test neměnnosti návratových hodnot rout
     - Ověřit, že obalení `recordCronRun` nemění návratovou hodnotu/HTTP status žádné ze 4 rout (mock DB zápis).
     - _Requirements: 11.4_
 
-- [ ] 25. Checkpoint — perzistence a monitoring cronů
+- [x] 25. Checkpoint — perzistence a monitoring cronů
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 26. Server actions (`src/app/admin/system/actions.ts`)
@@ -334,27 +334,27 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - `server-only` action **bez parametru cíle** (cíl se nikdy nebere od klienta): `requireAdmin()` re-check (Non_Admin_User → 403, žádné odeslání); chybějící `HOREA_ADMIN_EMAIL` → „administrátorská adresa není nastavena"; načíst `test_email_last_sent_at` ze `system_settings`, `computeCooldownState` → při zákazu vrátit zbývající dobu; jinak odeslat výhradně na `HOREA_ADMIN_EMAIL` (`sendEmail`), při úspěchu zapsat nový `last_sent_at`. Výsledek bez PII nad rámec adresy.
     - _Requirements: 2.4, 22.1, 22.3, 22.4, 22.5, 22.6, 22.7, 15.1, 15.3_
 
-  - [ ]* 26.6 Integrační test server-side admin re-check + side-effect guards
+  - [x]* 26.6 Integrační test server-side admin re-check + side-effect guards
     - Soubor `src/app/admin/system/__tests__/admin-recheck.test.ts`. Mock neadmin session → `revalidateTarget`/`triggerCron`/`pruneCronRuns`/`recheckHealth`/`sendTestEmail` vrací `ok:false`/403 a **nevolá** žádný side-effect (`revalidatePath`/`fetch`/`delete`/health/`sendEmail`); ověřit `server-only` import.
     - _Requirements: 2.4, 15.1, 19.6, 21.4, 22.7_
 
-  - [ ]* 26.7 Integrační test revalidace cache
+  - [x]* 26.7 Integrační test revalidace cache
     - Soubor `src/app/admin/system/__tests__/revalidate.test.ts`. Mock `revalidatePath`/`revalidateTag`; povolený cíl → volání + výsledek; cíl mimo allowlist → odmítnutí bez volání.
     - _Requirements: 10.1, 10.2, 10.4, 10.6_
 
-  - [ ]* 26.8 Integrační test `triggerCron`
+  - [x]* 26.8 Integrační test `triggerCron`
     - Soubor `src/app/admin/system/__tests__/trigger-cron.test.ts`. Mock `fetch`; ověřit `Bearer` autorizaci, chybějící `CRON_SECRET` → odmítnutí, zobrazení výsledku.
     - _Requirements: 12.1, 12.3, 12.4, 12.5_
 
-  - [ ]* 26.9 Integrační test `pruneCronRuns`
+  - [x]* 26.9 Integrační test `pruneCronRuns`
     - Soubor `src/app/admin/system/__tests__/prune-cron-runs.test.ts`. Mock `cron_runs` delete → počet smazaných, použití cutoffu, **žádný** dotaz na `audit_log`.
     - _Requirements: 19.1, 19.4, 19.5_
 
-  - [ ]* 26.10 Integrační test `sendTestEmail`
+  - [x]* 26.10 Integrační test `sendTestEmail`
     - Soubor `src/app/admin/system/__tests__/send-test-email.test.ts`. Mock `sendEmail` + `system_settings`; odeslání **jen** na `HOREA_ADMIN_EMAIL`, chybějící env → odmítnutí, aktivní cooldown → zbývající doba, zápis `last_sent_at` jen při úspěchu, výsledek bez PII.
     - _Requirements: 22.1, 22.3, 22.4, 22.5, 22.6_
 
-  - [ ]* 26.11 Integrační test `recheckHealth`
+  - [x]* 26.11 Integrační test `recheckHealth`
     - Soubor `src/app/admin/system/__tests__/recheck-health.test.ts`. Mock admin session + `runHealthChecks`; ověřit, že akce znovu spustí health check a vrátí nový `HealthReport` včetně aktualizovaného `checkedAt`; výsledek nese jen `service`/`label`/`status`/`latencyMs`/`errorKind` (žádná Secret_Value).
     - _Requirements: 21.1, 21.2_
 
@@ -386,11 +386,11 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - Všechny stavy textovým labelem (ne jen barvou); chybové stavy: české hlášky + „Zkusit znovu"; fallbacky pro nedostupný cron monitor/outbox/webhook/metriky.
     - _Requirements: 2.1, 2.4, 5.4, 7.1, 8.1, 8.2, 8.3, 9.1, 9.2, 9.3, 11.2, 13.1, 13.2, 13.3, 13.4, 16.8, 17.6, 18.2, 18.3, 18.4, 20.2, 20.3, 21.2, 23.1, 24.1, 24.4_
 
-  - [ ]* 28.2 Integrační testy renderu stránky
+  - [x]* 28.2 Integrační testy renderu stránky
     - Render sekcí: nasazení (textový label prostředí, „nedostupné"), outbox (souvislost s `/api/cron/email-retry`, fallback), zálohy (text „job není implementován", žádná akce ruční zálohy), webhook (proxy label, „bez aktivity"/stale), metriky (počty, storage „nedostupné"), konfigurace/logy, hranice auditu, cron rozvrh + drift, chybové stavy (mock throw → české hlášky, zbytek funkční).
     - _Requirements: 7.3, 8.1, 8.2, 8.3, 9.1, 9.2, 9.3, 13.1, 13.2, 13.3, 13.4, 16.8, 17.6, 17.7, 18.2, 18.3, 18.4, 20.2, 20.4, 23.3, 23.5, 24.1, 24.4_
 
-  - [ ]* 28.3 Testy přístupnosti
+  - [x]* 28.3 Testy přístupnosti
     - Textové labely stavů (ne jen barva) napříč sekcemi (health, nasazení, webhook, drift); fokus/aktivace klávesnicí; `aria-live` region aktualizovaný po akci (health re-check/revalidace/cron/prune/test e-mail).
     - _Requirements: 14.1, 14.2, 14.3, 16.8, 20.3, 21.3, 24.4_
 
@@ -403,20 +403,20 @@ Jazyk implementace: **TypeScript**, balíčkovač **pnpm**. Property testy běž
     - V `src/components/dashboard/DashboardChrome.tsx` pro admin předat `showSettings={true}`, `settingsHref="/admin/system"`, `settingsLabel="Správa systému"`; owner beze změny. Doplnit `/admin/system` do `TITLE_BY_PATH` („Správa systému").
     - _Requirements: 1.1, 1.2, 1.4_
 
-  - [ ]* 29.3 Testy headeru/routingu
+  - [x]* 29.3 Testy headeru/routingu
     - Render `DashboardHeader` v admin režimu — settings odkaz na `/admin/system`, `aria-label="Správa systému"`, vizuálně/funkčně oddělená ikona účtu (`/admin/account`).
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 14.4_
 
-- [ ] 30. Integrace a ověření konfigurace
-  - [ ]* 30.1 Test rovnosti `CRON_SCHEDULE_MAP` s `vercel.json`
+- [x] 30. Integrace a ověření konfigurace
+  - [x]* 30.1 Test rovnosti `CRON_SCHEDULE_MAP` s `vercel.json`
     - Soubor `src/lib/system/__tests__/cron-schedule-map.test.ts`. Načíst `vercel.json` a ověřit, že `CRON_SCHEDULE_MAP` přesně odpovídá rozvrhům (`billing '0 3 * * *'`, `warnings '30 3 * * *'`, `cleanup '0 4 * * *'`, `email-retry '*/15 * * * *'`) — ochrana proti driftu deklarace.
     - _Requirements: 24.3_
 
-  - [ ]* 30.2 Test migrace `system_settings` (RLS a tvar)
+  - [x]* 30.2 Test migrace `system_settings` (RLS a tvar)
     - Soubor `src/app/admin/system/__tests__/system-settings-migration.test.ts`. Načíst `0053_create_system_settings.sql` a ověřit textově: PK `key`, sloupce `value`/`updated_at`, `enable row level security`, admin `select` policy přes `current_user_is_admin()`, `grant insert, update, select` jen pro `service_role`, revoke pro public/anon.
     - _Requirements: 22.4_
 
-- [ ] 31. Závěrečný checkpoint — kompletní funkce
+- [x] 31. Závěrečný checkpoint — kompletní funkce
   - Ensure all tests pass, ask the user if questions arise. Spustit `pnpm test:run`, `pnpm lint`, `pnpm build`.
 
 ## Notes

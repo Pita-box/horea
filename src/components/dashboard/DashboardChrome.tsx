@@ -71,6 +71,8 @@ const TITLE_BY_PATH: { prefix: string; exact?: boolean; title: string }[] = [
   { prefix: '/admin/coupons', title: 'Kupóny' },
   { prefix: '/admin/plans', title: 'Tarify a funkce' },
   { prefix: '/admin/audit', title: 'Audit' },
+  { prefix: '/admin/account', title: 'Nastavení účtu' },
+  { prefix: '/admin/system', title: 'Správa systému' },
 ];
 
 function resolveTitle(pathname: string): string {
@@ -112,8 +114,9 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
   }, [isReservationsPage]);
 
   const items = NAV_BY_VARIANT[variant];
-  const settingsHref = variant === 'admin' ? '/admin' : '/dashboard/settings';
-  const accountHref = variant === 'admin' ? '/admin' : '/dashboard/account';
+  const accountHref = variant === 'admin' ? '/admin/account' : '/dashboard/account';
+  const settingsHref = variant === 'admin' ? '/admin/system' : '/dashboard/settings';
+  const settingsLabel = variant === 'admin' ? 'Správa systému' : 'Nastavení';
   const title = resolveTitle(pathname);
 
   return (
@@ -130,6 +133,7 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
           <DashboardSidebar
             items={items}
             showUpgrade={variant === 'owner'}
+            showHelp={variant === 'owner'}
             collapsed={collapsed}
             onToggleCollapse={() => setCollapsed((value) => !value)}
           />
@@ -147,6 +151,7 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
               <DashboardSidebar
                 items={items}
                 showUpgrade={variant === 'owner'}
+                showHelp={variant === 'owner'}
                 onNavigate={() => setMobileOpen(false)}
               />
             </aside>
@@ -160,7 +165,9 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
           <DashboardHeader
             onMenuClick={() => setMobileOpen(true)}
             settingsHref={settingsHref}
+            settingsLabel={settingsLabel}
             accountHref={accountHref}
+            showSettings
             showSearch={variant === 'owner'}
           />
           <main className="min-h-0 flex-1 p-4 pt-0">

@@ -2,6 +2,104 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — admin-system-tools: Task 31 — Závěrečný checkpoint (kompletní funkce)
+
+### Hotové tasky
+- 31 Závěrečný checkpoint — ověřeno celou sadou:
+  - `pnpm test:run`: 155 test files passed | 23 skipped; 740 testů passed | 57 skipped (exit 0).
+  - `pnpm lint`: bez errors (exit 0).
+  - `pnpm build`: produkční build prošel, route `/admin/system` přítomna (exit 0).
+- Žádné opravy nebyly potřeba — admin-system soubory (page/accessibility/server action/I/O/cron/config guard/dashboard-header testy) prošly bez zásahu.
+
+## 2026-06-21 — admin-system-tools: Task 30.1 — Test rovnosti CRON_SCHEDULE_MAP s vercel.json
+
+### Hotové tasky
+- 30.1 `src/lib/system/__tests__/cron-schedule-map.test.ts` — ověřeno `pnpm test:run` (6 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/cron-schedule-map.test.ts` — ochrana proti driftu deklarace cron rozvrhů (R24.3). Načítá reálný `vercel.json` přes `readFileSync(join(process.cwd(),'vercel.json'),'utf8')` + `JSON.parse`, z `path` (`/api/cron/<job>`) odvozuje název jobu posledním segmentem. Ověřuje obousměrně: stejná množina jobů (žádný navíc/chybějící), shodné rozvrhy mapa↔vercel, plus explicitní `toEqual` na očekávané hodnoty (billing `0 3 * * *`, warnings `30 3 * * *`, cleanup `0 4 * * *`, email-retry `*/15 * * * *`). Mapa a `vercel.json` souhlasí — žádný drift.
+
+### Hotové tasky
+- 28.3 `src/app/admin/system/__tests__/accessibility.test.tsx` — ověřeno `pnpm test:run` (4 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/accessibility.test.tsx` — RTL testy přístupnosti panelů Správy systému (R14.1–R14.3, R21.3). Server actions z `./actions` mockované přes `vi.hoisted`/`vi.mock` jako spy s řízeným výsledkem. Pokrývá: (1) `HealthRecheckButton` — stavy služeb mají textový label (v pořádku/zhoršené/nedostupné, dotaz scopovaný do `getByRole('table')` kvůli kolizi s agregátem v aria-live), přítomnost `aria-live` regionu, klávesová ovladatelnost (`userEvent.tab()` + `keyboard('{Enter}')` na nativním `<button>`) a aktualizace aria-live regionu po re-checku (nový agregát z mocku, čekání přes `findByText`); (2) `TestEmailPanel` a (3) `RevalidatePanel` — `aria-live` region, akce za explicitním potvrzením (první klik akci nespustí), po potvrzení textový výsledek v aria-live regionu.
+- Přidána dev dependency `@testing-library/user-event@14.5.2` (companion k `@testing-library/react`) — task explicitně vyžaduje `userEvent`; dříve v projektu nebyla.
+
+## 2026-06-21 — admin-system-tools: Task 28.2 — Integrační testy renderu `/admin/system`
+
+### Hotové tasky
+- 28.2 `src/app/admin/system/__tests__/page.test.tsx` — ověřeno `pnpm test:run` (3 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/page.test.tsx` — integrační RTL testy `AdminSystemPage` (async RSC). Vzor renderu: `render(await AdminSystemPage())` (projekt nemá samostatný RSC test setup). Všechny gettery (`runHealthChecks`, `getDeployInfo`, `getOutboxStatus`, `getBackupStatus`, `getWebhookFreshness`, `getOperationalMetrics`, `getConfigReport`, `getCronStatuses`) + `requireAdmin` mockované přes `vi.hoisted`/`vi.mock`; klientské panely nahrazeny stuby. Čisté moduly `cron-schedule` a `datetime` NEmockované (deterministické, součást renderu rozvrhu/driftu). Pokrývá: šťastnou cestu (nasazení, outbox + `/api/cron/email-retry`, zálohy „není implementována", webhook proxy/čerstvé, metriky + storage „nedostupné", konfigurace nastaveno/nenastaveno + log info, odkaz `/admin/audit`, cron rozvrh + „žádný drift"), fallbacky (`null`/`db:null` → české hlášky o nedostupnosti, zbytek funkční) a health throw (fallback sekce stavu služeb, zbytek funkční).
+
+## 2026-06-21 — admin-system-tools: Task 29.3 — Testy headeru/routingu (admin režim)
+
+### Hotové tasky
+- 29.3 `src/components/dashboard/__tests__/dashboard-header.admin.test.tsx` — ověřeno `pnpm test:run` (3 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/components/dashboard/__tests__/dashboard-header.admin.test.tsx` — RTL testy `DashboardHeader` v admin režimu (R1.1–R1.4, R14.4). Render s admin props (`showSettings`, `settingsHref="/admin/system"`, `settingsLabel="Správa systému"`, `accountHref="/admin/account"`). Dotazy přes `getByRole('link', { name })`: gear odkaz míří na `/admin/system` a má aria-label „Správa systému"; account ikona míří na `/admin/account` a je to oddělený odkaz s odlišným cílem (account má napevno aria-label „Nastavení účtu"). Třetí test: bez `showSettings` se gear nezobrazí, účet zůstává. Bez mocku `next/link` (pod jsdom se renderuje jako `<a href>`).
+
+## 2026-06-21 — admin-system-tools: Task 26.10 — Integrační test server action `sendTestEmail`
+
+### Hotové tasky
+- 26.10 `src/app/admin/system/__tests__/send-test-email.test.ts` — ověřeno `pnpm test:run` (5 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/send-test-email.test.ts` — integrační test `sendTestEmail` (R22.1, R22.3, R22.4, R22.5, R22.6). `@/lib/admin/require-admin` mockován jako admin ok s builderem nad `system_settings` (`select().eq().maybeSingle()` vrací řízenou hodnotu `last_sent_at`; `upsert()` jako spy). `@/lib/email/client` (`sendEmail`) spy s řízeným návratem (úspěch / `{ error }`); `@/lib/log-server` no-op. `HOREA_ADMIN_EMAIL` přes `vi.stubEnv`, cooldown přes fake timers (`vi.setSystemTime`). Testy: úspěch (žádný předchozí záznam) → `to === HOREA_ADMIN_EMAIL`, `{ ok:true }`, upsert `last_sent_at` proběhl; chybějící env → `{ ok:false, reason:'no_admin_email' }` bez odeslání; aktivní cooldown → `reason:'cooldown'` + `retryAfterSeconds>0`, bez odeslání i zápisu; selhání odeslání → `reason:'send_failed'`, bez zápisu; výsledek bez PII (adresa jen z env, action bez argumentů).
+
+## 2026-06-21 — admin-system-tools: Task 26.11 — Integrační test recheckHealth
+
+### Hotové tasky
+- 26.11 `src/app/admin/system/__tests__/recheck-health.test.ts` — ověřeno `pnpm test:run` (4 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/recheck-health.test.ts` — integrační test server action `recheckHealth` (R21.1, R21.2). Mockuje `@/lib/admin/require-admin` (admin/ne-admin) a `@/lib/system/health` (`runHealthChecks` → řízený `HealthReport`: 6 služeb + aggregate + pevný `checkedAt`); `@/lib/log-server` no-op. Ověřuje: admin → `runHealthChecks` znovu spuštěn a vrácen `{ ok:true, report }` s daným `checkedAt`; každý `services[]` prvek nese JEN klíče `service`/`label`/`status`/`latencyMs`/`errorKind` (žádná Secret_Value); opětovné volání spustí check znovu; ne-admin → `{ ok:false }` a `runHealthChecks` NEvolán (R21.4).
+- **Pozn.:** `ServiceStatus`/`AggregateStatus` v `@/lib/system/status` má literály `'ok' | 'degraded' | 'down'` (ne `'operational'`) — řízený `HealthReport` v testu musí používat tyto hodnoty.
+
+## 2026-06-21 — admin-system-tools: Task 26.6 — Integrační test server-side admin re-check + side-effect guards
+
+### Hotové tasky
+- 26.6 `src/app/admin/system/__tests__/admin-recheck.test.ts` — ověřeno `pnpm test:run` (6 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/admin-recheck.test.ts` — integrační test defense-in-depth re-checku (R2.4) pro všech 5 server actions stránky `/admin/system`. Ne-admin session simulována mockem `@/lib/admin/require-admin` (`requireAdmin` → `{ ok:false, message }`). Špehované side-effect kanály: `next/cache` (`revalidatePath`/`revalidateTag`), globální `fetch` (`vi.stubGlobal`), `@/lib/system/health` (`runHealthChecks`), `@/lib/email/client` (`sendEmail`), `@/lib/supabase/admin` (`createAdminClient` builder s `delete`/`upsert` spy); `@/lib/log-server` no-op. Pro každou action ověřeno odmítnutí (`ok:false`) A že odpovídající side-effect NEbyl volán. Šestý test čte zdroj `src/lib/admin/require-admin.ts` (přes `process.cwd()` join) a ověřuje přítomnost `import 'server-only'`.
+- **Pozn.:** `import.meta.url` pod vitest/oxc runnerem není `file://` URL → `fileURLToPath` vyhodí „The URL must be of scheme file". Pro čtení zdroje v testu použij `join(process.cwd(), 'src/...')` místo `new URL(..., import.meta.url)`.
+
+## 2026-06-21 — admin-system-tools: Task 24.5 — Test neměnnosti návratových hodnot cron rout
+
+### Hotové tasky
+- 24.5 `src/app/api/cron/__tests__/record-run-invariance.test.ts` — ověřeno `pnpm test:run` (5 testů passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/api/cron/__tests__/record-run-invariance.test.ts` — testy invariantnosti kontraktu všech 4 cron rout (cleanup, billing, warnings, email-retry) po obalení `recordCronRun` (R11.4). `@/lib/cron/record-run` mockován jako transparentní průchod (jen zavolá předaný `run()` a vrátí výsledek, žádný DB zápis) + spy na `(job, trigger)`. `verifyCronAuthorization` → `{ ok:true }`; `createAdminClient` → chainable thenable query builder řešící každý dotaz jako prázdný úspěch (`{ data:[], error:null }`); doménové závislosti (`chargeMonthly`, `createGopayClient`, `transitionToGracePeriod`, `dispatchTransactionalEmail`, `notifyAdminCronFailure`, `drainEmailOutbox`, `purgeOldOutbox`) mockované na minimální úspěšný průchod; `serverLog` no-op. Každá routa ověřena na HTTP 200 + nezměněné JSON tělo metrik a volání `recordCronRun` se správným `job`/`trigger`; navíc `?trigger=manual` → `trigger='manual'`.
+
+## 2026-06-21 — admin-system-tools: Task 26.8 — Integrační test triggerCron
+
+### Hotové tasky
+- 26.8 `src/app/admin/system/__tests__/trigger-cron.test.ts` — ověřeno `pnpm test:run` (4 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/trigger-cron.test.ts` — integrační testy server action `triggerCron(job)`. Mock `@/lib/admin/require-admin` (`requireAdmin` → admin ok) a `@/lib/log-server` (spy). `fetch` mockován přes `vi.stubGlobal`, `CRON_SECRET` přes `vi.stubEnv`. Pokrytí: s nastaveným secretem a `job='cleanup'` → `fetch` volán právě jednou na URL obsahující `/api/cron/cleanup` + `trigger=manual`, hlavička `Authorization: Bearer <secret>`, výsledek `{ ok:true, job:'cleanup', httpStatus:200, httpOk:true }` (R12.1, R12.3); HTTP 500 → `httpOk:false`; bez `CRON_SECRET` → `{ ok:false, message:'cron tajemství není nastaveno' }` a `fetch` NEvolán (R12.4); ověřeno, že hodnota secretu neunikne do výsledku ani do logu (R12.5, R15.4). Úklid `vi.unstubAllGlobals`/`vi.unstubAllEnvs`/`vi.clearAllMocks` v `afterEach`.
+
+## 2026-06-21 — admin-system-tools: Task 26.9 — Integrační test pruneCronRuns
+
+### Hotové tasky
+- 26.9 `src/app/admin/system/__tests__/prune-cron-runs.test.ts` — ověřeno `pnpm test:run` (4 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/prune-cron-runs.test.ts` — integrační testy server action `pruneCronRuns(days?)`. Mock `@/lib/admin/require-admin` (`requireAdmin` → `{ ok:true, actorUserId:'a', admin }`), kde admin je chainovatelný builder zachycující `from(table)`, `delete().lt(col,val)` a `select(col)` přes `vi.hoisted`; řízený výsledek `{ data, error }`. `serverLog` jako spy. Pokrytí: bez parametru → cutoff = `computePruneCutoff(now, DEFAULT_CRON_RETENTION_DAYS)` (fake timers, přesné porovnání) a `deleted` = počet vrácených řádků (R19.1, R19.2, R19.4); `days=30` → cutoff dle 30 dní; prázdný výsledek → `deleted: 0`; `from` volán JEN s `cron_runs`, nikdy `audit_log` (R19.5). Úklid `vi.useRealTimers` + `vi.clearAllMocks` v `afterEach`.
+
+## 2026-06-21 — admin-system-tools: Task 26.7 — Integrační test revalidace cache
+
+### Hotové tasky
+- 26.7 `src/app/admin/system/__tests__/revalidate.test.ts` — ověřeno `pnpm test:run` (3 testy passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/app/admin/system/__tests__/revalidate.test.ts` — integrační testy server action `revalidateTarget`. Mock `@/lib/admin/require-admin` (`requireAdmin` → úspěšný admin `{ ok:true, actorUserId:'a', admin }`) a `next/cache` (`revalidatePath`/`revalidateTag` spy přes `vi.hoisted`). Pokrytí: povolená cesta z `ALLOWED_PATHS` → `revalidatePath` volán s tou cestou + `{ ok:true, target }` (R10.1, R10.2, R10.4); cíl mimo allowlist (`/nope`, neznámý tag) → `{ ok:false }` a `revalidatePath`/`revalidateTag` NEvolány (R10.6). Test povoleného tagu je podmíněný (`ALLOWED_TAGS` je nyní prázdné → přeskočen). Úklid `vi.clearAllMocks` v `afterEach`.
+
 ## 2026-06-21 — admin-system-tools: Task 23.4 — Unit testy getCronStatuses
 
 ### Hotové tasky

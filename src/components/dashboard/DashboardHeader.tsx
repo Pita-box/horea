@@ -8,9 +8,13 @@ import { DashboardSearch } from './DashboardSearch';
 type DashboardHeaderProps = {
   /** Otevření mobilního sidebar draweru. */
   onMenuClick: () => void;
-  /** Cíl ikony nastavení (owner vs admin). */
+  /** Cíl ikony nastavení (owner). */
   settingsHref?: string;
-  /** Cíl ikony účtu (owner → nastavení účtu). */
+  /** Přístupný název ikony nastavení (aria-label). */
+  settingsLabel?: string;
+  /** Zobrazit ikonu nastavení (owner → nastavení podniku, admin → správa systému). */
+  showSettings?: boolean;
+  /** Cíl ikony účtu (owner → nastavení účtu, admin → nastavení admin účtu). */
   accountHref?: string;
   /** Zobrazit funkční vyhledávání (zatím owner). */
   showSearch?: boolean;
@@ -24,7 +28,9 @@ type DashboardHeaderProps = {
 export function DashboardHeader({
   onMenuClick,
   settingsHref = '/dashboard/settings',
+  settingsLabel = 'Nastavení',
   accountHref = '/dashboard/account',
+  showSettings = true,
   showSearch = false,
 }: DashboardHeaderProps) {
   return (
@@ -43,13 +49,15 @@ export function DashboardHeader({
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         {showSearch ? <DashboardSearch /> : null}
 
-        <Link
-          href={settingsHref}
-          aria-label="Nastavení"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)] hover:text-[var(--color-action-violet)]"
-        >
-          <IconSettings size={20} stroke={2} aria-hidden="true" />
-        </Link>
+        {showSettings ? (
+          <Link
+            href={settingsHref}
+            aria-label={settingsLabel}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)] hover:text-[var(--color-action-violet)]"
+          >
+            <IconSettings size={20} stroke={2} aria-hidden="true" />
+          </Link>
+        ) : null}
         <Link
           href={accountHref}
           aria-label="Nastavení účtu"

@@ -29,6 +29,8 @@ type DashboardSidebarProps = {
   items: DashboardNavItem[];
   /** Zobrazit tlačítko „Předplatné" (jen owner). */
   showUpgrade?: boolean;
+  /** Zobrazit odkaz „Nápověda" (jen owner; admin ho nepotřebuje). */
+  showHelp?: boolean;
   /** Voláno po kliknutí na odkaz (zavření mobilního draweru). */
   onNavigate?: () => void;
   /** Sbalený režim — jen ikony (desktop rail). */
@@ -46,6 +48,7 @@ type DashboardSidebarProps = {
 export function DashboardSidebar({
   items,
   showUpgrade = false,
+  showHelp = true,
   onNavigate,
   collapsed = false,
   onToggleCollapse,
@@ -124,18 +127,20 @@ export function DashboardSidebar({
             {collapsed ? <span className="sr-only">Tarify</span> : 'Tarify'}
           </Link>
         ) : null}
-        <Link
-          href="/kontakt"
-          onClick={onNavigate}
-          title={collapsed ? 'Nápověda' : undefined}
-          className={[
-            'flex items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
-            collapsed ? 'justify-center px-0' : 'px-4',
-          ].join(' ')}
-        >
-          <IconHelpCircle size={20} stroke={2} aria-hidden="true" />
-          {collapsed ? <span className="sr-only">Nápověda</span> : 'Nápověda'}
-        </Link>
+        {showHelp ? (
+          <Link
+            href="/kontakt"
+            onClick={onNavigate}
+            title={collapsed ? 'Nápověda' : undefined}
+            className={[
+              'flex items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
+              collapsed ? 'justify-center px-0' : 'px-4',
+            ].join(' ')}
+          >
+            <IconHelpCircle size={20} stroke={2} aria-hidden="true" />
+            {collapsed ? <span className="sr-only">Nápověda</span> : 'Nápověda'}
+          </Link>
+        ) : null}
         <form action="/logout" method="post">
           <button
             type="submit"
