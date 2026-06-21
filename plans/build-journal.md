@@ -2,6 +2,96 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — telegram-operator-notifications: property test obsahu notifikačních zpráv (Task 4.3)
+
+### Hotové tasky
+- 4.3 Property test pro obsah notifikačních zpráv — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 11 test** (`src/lib/telegram/__tests__/messages-notifications.property.test.ts`) — fast-check `{ numRuns: 100 }` pro notifikační buildery. Generátory: neprázdný `businessName` (`fc.string({ minLength: 1 })` + `trim().length > 0`), `createdAt` přes `fc.date()`, `plan` přes `fc.constantFrom('start','pokrocily','max')`, `amountCzk` přes `fc.nat()`. Ověřuje: (a) `buildBusinessCreatedMessage` obsahuje `businessName` a `formatPragueDateTime(createdAt)`; (b) `buildPaymentConfirmedMessage` obsahuje `businessName`, český label tarifu (Start/Pokročilý/Max) a `formatCzk(amountCzk)`. Tag `// Feature: telegram-operator-notifications, Property 11: Notifikační zprávy obsahují požadovaná pole`, Validates R3.2/R3.3/R4.2/R4.3.
+
+## 2026-06-21 — telegram-operator-notifications: property test parsování příkazů (Task 3.5)
+
+### Hotové tasky
+- 3.5 Property test pro parsování příkazů — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 9 test** (`src/lib/telegram/__tests__/commands.property.test.ts`) — fast-check `{ numRuns: 100 }` pro `parseCommand`. Pozitivní větev: pro každý známý příkaz (`/trzby`, `/odhad`, `/stav`, `/start`, `/help`) generuje variace velikosti písmen (vč. náhodného mixed-case přes `chain`), vedoucí/koncový whitespace a volitelný `@botname` suffix → `{ kind: 'command', command }`. Negativní větev: libovolný `fc.string()` (vč. `/`+string variant), s `fc.pre(!looksLikeKnownCommand)` pro vyloučení náhodné shody → `{ kind: 'unknown' }`. Tag `// Feature: telegram-operator-notifications, Property 9: Rozpoznání příkazů a odmítnutí neznámého textu`, Validates R12.2.
+- **Pozn.:** fast-check v4 odstranil `fc.stringOf` — whitespace generátor řešen přes `fc.array(constantFrom(...)).map(join)`.
+
+## 2026-06-21 — telegram-operator-notifications: property test autorizace secretu (Task 3.7)
+
+### Hotové tasky
+- 3.7 Property test pro autorizaci secretu — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 7 test** (`src/lib/telegram/__tests__/webhook-secret.property.test.ts`) — fast-check `{ numRuns: 100 }` pro `isAuthorizedSecret`. Generátory: neprázdný secret (`fc.string({ minLength: 1 })`), náhodná hlavička (`fc.string()`) a `fc.boolean()` pro volbu shody. Ověřuje: (a) shoda neprázdného secretu a hlavičky → `true`; (b) neshoda → `false` (výsledek odvozen z `headerValue === configured`, aby náhodná kolize neselhala); (c) `configured === null` → vždy `false` při libovolné hlavičce; (d) `headerValue === null` → `false`. Tag `// Feature: telegram-operator-notifications, Property 7: Autorizace webhook secretu`, Validates R7.1/R7.2/R7.3.
+
+## 2026-06-21 — telegram-operator-notifications: property test výpočtu tržeb (Task 2.2)
+
+### Hotové tasky
+- 2.2 Property test pro výpočet tržeb — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 3 test** (`src/lib/telegram/__tests__/revenue.property.test.ts`) — fast-check `{ numRuns: 100 }` pro `calculateRevenueCzk`. Generátor `fc.array` plateb s celočíselným `amount_czk` (přesný součet bez chyb plovoucí čárky). Ověřuje: výsledek roven součtu `amount_czk`, aditivita vůči zřetězení dvou seznamů, prázdný seznam → 0. Tag `// Feature: telegram-operator-notifications, Property 3: Výpočet tržeb je součet částek`, Validates R9.2/R9.3/R13.1/R13.3.
+
+## 2026-06-21 — telegram-operator-notifications: property test reportu zdraví (Task 3.3)
+
+### Hotové tasky
+- 3.3 Property test pro report zdraví — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 6 test** (`src/lib/telegram/__tests__/health.property.test.ts`) — fast-check `{ numRuns: 100 }` pro `buildHealthReport`. Smart generátor mapuje šest sledovaných služeb (`supabase, resend, smtp2go, gopay, r2, google`) na náhodné stavy (`ok/degraded/down`), bez duplicit a neznámých služeb. Ověřuje: report obsahuje právě těchto šest služeb, agregát dodržuje precedenci `down > degraded > ok`, a žádný prvek nemá jiná pole než `service/label/status` (bez tajemství). Tag `// Feature: telegram-operator-notifications, Property 6: Report zdraví pokrývá všech šest služeb bez tajemství`, Validates R11.2/R11.5/R11.6.
+
+## 2026-06-21 — telegram-operator-notifications: property test odhadu tržeb (Task 2.4)
+
+### Hotové tasky
+- 2.4 Property test pro odhad tržeb — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 4 test** (`src/lib/telegram/__tests__/estimate.property.test.ts`) — fast-check `{ numRuns: 100 }` pro `estimateNextMonthRevenueCzk`. Generátor `fc.array` předplatných s `plan` přes `fc.constantFrom('start','pokrocily','max')`. Ověřuje: výsledek roven součtu `planPriceCzk(plan)`, vždy nezáporný; prázdný seznam → 0. Tag `// Feature: telegram-operator-notifications, Property 4: Odhad odpovídá ceníku a je nezáporný`, Validates R10.2/R10.3/R10.4/R13.2/R13.4.
+
+## 2026-06-21 — telegram-operator-notifications: property test agregace zdraví (Task 3.2)
+
+### Hotové tasky
+- 3.2 Property test pro agregaci zdraví — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 5 test** (`src/lib/telegram/__tests__/health.property.test.ts`) — fast-check `{ numRuns: 100 }` pro `aggregateHealth`. Generátor `fc.constantFrom('ok','degraded','down')` v poli (maxLength 50). Ověřuje invariant precedence `down > degraded > ok` a prázdný vstup → `ok`. Tag `// Feature: telegram-operator-notifications, Property 5: ...`, Validates R11.3/R11.4.
+
+## 2026-06-21 — telegram-operator-notifications: property test resoluce konfigurace (Task 1.2)
+
+### Hotové tasky
+- 1.2 Property test pro resoluci konfigurace — ověřeno (vitest run + eslint, exit 0)
+
+### Nové funkce
+- **Property 1 test** (`src/lib/telegram/__tests__/config.property.test.ts`) — fast-check `{ numRuns: 100 }` pro `resolveTelegramConfig`. Generátor pokrývá nepřítomnost (`undefined`), prázdný string i neprázdné hodnoty (vč. whitespace) obou proměnných `TELEGRAM_BOT_TOKEN` / `TELEGRAM_OPERATOR_CHAT_ID`. Ověřuje ekvivalenci: neprázdná konfigurace ⟺ oba truthy, jinak `null` (posouzení prázdnosti přes truthiness). Tag `// Feature: telegram-operator-notifications, Property 1: ...`, Validates R1.1/R1.2.
+
+## 2026-06-21 — telegram-operator-notifications: čisté buildery zpráv (Task 4.1)
+
+### Nové funkce
+- **Message_Builder** (`src/lib/telegram/messages.ts`) — čisté buildery českých textů zpráv + formátování. `formatCzk(amountCzk)` (cs-CZ, bez desetin, sufix „ Kč", vzor `analytics.ts`) a `formatPragueDateTime(at)` (Intl.DateTimeFormat, timeZone `Europe/Prague`). Buildery `buildBusinessCreatedMessage`, `buildPaymentConfirmedMessage` (labely tarifů Start/Pokročilý/Max), `buildRevenueMessage`, `buildEstimateMessage`, `buildHealthMessage` (mapování stavu ok→„v pořádku"/degraded→„zhoršené"/down→„nedostupné"), `buildHelpMessage` (všechny příkazy), `buildUnknownCommandMessage` (odkaz na /help). Vstupní typy `BusinessCreatedInput` a `PaymentConfirmedInput` definovány a exportovány zde (kvůli pořadí vln a prevenci cyklické závislosti — `notifications.ts` je bude importovat). Bez I/O / `server-only` (property/unit testy jsou tasky 4.2–4.4). Ověřeno `pnpm exec eslint` (exit 0).
+
+## 2026-06-21 — telegram-operator-notifications: čistá agregace zdraví (Task 3.1)
+
+### Nové funkce
+- **Health_Reporter** (`src/lib/telegram/health.ts`) — čisté funkce a typy pro technický stav služeb. Typy `ServiceStatus` (`ok`/`degraded`/`down`), `MonitoredService` (supabase/resend/smtp2go/gopay/r2/google), `ServiceHealth` (`service`/`label`/`status`) a `HealthReport` (`services` + `aggregate`, sladěno s `admin-system-tools`). Funkce `aggregateHealth(statuses)` s precedencí `down > degraded > ok` (prázdný vstup → `ok`) a `buildHealthReport(services)` vracející seznam služeb + agregovaný stav, bez Secret_Value. Bez I/O (`runServiceProbes` + `server-only` přijdou v tasku 7.3). Ověřeno `pnpm exec eslint` (exit 0).
+
+## 2026-06-21 — telegram-operator-notifications: čistý výpočet tržeb (Task 2.1)
+
+### Nové funkce
+- **Revenue_Calculator** (`src/lib/telegram/revenue.ts`) — čistá funkce `calculateRevenueCzk(payments)` + typ `RevenuePaymentRow` (`amount_czk: number`). Součet `amount_czk` vstupních plateb; prázdný vstup → 0. Bez I/O (filtr `paid`/období a `server-only` wrapper `getCurrentMonthRevenueCzk` přijdou v tasku 7.1). Ověřeno `pnpm exec eslint` (exit 0).
+
+## 2026-06-21 — telegram-operator-notifications: čisté parsování příkazů (Task 3.4)
+
+### Nové funkce
+- **Command_Parser** (`src/lib/telegram/commands.ts`) — čistá funkce `parseCommand(text)` + typy `Command` (`'trzby' | 'odhad' | 'stav' | 'start' | 'help'`) a `ParsedCommand` (`{ kind: 'command'; command } | { kind: 'unknown' }`). Rozpozná `/trzby`, `/odhad`, `/stav`, `/start`, `/help` s tolerancí velikosti písmen, okolního whitespace a volitelného `@botname` sufixu; cokoli jiného → `unknown`. Bez I/O / `server-only` (property test je task 3.5). Ověřeno `pnpm exec eslint` (exit 0).
+
+## 2026-06-21 — telegram-operator-notifications: čistý odhad tržeb (Task 2.3)
+
+### Nové funkce
+- **Estimate_Calculator** (`src/lib/telegram/estimate.ts`) — čistá funkce `estimateNextMonthRevenueCzk(subscriptions)` + typ `EstimateSubscriptionRow`. Odhad tržeb příštího měsíce jako součet `planPriceCzk(plan)` přes vstupní předplatná z jednotného ceníku `src/lib/checkout/pricing.ts`; prázdný vstup → 0, výsledek vždy nezáporný. Bez I/O (wrapper + `server-only` přijdou v tasku 7.2). Ověřeno `pnpm exec eslint` (exit 0).
+
 ## 2026-06-20 — dashboard-fulltext-search: finální checkpoint (Task 8) + souhrn feature
 
 ### Nové funkce (souhrn dokončené feature)
@@ -2549,3 +2639,13 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 
 ### Verifikace
 - `pnpm lint` čistý; `pnpm exec vitest run` auth → 7 passed; `pnpm build` OK.
+
+## 2026-06-20 — Admin: stránka Nastavení účtu (změna e-mailu/hesla) + skrytí Nápovědy
+
+### Nové funkce
+- Nová stránka `/admin/account` (`src/app/admin/account/page.tsx`) — administrátor si může změnit e-mail a heslo. Sdílí komponentu `AccountCredentialsForm` i serverové akce z `dashboard/account/actions.ts` (akce pracují nad přihlášeným uživatelem bez ohledu na roli, takže fungují i pro admina). Přístup chrání Access_Guard middleware (`/admin/*`).
+- `DashboardChrome`: pro `variant="admin"` míří ikony „Nastavení" i „Účet" v topbaru na `/admin/account` (dříve na `/admin`); doplněn titulek topbaru pro `/admin/account` = „Nastavení účtu".
+- `DashboardSidebar`: nový prop `showHelp` (default true); odkaz „Nápověda" se v admin aside skryl (`showHelp={variant === 'owner'}`), owner ho má dál.
+
+### Verifikace
+- `pnpm lint` čistý; `pnpm build` OK (nová route `/admin/account`).
