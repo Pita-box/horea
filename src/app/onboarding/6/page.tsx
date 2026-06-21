@@ -248,7 +248,7 @@ export default async function OnboardingSummaryPage() {
           />
           <p className="text-sm leading-6 text-[var(--color-slate-text)]">
             Váš profil bude připraven k editaci. Jakmile kliknete na dokončení, získáte přístup do
-            administrace vašeho nového podniku.
+            administrace vašeho profilu.
           </p>
         </div>
 
