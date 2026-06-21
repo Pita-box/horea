@@ -94,6 +94,16 @@ function emit(level: LogLevel, msg: string, ctx?: LogContext): void {
   }
 }
 
+/**
+ * Tenký exportovaný wrapper nad interní `redact` — umožňuje znovupoužití redakce
+ * (např. health/cron vrstvou) a přímé property-testování bez změny chování loggeru.
+ * Projde kontext a nahradí citlivé klíče za `[REDACTED]` (rekurzivně, case-insensitive,
+ * substring match — `CRON_SECRET` obsahuje `secret`, takže je redigován).
+ */
+export function redactContext(ctx: LogContext): LogContext {
+  return redact(ctx, 0, new WeakSet()) as LogContext;
+}
+
 export const log = {
   info: (msg: string, ctx?: LogContext): void => emit('info', msg, ctx),
   warn: (msg: string, ctx?: LogContext): void => emit('warn', msg, ctx),

@@ -2,6 +2,100 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — admin-system-tools: Checkpoint (Task 12) — stabilizace property testů čistého jádra
+
+### Hotové tasky
+- 12 Checkpoint — ověřeno `pnpm test:run` (620 passed | 57 skipped, 0 failed) a `pnpm lint` (exit 0; jen neškodné varování o Node engine).
+
+### Bug & fix
+- **Symptom:** `pnpm test:run` občas selhal (seed-dependent flaky) ve `config-report.pbt.test.ts`, `email-cooldown.pbt.test.ts`, `cron-schedule.pbt.test.ts`, `outbox-status.pbt.test.ts`. U config-report: `AssertionError: expected true to be false` (tajná hodnota „nalezena" ve výstupu). U ostatních: `RangeError: Invalid time value` z `.toISOString()`.
+- **Root cause:**
+  1. `config-report.pbt.test.ts` používal sentinel prefix `SECRET_`, který je podřetězcem reálných názvů klíčů (např. `SECRET_A` ⊂ `R2_SECRET_ACCESS_KEY`). Kontrola „žádná hodnota ve výstupu" pak hlásila falešný pozitiv proti názvu klíče, ne proti hodnotě. Implementace `buildConfigReport` je korektní — hodnoty nikdy neemituje.
+  2. `fc.date({min,max})` v fast-check 4 může generovat `Invalid Date` i v rozsahu; `email-cooldown`, `cron-schedule` a `outbox-status` to neošetřily, takže `now`/ISO konverze čas od času spadly mimo vstupní prostor funkcí.
+- **Fix (jen testy, čisté jádro beze změny):**
+  - `config-report.pbt.test.ts`: sentinel prefix změněn na malými písmeny `secretvalue_` (nikdy podřetězec VELKÝCH názvů klíčů); upraven i odpovídající `startsWith` filtr.
+  - `email-cooldown.pbt.test.ts`, `cron-schedule.pbt.test.ts`, `outbox-status.pbt.test.ts`: do `fc.date(...)` doplněno `noInvalidDate: true` (`prune-cutoff` a `webhook-freshness` už invalid data filtrovaly přes `.filter(d => !Number.isNaN(d.getTime()))`).
+- **Nefungovalo:** spoléhat jen na `min`/`max` u `fc.date` nestačí k vyloučení `Invalid Date`.
+
+## 2026-06-21 — admin-system-tools: Property testy cron rozvrhu (Tasky 11.2 a 11.3)
+
+### Hotové tasky
+- 11.2 Property 13 — výpočet příštího běhu cronu — ověřeno `pnpm test:run src/lib/system/__tests__/cron-schedule.pbt.test.ts` (2 passed) a `pnpm exec eslint` (exit 0).
+- 11.3 Property 14 — detekce driftu rozvrhu cronů — ověřeno týmž během.
+
+### Nové funkce
+- `src/lib/system/__tests__/cron-schedule.pbt.test.ts` — dvě fast-check property (`numRuns: 100`) nad `src/lib/system/cron-schedule.ts`:
+  - Property 13 (R24.2) nad `computeNextRun(expr, now)`: generuje `now` a podporované výrazy `M H * * *` (M∈0..59, H∈0..23) a `*/N * * * *` (N∈1..59); ověřuje, že výsledek je ostře po `now`, vyhovuje výrazu (denní: UTC H/M sedí a delta < 24h; krokový: sek/ms == 0, minuta dělitelná N, delta ≤ N min) a je nejbližší budoucí.
+  - Property 14 (R24.4) nad `detectScheduleDrift(configured, monitored)`: generuje dvojice map (job→expr) z malého prostoru klíčů/výrazů; ověřuje set-logiku `missing`/`extra`/`mismatched` (vč. hodnot mismatched) a ekvivalenci „žádný drift ⟺ shodné mapy".
+
+## 2026-06-21 — admin-system-tools: Property test agregace outboxu (Task 6.2)
+
+### Hotové tasky
+- 6.2 Property test — agregace stavu e-mailové fronty — ověřeno `pnpm test:run src/lib/system/__tests__/outbox-status.pbt.test.ts` (1 passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/outbox-status.pbt.test.ts` — Property 8 (fast-check, `numRuns: 100`) nad `summarizeOutbox(rows, now)` z `src/lib/system/outbox-status.ts`: generuje pole `OutboxRowMeta` (status pending/sent/dead, `createdAt`/`nextAttemptAt` jako ISO řetězce z `fc.date().toISOString()`, `nextAttemptAt` vč. null) a `now`; ověřuje součet `counts` == počet vstupů, rozdělení podle stavu, `oldestPendingAt` = nejmenší `createdAt` mezi pending (jinak null), `readyToRetry` = počet pending s `nextAttemptAt <= now` a tvar výstupu bez PII (R17.1–17.5).
+
+## 2026-06-21 — admin-system-tools: Property test stavu záloh (Task 7.2)
+
+### Hotové tasky
+- 7.2 Property test — stav záloh nakonfigurováno iff všechny GOOGLE_* klíče přítomné — ověřeno `pnpm test:run src/lib/system/__tests__/backup-status.pbt.test.ts` (1 passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/backup-status.pbt.test.ts` — property test (fast-check, `numRuns: 100`) nad čistou funkcí `buildBackupStatus(env, driveStatus)` z `src/lib/system/backup-status.ts`:
+  - Property 9: generuje env mapy s náhodnou podmnožinou `GOOGLE_BACKUP_ENV_KEYS` (chybí/prázdná/tajná `SECRET_*` hodnota) + nadbytečné `EXTRA_*` klíče a libovolný `driveStatus` (ok/degraded/down); ověřuje `configured === true` ⟺ všechny klíče truthy, věrné převzetí `driveStatus` a absenci jakékoli env hodnoty v `JSON.stringify(result)` (R18.1, R18.5).
+
+## 2026-06-21 — admin-system-tools: Property testy stavu služeb (Task 1.2 + 1.3)
+
+### Hotové tasky
+- 1.2 Property test — mapování výsledku probe na status — ověřeno `pnpm test:run src/lib/system/__tests__/status.pbt.test.ts` (2 passed) a `pnpm exec eslint` (exit 0).
+- 1.3 Property test — precedence agregovaného stavu — tentýž běh (2 passed) a lint (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/status.pbt.test.ts` — dva property testy (fast-check, `numRuns: 100`) nad čistými funkcemi z `src/lib/system/status.ts`:
+  - Property 1 pro `mapProbeStatus(outcome, thresholds)`: generuje `ProbeOutcome` (success/error/timeout) + práh latence; ověřuje success&≤práh→`ok`, success&>práh→`degraded`, error|timeout→`down`, a u timeoutu diskriminant `kind==='timeout'` (R3.2/3.3/4.2/5.3).
+  - Property 2 pro `aggregateStatus(statuses)`: generuje pole `ServiceStatus`; ověřuje precedenci `down`>`degraded`>`ok` včetně prázdného pole → `ok` (R5.1/5.2/5.3).
+
+## 2026-06-21 — admin-system-tools: Property test allowlist cílů revalidace (Task 3.2)
+
+### Hotové tasky
+- 3.2 Property test — vynucení allowlistu cílů revalidace — ověřeno `pnpm test:run src/lib/system/__tests__/cache-targets.pbt.test.ts` (1 passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/cache-targets.pbt.test.ts` — Property 5 (fast-check, `numRuns: 100`) pro `isAllowedTarget(target)`: generuje cíle `RevalidateTarget` v obou větvích (`path`/`tag`) s hodnotami z allowlistu i náhodnými řetězci a ověřuje ekvivalenci `isAllowedTarget(t) === (t.kind==='path' ? ALLOWED_PATHS.includes(t.value) : ALLOWED_TAGS.includes(t.value))` (R10.5, R10.6).
+
+## 2026-06-21 — admin-system-tools: Property test build/deploy info (Task 5.2)
+
+### Hotové tasky
+- 5.2 Property test — build info placeholder a bez tajemství — ověřeno `pnpm test:run src/lib/system/__tests__/build-info.pbt.test.ts` (1 passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/build-info.pbt.test.ts` — Property 7 (fast-check, `numRuns: 100`) pro `buildDeployInfo(env, nodeVersion)`: generuje env mapy (s/bez `VERCEL_*`, neplatné/orámcované `VERCEL_ENV`, navíc tajné klíče jako `SUPABASE_SERVICE_ROLE_KEY` s rozeznatelnou sentinel hodnotou) a verzi Node. Ověřuje: chybějící/prázdná/whitespace proměnná → `'nedostupné'` (R16.1/16.2/16.4/16.6), `environment` jen `production`/`preview`/`development` jinak `'nedostupné'` (R16.3), `nodeVersion` = předaná hodnota (R16.5), a že `JSON.stringify(result)` neobsahuje žádnou tajnou hodnotu (R16.7).
+
+## 2026-06-21 — admin-system-tools: Property test hranice retence cronů (Task 8.2)
+
+### Hotové tasky
+- 8.2 Property test — monotonie hranice retence a „older-than" — ověřeno `pnpm test:run src/lib/system/__tests__/prune-cutoff.pbt.test.ts` (3 passed) a `pnpm exec eslint` (exit 0).
+
+### Nové funkce
+- `src/lib/system/__tests__/prune-cutoff.pbt.test.ts` — Property 10 (fast-check, `numRuns: 100`) pro `computePruneCutoff(now, days)`: ověřuje `cutoff = now - days` (přesný rozdíl v ms = `days * 86 400 000`), monotonii v `days` (`days1<=days2 ⇒ cutoff(days2)<=cutoff(days1)`) a predikát „older-than" (kandidát na smazání ⟺ čas záznamu ostře starší než cutoff; hranice se nemaže). `days` generováno jako celé číslo, aby Date konstruktor netruncoval sub-ms a zůstala přesná rovnost.
+
+## 2026-06-21 — admin-system-tools: Čisté funkce rozvrhu a driftu cronů (Task 11.1)
+
+### Hotové tasky
+- 11.1 Implementovat `CRON_SCHEDULE_MAP`, `computeNextRun`, `detectScheduleDrift` — ověřeno `pnpm exec eslint src/lib/system/cron-schedule.ts` (exit 0).
+
+### Nové funkce
+- `CRON_SCHEDULE_MAP`, `computeNextRun(cronExpr, now)`, `detectScheduleDrift(configured, monitored)` + typy `CronJobName`, `ScheduleDrift` (`src/lib/system/cron-schedule.ts`) — čisté funkce (bez I/O). `CRON_SCHEDULE_MAP` přesně dle `vercel.json`. `computeNextRun` je minimalistický parser POUZE pro `'M H * * *'` (nejbližší budoucí den H:M UTC) a `'*/N * * * *'` (nejbližší budoucí minuta dělitelná N, vynulované s/ms), vždy ostře po `now`; nepodporovaný výraz → `throw`. `detectScheduleDrift` počítá `missing`/`extra`/`mismatched` set-logikou. `CronJobName` definován lokálně (kanonický zdroj přijde v tasku 23 `record-run.ts`).
+
+## 2026-06-21 — admin-system-tools: Čistá funkce informací o nasazení (Task 5.1)
+
+### Hotové tasky
+- 5.1 Implementovat `buildDeployInfo` + `UNAVAILABLE` — ověřeno `pnpm exec eslint src/lib/system/build-info.ts` (exit 0).
+
+### Nové funkce
+- `buildDeployInfo(env, nodeVersion)` + typy `DeployEnvironment`, `DeployInfo` a konstanta `UNAVAILABLE = 'nedostupné'` (`src/lib/system/build-info.ts`) — čistá funkce (bez I/O) sestavující info o nasazení z neutajených `VERCEL_*` proměnných; chybějící/prázdné → `'nedostupné'`, `environment` mapováno jen na `production`/`preview`/`development`. I/O wrapper `getDeployInfo` přijde v tasku 15.1.
+
 ## 2026-06-21 — telegram-operator-notifications: Finální checkpoint (Task 14)
 
 ### Hotové tasky
@@ -2791,3 +2885,11 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 
 ### Verifikace
 - `pnpm lint` čistý; `pnpm build` OK (nová route `/admin/account`).
+
+## 2025-XX-XX — admin-system-tools
+
+### Hotové tasky
+- 2.2 Property test — config report bez hodnot a věrná přítomnost (Property 4) — ověřeno (test:run + eslint)
+
+### Nové funkce
+- Property test (`src/lib/system/__tests__/config-report.pbt.test.ts`) — ověřuje, že `buildConfigReport` nikdy neemituje hodnoty env proměnných, `isSet` koresponduje s truthy přítomností a `logLevel` se odvozuje z `LOG_LEVEL` (default `info`).
