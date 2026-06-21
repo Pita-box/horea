@@ -2,6 +2,99 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-21 — telegram-operator-notifications: Property test Notifier (Task 8.2)
+
+### Hotové tasky
+- 8.2 Property test pro no-op a fail-safe notifikace (Property 2) — `src/lib/telegram/__tests__/notifications.property.test.ts` — ověřeno (vitest 3 testy green, eslint exit 0)
+
+### Nové funkce
+- **`notifications.property.test.ts`** (`src/lib/telegram/__tests__/notifications.property.test.ts`) — Property 2 (R1.2, R1.3, R5.1, R5.2, R5.3), fast-check `{ numRuns: 100 }`. Mockuje `../client` (`sendTelegramMessage`) na čtyři chování (`sent`, `failed/http_error`, `failed/network_error`, `throw`) a `@/lib/log-server` jako spy (odpojí `next/headers`). Invariant 1: `notifyBusinessCreated`/`notifyPaymentConfirmed` pro libovolný vstup (`businessName`, `createdAt` bez Invalid Date, `plan`, `amountCzk`) a libovolné chování odesílatele vždy doběhnou bez vyhození a vrátí `SendResult` se `status ∈ {sent, failed, skipped}`. Invariant 2: v samostatném bloku s prázdným env (`vi.stubEnv` token/chat = '') testuje reálné `sendTelegramMessage` přes `vi.importActual('../client')` → pro libovolný text vrací `skipped/feature_disabled` a nevyhodí.
+
+## 2026-06-21 — telegram-operator-notifications: unit testy orchestrace (Task 9.2)
+
+### Hotové tasky
+- 9.2 Unit testy `handleTelegramUpdate` — `src/lib/telegram/__tests__/webhook.orchestration.test.ts` — ověřeno (vitest 9 testů green, eslint exit 0)
+
+### Nové funkce
+- **`webhook.orchestration.test.ts`** (`src/lib/telegram/__tests__/webhook.orchestration.test.ts`) — unit pokrytí orchestrace `handleTelegramUpdate` (R8.2, R8.3, R9.1, R9.3, R10.1, R11.1, R12.1, R12.2). Mockuje I/O sousedy přes `vi.mock`: `../config` (`getTelegramConfig` → `{ botToken:'t', operatorChatId:'42' }`), `../client` (`sendTelegramMessage` spy), `../revenue`/`../estimate` (kalkulátory), `../health` (jen `runServiceProbes`; `buildHealthReport`+typy reálné přes `vi.importActual`), `@/lib/supabase/admin` (`createAdminClient` → dummy) a `@/lib/log-server` (odpojí `next/headers`). Ověřuje: cizí chat → žádná odpověď; `/trzby`/`/odhad` volají správný kalkulátor a odešlou naformátovaný výsledek (`formatCzk`); `/stav` volá `runServiceProbes` a odešle reálnou health zprávu; `/help`+`/start` → `buildHelpMessage`; neznámý text → `buildUnknownCommandMessage`; reject kalkulátoru → „Údaje se teď nepodařilo načíst." bez vyhození; neplatný tvar updatu → `sendTelegramMessage` se nevolá. Úklid v `afterEach` (`restoreAllMocks`/`clearAllMocks`).
+
+## 2026-06-21 — telegram-operator-notifications: Webhook orchestrace (Task 9.1)
+
+### Hotové tasky
+- 9.1 `handleTelegramUpdate(update)` doplněn do `src/lib/telegram/webhook.ts` — ověřeno (eslint exit 0, tsc bez chyb v souboru, property testy 3.7/3.8 green)
+
+### Nové funkce
+- **`handleTelegramUpdate(update: unknown)`** (`src/lib/telegram/webhook.ts`) — server-only orchestrace ověřeného Telegram updatu (R8.1–8.3, R9–R12). Bezpečně parsuje `update.message.chat.id`/`.text` (neplatný tvar → tiše skončí, R7.4); bez `getTelegramConfig()` tiše skončí (R1.2/1.3); cizí chat ignoruje bez odpovědi (R8.2). Dispatch: `/trzby`→`getCurrentMonthRevenueCzk`, `/odhad`→`getNextMonthEstimateCzk`, `/stav`→`runServiceProbes`+`buildHealthReport`, `/start`+`/help`→`buildHelpMessage`, jinak `buildUnknownCommandMessage`. Odpověď výhradně na Operator_Chat_Id přes `sendTelegramMessage` (R8.3). Service-role klient přes `createAdminClient()` z `@/lib/supabase/admin`. Selhání čtení DB (`try/catch` kolem kalkulátorů) → česká hláška „Údaje se teď nepodařilo načíst." bez Secret_Value, zaloguje se jen kategorie `telegram_command_db_error` s `command` (bez stack trace/tajemství) přes `serverLog.error`. Soubor nově začíná `import 'server-only'`; čisté predikáty `isAuthorizedSecret`/`isOperatorChat` beze změny (server-only je ve vitestu stub, property testy zůstávají green).
+
+## 2026-06-21 — telegram-operator-notifications: unit testy Telegram_Client (Task 6.3)
+
+### Hotové tasky
+- 6.3 Unit testy `sendTelegramMessage` / `telegramGetMe` — `src/lib/telegram/__tests__/client.test.ts` — ověřeno (vitest 11 testů green, eslint exit 0)
+
+### Nové funkce
+- **`client.test.ts`** (`src/lib/telegram/__tests__/client.test.ts`) — unit pokrytí I/O klienta (R2.1–2.3, R15.2, R15.3). Konfiguraci nastavuje přes `vi.stubEnv('TELEGRAM_BOT_TOKEN' / 'TELEGRAM_OPERATOR_CHAT_ID')`, `@/lib/log-server` (`serverLog`) mockuje jako spy a `fetch` přes `vi.stubGlobal`; uklízí v `afterEach` (`unstubAllGlobals`/`unstubAllEnvs`/`restoreAllMocks`/`clearAllMocks`). Ověřuje: (1) `sendMessage` na `/bot<token>/sendMessage` POST s `chat_id` = Operator_Chat_Id a `parse_mode: HTML` → `sent`; (2) bez konfigurace → `skipped/feature_disabled` bez volání fetch; (3) HTTP 500 → `failed/http_error`; (4) `TypeError` → `failed/network_error`; (5) `getMe` GET → `ok` bez volání `/sendMessage`, 500 → `error/http_error`, `TypeError` → `error/network_error`; (6) bezpečnost — žádný argument napříč všemi `serverLog` voláními neobsahuje token ani text zprávy (skipped/http/network scénáře), loguje se jen `status`/`errorKind`.
+
+## 2026-06-21 — telegram-operator-notifications: Notifier (Task 8.1)
+
+### Hotové tasky
+- 8.1 `src/lib/telegram/notifications.ts` — ověřeno (eslint exit 0, tsc bez chyb v souboru)
+
+### Nové funkce
+- **Notifier** (`src/lib/telegram/notifications.ts`) — best-effort PUSH notifikace operátorovi (R3, R4, R5). Funkce `notifyBusinessCreated` a `notifyPaymentConfirmed` sestaví český text přes Message_Builder (`buildBusinessCreatedMessage` / `buildPaymentConfirmedMessage`) a odešlou přes `sendTelegramMessage`. Celé tělo v `try/catch` — vrací `SendResult` pro log/test, ale NIKDY nevyhodí výjimku; při zachycené chybě vrací `{ status: 'failed', errorKind: 'unexpected' }` a zaloguje `telegram_notify_failed`. Vstupní typy `BusinessCreatedInput`/`PaymentConfirmedInput` se importují (a re-exportují) z `./messages`, neduplikují se.
+
+## 2026-06-21 — telegram-operator-notifications: unit testy health probes (Task 7.4)
+
+### Hotové tasky
+- 7.4 Unit testy `runServiceProbes()` — `src/lib/telegram/__tests__/health.probes.test.ts` — ověřeno (vitest 5 testů green, eslint exit 0)
+
+### Nové funkce
+- **`health.probes.test.ts`** (`src/lib/telegram/__tests__/health.probes.test.ts`) — unit pokrytí I/O vrstvy probe (R11.1, R11.5, R11.6). Mockuje `fetch` přes `vi.stubGlobal` a env přes `vi.stubEnv`, uklízí v `afterEach`. Ověřuje: (1) kompletní konfigurace + dostupný fetch → všech 6 služeb `ok`; (2) reject jedné probe (Resend) neshodí ostatní (ta `down`, ostatní `ok`, výsledek má 6 služeb); (3) výsledek má jen pole `service`/`label`/`status` (žádné Secret_Value); (4) read-only — `fetch` volán jen metodou GET; (5) chybějící kritická env (`NEXT_PUBLIC_SUPABASE_URL`) → Supabase `down` bez volání fetch a bez prosáknutí env (R11.6).
+
+## 2026-06-21 — telegram-operator-notifications: Telegram_Client (Task 6.2)
+
+### Hotové tasky
+- 6.2 Vytvořit `src/lib/telegram/client.ts` — odesílací helper a health probe — ověřeno (eslint exit 0, tsc bez chyb v souboru)
+
+### Nové funkce
+- **`sendTelegramMessage(text): Promise<SendResult>`** (`src/lib/telegram/client.ts`) — server-only odesílací helper (R2, R15.1). Bez konfigurace (`getTelegramConfig() === null`) → `{ status: 'skipped', reason: 'feature_disabled' }`. Jinak `fetch` POST na `https://api.telegram.org/bot<token>/sendMessage` s body `{ chat_id: operatorChatId, text: escapeHtml(text), parse_mode: 'HTML' }` a `AbortController` timeoutem (`REQUEST_TIMEOUT_MS = 5000`). HTTP ne-ok → `{ status: 'failed', errorKind: 'http_error' }`; throw z fetch (`TypeError`/`AbortError`) → `network_error`; jinak `unexpected`. Úspěch → `{ status: 'sent' }`. NIKDY nevyhodí.
+- **`telegramGetMe(): Promise<GetMeResult>`** (`src/lib/telegram/client.ts`) — read-only health probe (R15.2, R15.3). Bez konfigurace → `skipped`; jinak GET na `/getMe` BEZ odeslání zprávy; ne-ok → `http_error`, síťová chyba → `network_error`, jiné → `unexpected`; úspěch → `ok`.
+- **Typy `SendResult`, `GetMeResult`** + interní helpery `escapeHtml` (jen `& < >`), `logStatus` (best-effort, nikdy nevyhodí), `categorizeFetchError`. Bot_Token ani text se NIKDY nelogují — do `serverLog` jde jen `status`/`errorKind`.
+
+## 2026-06-21 — telegram-operator-notifications: read-only health probe (Task 7.3)
+
+### Hotové tasky
+- 7.3 Doplnit `runServiceProbes()` do `src/lib/telegram/health.ts` — ověřeno (eslint + vitest health.property.test + tsc, exit 0)
+
+### Nové funkce
+- **`runServiceProbes(): Promise<ReadonlyArray<ServiceHealth>>`** (`src/lib/telegram/health.ts`) — server-only I/O wrapper (R11.2, R11.5, R11.6). Paralelně přes `Promise.allSettled` spustí read-only liveness probe šesti služeb (Supabase, Resend, SMTP2GO, GoPay, Cloudflare R2, Google). Každá probe: kontrola přítomnosti povinné konfigurace + síťová dostupnost endpointu přes `fetch` GET s `AbortController` timeoutem (`PROBE_TIMEOUT_MS = 3000`). Jakákoli HTTP odpověď → `ok`; síťová chyba/timeout → `down`. Chybějící kritická konfigurace (Supabase URL, Resend klíč, GoPay base+GOID, R2 base+account) → `down`; chybějící volitelná (SMTP2GO klíč, Google OAuth — fallback/zálohy) → `degraded`. Probe jsou read-only (žádný zápis/odeslání) a nepoužívají autorizační tajemství (kromě veřejné Supabase URL); výsledek obsahuje jen `service`/`label`/`status` — žádné Secret_Value. Rejected probe se mapuje na `down`. Soubor nově začíná `import 'server-only';`; čisté funkce/typy (`aggregateHealth`, `buildHealthReport`, `ServiceStatus`/`MonitoredService`/`ServiceHealth`/`HealthReport`) beze změny — property test importuje jen čisté funkce a dál prochází (`server-only` je ve vitest aliasován na stub).
+
+## 2026-06-21 — telegram-operator-notifications: I/O wrapper odhadu (Task 7.2)
+
+### Hotové tasky
+- 7.2 Doplnit I/O wrapper do `src/lib/telegram/estimate.ts` — ověřeno (eslint + vitest estimate.property.test + tsc, exit 0)
+
+### Nové funkce
+- **`getNextMonthEstimateCzk(supabase, now: Date): Promise<number>`** (`src/lib/telegram/estimate.ts`) — server-only I/O wrapper (R10.1, R10.2). Spočítá hranice příštího kalendářního měsíce v Europe/Prague přes pomocnou `nextMonthBoundsIso` (znovupoužívá `fromPragueInput` z `@/lib/datetime`, polootevřený interval [start, end)), načte `subscriptions` se `status='active'`, `auto_renew=true`, `current_period_end` v období (`.gte`/`.lt`), mapuje na `EstimateSubscriptionRow[]` a předá čisté `estimateNextMonthRevenueCzk`. Soubor nově začíná `import 'server-only';`. Čistá funkce + typ `EstimateSubscriptionRow` beze změny — property test importuje jen čistou funkci a dál prochází.
+
+## 2026-06-21 — telegram-operator-notifications: I/O wrapper tržeb (Task 7.1)
+
+### Hotové tasky
+- 7.1 Doplnit I/O wrapper do `src/lib/telegram/revenue.ts` — ověřeno (eslint exit 0, vitest revenue.property.test prošel, tsc bez chyb v souboru)
+
+### Nové funkce
+- **`getCurrentMonthRevenueCzk(supabase, now): Promise<number>`** (`src/lib/telegram/revenue.ts`) — server-only I/O wrapper pro `/trzby`. Spočítá hranice aktuálního kalendářního měsíce v Europe/Prague jako UTC `[start, nextStart)`, načte `payments` se `status='paid'` a `created_at >= start && < nextStart`, předá do čisté `calculateRevenueCzk`. Vzor dotazu dle `sumPaidRevenueCzk` (`admin/stats.ts`). Soubor nově začíná `import 'server-only';`. Čistá funkce `calculateRevenueCzk` a typ `RevenuePaymentRow` beze změny.
+- **Pomocná `pragueCurrentMonthRange(now)`** (privátní) — hranice měsíce přes `Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Prague' })` pro rok/měsíc + `fromPragueInput` (`@/lib/datetime`) pro korektní UTC převod přes DST. `amount_czk` z DB coercnuto `Number()` (sloupec může být number|string, stejně jako ve `stats.ts`).
+- **Pozn.:** `server-only` je v testech aliasovaný na stub (`vitest.config.ts`), property test `revenue.property.test.ts` (importuje jen `calculateRevenueCzk`) dál prochází beze změny.
+
+## 2026-06-21 — telegram-operator-notifications: I/O wrapper konfigurace (Task 6.1)
+
+### Hotové tasky
+- 6.1 Doplnit I/O wrapper do `src/lib/telegram/config.ts` — ověřeno (eslint + vitest config.property.test, exit 0)
+
+### Nové funkce
+- **`getTelegramConfig(): TelegramConfig | null`** (`src/lib/telegram/config.ts`) — jediné místo čtení tokenu/chatu z `process.env`, deleguje na čistou `resolveTelegramConfig`. Soubor nově začíná `import 'server-only';` (R1.4). Čisté funkce `resolveTelegramConfig`/`resolveWebhookSecret` beze změny.
+- **Pozn.:** `server-only` je v testech aliasovaný na stub `src/test/server-only-stub.ts` (`vitest.config.ts`), takže import test nerozbije — property test `config.property.test.ts` dál prochází.
+
 ## 2026-06-21 — telegram-operator-notifications: property test obsahu notifikačních zpráv (Task 4.3)
 
 ### Hotové tasky

@@ -102,7 +102,7 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
     - (orchestraci `handleTelegramUpdate` doplní task 9.1 do téhož souboru)
     - _Requirements: 7.1, 7.2, 7.3, 8.1, 8.2_
 
-  - [x]* 3.7 Property test pro autorizaci secretu
+  - [ ]* 3.7 Property test pro autorizaci secretu
     - **Property 7: Autorizace webhook secretu**
     - **Validates: Requirements 7.1, 7.2, 7.3**
     - fast-check `{ numRuns: 100 }`, tag `// Feature: telegram-operator-notifications, Property 7: ...`
@@ -127,7 +127,7 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
     - **Validates: Requirements 14.1, 14.2**
     - fast-check `{ numRuns: 100 }`, tag `// Feature: telegram-operator-notifications, Property 10: ...`
 
-  - [x]* 4.3 Property test pro obsah notifikačních zpráv
+  - [ ]* 4.3 Property test pro obsah notifikačních zpráv
     - **Property 11: Notifikační zprávy obsahují požadovaná pole**
     - **Validates: Requirements 3.2, 3.3, 4.2, 4.3**
     - fast-check `{ numRuns: 100 }`, tag `// Feature: telegram-operator-notifications, Property 11: ...`
@@ -140,13 +140,13 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
 - [x] 5. Checkpoint — čisté jádro
   - Spustit `pnpm test:run` a `pnpm lint`. Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Server-only I/O: konfigurace a Telegram_Client
-  - [~] 6.1 Doplnit I/O wrapper do `src/lib/telegram/config.ts`
+- [x] 6. Server-only I/O: konfigurace a Telegram_Client
+  - [x] 6.1 Doplnit I/O wrapper do `src/lib/telegram/config.ts`
     - Přidat `import 'server-only'` a funkci `getTelegramConfig()` předávající `process.env` do
       `resolveTelegramConfig` (jediné místo čtení tokenu/chatu)
     - _Requirements: 1.4_
 
-  - [~] 6.2 Vytvořit `src/lib/telegram/client.ts` — odesílací helper a health probe
+  - [x] 6.2 Vytvořit `src/lib/telegram/client.ts` — odesílací helper a health probe
     - `import 'server-only'`; definovat typy `SendResult` a `GetMeResult`
     - Implementovat `sendTelegramMessage(text)`: bez konfigurace → `skipped`; jinak `fetch` na
       `sendMessage` na Operator_Chat_Id (`parse_mode: 'HTML'`, escapovaný obsah); chyba/nedostupnost
@@ -155,36 +155,36 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
       `status`/`errorKind`
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 1.2, 1.3, 15.1, 15.2, 15.3_
 
-  - [ ]* 6.3 Unit testy Telegram_Client (mock `fetch`)
+  - [x]* 6.3 Unit testy Telegram_Client (mock `fetch`)
     - Ověřit URL a cílový chat u `sendMessage`/`getMe`, mapování 5xx/network na `failed`/`error`,
       a že `serverLog` nikdy nedostane token ani text (spy)
     - _Requirements: 2.1, 2.2, 2.3, 15.2, 15.3_
 
-- [ ] 7. Server-only I/O: kalkulátorové wrappery a health probes
-  - [~] 7.1 Doplnit I/O wrapper do `src/lib/telegram/revenue.ts`
+- [x] 7. Server-only I/O: kalkulátorové wrappery a health probes
+  - [x] 7.1 Doplnit I/O wrapper do `src/lib/telegram/revenue.ts`
     - `import 'server-only'`; `getCurrentMonthRevenueCzk(supabase, now)`: hranice aktuálního
       kalendářního měsíce v Europe/Prague, načíst `payments` se `status='paid'` a `created_at`
       v období (vzor `sumPaidRevenueCzk` z `src/lib/admin/stats.ts`), předat do `calculateRevenueCzk`
     - _Requirements: 9.1, 9.2_
 
-  - [~] 7.2 Doplnit I/O wrapper do `src/lib/telegram/estimate.ts`
+  - [x] 7.2 Doplnit I/O wrapper do `src/lib/telegram/estimate.ts`
     - `import 'server-only'`; `getNextMonthEstimateCzk(supabase, now)`: hranice příštího
       kalendářního měsíce v Europe/Prague, načíst `subscriptions` se `status='active'`,
       `auto_renew=true` a `current_period_end` v období, předat do `estimateNextMonthRevenueCzk`
     - _Requirements: 10.1, 10.2_
 
-  - [~] 7.3 Doplnit `runServiceProbes()` do `src/lib/telegram/health.ts`
+  - [ ] 7.3 Doplnit `runServiceProbes()` do `src/lib/telegram/health.ts`
     - `import 'server-only'`; paralelní read-only probe šesti služeb (Supabase, Resend, SMTP2GO,
       GoPay, Cloudflare R2, Google) přes `Promise.allSettled`; selhání/timeout → `status: 'down'`
       u dané služby a pokračovat; výsledek bez Secret_Value
     - _Requirements: 11.2, 11.5, 11.6_
 
-  - [ ]* 7.4 Unit testy health probes (mock klientů)
+  - [x]* 7.4 Unit testy health probes (mock klientů)
     - Read-only volání, selhání jedné probe neshodí ostatní, výsledek bez Secret_Value
     - _Requirements: 11.1, 11.5, 11.6_
 
-- [ ] 8. Notifier — best-effort PUSH notifikace
-  - [~] 8.1 Vytvořit `src/lib/telegram/notifications.ts`
+- [x] 8. Notifier — best-effort PUSH notifikace
+  - [x] 8.1 Vytvořit `src/lib/telegram/notifications.ts`
     - `import 'server-only'`; definovat typy `BusinessCreatedInput` (jen `businessName`,
       `createdAt`) a `PaymentConfirmedInput` (`businessName`, `plan`, `amountCzk`)
     - Implementovat `notifyBusinessCreated` a `notifyPaymentConfirmed`: sestaví český text přes
@@ -192,13 +192,13 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
       `SendResult` pro log/test, ale nikdy nevyhodí výjimku
     - _Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.3, 14.1, 14.3_
 
-  - [ ]* 8.2 Property test pro no-op a fail-safe notifikace
+  - [x]* 8.2 Property test pro no-op a fail-safe notifikace
     - **Property 2: No-op a nevyhození bez kompletní konfigurace**
     - **Validates: Requirements 1.2, 1.3, 5.1, 5.2, 5.3**
     - fast-check `{ numRuns: 100 }`, tag `// Feature: telegram-operator-notifications, Property 2: ...`
 
-- [ ] 9. Webhook orchestrace
-  - [~] 9.1 Doplnit `handleTelegramUpdate(update)` do `src/lib/telegram/webhook.ts`
+- [x] 9. Webhook orchestrace
+  - [x] 9.1 Doplnit `handleTelegramUpdate(update)` do `src/lib/telegram/webhook.ts`
     - `import 'server-only'`; autorizace chatu přes `isOperatorChat` (cizí chat → ignorovat bez
       odpovědi), `parseCommand`, dispatch příkazů (`/trzby`→`getCurrentMonthRevenueCzk`,
       `/odhad`→`getNextMonthEstimateCzk`, `/stav`→`runServiceProbes`+`buildHealthReport`,
@@ -206,22 +206,22 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
       `sendTelegramMessage`; selhání čtení DB → krátká česká chybová hláška bez Secret_Value
     - _Requirements: 8.1, 8.2, 8.3, 9.1, 9.3, 10.1, 10.4, 11.1, 12.1, 12.2_
 
-  - [ ]* 9.2 Unit testy orchestrace (mock kalkulátorů/probe/clientu)
+  - [x]* 9.2 Unit testy orchestrace (mock kalkulátorů/probe/clientu)
     - Cizí chat → žádná odpověď; dispatch každého příkazu volá správný kalkulátor a odpovídá na
       Operator_Chat_Id; neznámý text → nápověda; selhání DB → chybová hláška
     - _Requirements: 8.2, 8.3, 9.1, 9.3, 10.1, 11.1, 12.1, 12.2_
 
-- [~] 10. Checkpoint — server-only moduly
+- [x] 10. Checkpoint — server-only moduly
   - Spustit `pnpm test:run` a `pnpm lint`. Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 11. Integrace do existujících toků (surgical hooky)
-  - [~] 11.1 Napojit notifikaci nového podniku v `src/app/onboarding/6/actions.ts`
+  - [ ] 11.1 Napojit notifikaci nového podniku v `src/app/onboarding/6/actions.ts`
     - Po `result.ok` a **před** `redirect('/dashboard')` načíst název nově vzniklého podniku
       a zavolat `await notifyBusinessCreated(...)` v `try/catch`; selhání nezmění výsledek ani
       redirect (dedup odvozen z unikátnosti slugu — notifikace jen po `{ ok: true }`)
     - _Requirements: 3.1, 5.1, 6.2_
 
-  - [~] 11.2 Napojit notifikaci platby v `src/lib/webhooks/handler.ts`
+  - [ ] 11.2 Napojit notifikaci platby v `src/lib/webhooks/handler.ts`
     - Ve větvi `applyPaid` v místě úspěšného `return { ok: true, outcome: 'paid_applied' }`
       zavolat `await notifyPaymentConfirmed({ businessName, plan: sub.plan, amountCzk:
       payment.amount_czk })` v `try/catch`; selhání jen zalogovat, výsledek webhooku nezměnit
@@ -235,7 +235,7 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
     - _Requirements: 3.1, 4.1, 5.1, 5.2, 6.1, 6.2_
 
 - [ ] 12. Příchozí Route Handler
-  - [~] 12.1 Vytvořit `src/app/api/telegram/webhook/route.ts`
+  - [ ] 12.1 Vytvořit `src/app/api/telegram/webhook/route.ts`
     - Tenký adaptér dle vzoru `app/api/webhooks/gopay/route.ts`: `resolveWebhookSecret` → `null` →
       HTTP 401 + log `telegram_webhook_secret_missing` bez Secret_Value; `isAuthorizedSecret`
       nad hlavičkou `x-telegram-bot-api-secret-token` → neshoda/chybí → HTTP 401 bez business
@@ -249,12 +249,12 @@ Ověřovací příkazy: `pnpm test:run`, `pnpm lint`, `pnpm build`.
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
 - [ ] 13. Wiring konfigurace
-  - [~] 13.1 Doplnit nové proměnné do `.env.example`
+  - [ ] 13.1 Doplnit nové proměnné do `.env.example`
     - Přidat `TELEGRAM_BOT_TOKEN`, `TELEGRAM_OPERATOR_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET`
       s krátkým českým komentářem (server-only, bez nich je feature no-op / webhook odmítá vše)
     - _Requirements: 1.1, 1.4, 7.3_
 
-- [~] 14. Finální checkpoint
+- [ ] 14. Finální checkpoint
   - Spustit `pnpm test:run`, `pnpm lint` a `pnpm build`. Ensure all tests pass, ask the user if
     questions arise.
 

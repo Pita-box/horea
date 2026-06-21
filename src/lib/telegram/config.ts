@@ -1,8 +1,10 @@
-// Telegram_Config — čistá resoluce konfigurace z proměnných prostředí.
+import 'server-only';
+
+// Telegram_Config — čistá resoluce konfigurace z proměnných prostředí + I/O wrapper.
 //
-// Tento soubor obsahuje ZÁMĚRNĚ jen čisté funkce (žádný `import 'server-only'`,
-// žádné čtení `process.env`), aby byly přímo pokryté property testy. I/O wrapper
-// `getTelegramConfig()` doplní až task 6.1.
+// Čisté funkce (`resolveTelegramConfig`, `resolveWebhookSecret`) jsou přímo pokryté
+// property testy. Jediné místo, které čte `process.env` (token/chat), je I/O wrapper
+// `getTelegramConfig()` níže.
 
 /** Vyřešená konfigurace, když je Feature_Enabled aktivní. */
 export interface TelegramConfig {
@@ -37,4 +39,13 @@ export function resolveWebhookSecret(
 ): string | null {
   const secret = env.TELEGRAM_WEBHOOK_SECRET;
   return secret ? secret : null;
+}
+
+/**
+ * I/O wrapper: jediné místo, které čte token a chat z `process.env`. Deleguje na
+ * čistou `resolveTelegramConfig`. Vrací `TelegramConfig`, jen když je konfigurace
+ * úplná (R1.4), jinak `null`.
+ */
+export function getTelegramConfig(): TelegramConfig | null {
+  return resolveTelegramConfig(process.env);
 }
