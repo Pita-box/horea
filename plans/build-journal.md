@@ -2,6 +2,21 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — deploy: Horea app container postaven (fáze 3)
+
+### Nové funkce
+- `Dockerfile` (repo root) — multi-stage Next.js 15 standalone image: `node:22-alpine`, pnpm@8.15.0 přes corepack, `libc6-compat` pro sharp; stage deps→builder→runner, běh jako non-root `nextjs`, `server.js` na portu 3000. NEXT_PUBLIC_* (SUPABASE_URL, ANON_KEY, R2_PUBLIC_BASE_URL) jako build args (zapékají se do klienta).
+- `next.config.ts` — přidáno `output: 'standalone'` (štíhlý image, samostatný server).
+- `.dockerignore` — vylučuje node_modules/.next/.git/testy/.env/plans/.kiro atd. z build kontextu.
+- `docker-compose.yml` (repo root) — služba `web` (`horea-web:latest`), `env_file: .env`, port `127.0.0.1:3200:3000`, `restart: unless-stopped`. Na VPS běží z `/opt/apps/horea/app/` (zdroják rsyncnut, `.env` mimo git).
+- Produkční `.env` na VPS (`/opt/apps/horea/app/.env`, chmod 600): app tajemství z lokálního prostředí, Supabase proměnné přepsané na self-hosted (`NEXT_PUBLIC_SUPABASE_URL=https://supabase.horea.cz`, anon/service self-hosted klíče, DB heslo). `VPS_PASS` odstraněn. 25 proměnných.
+
+### Ověřeno
+- `docker compose build` na VPS → exit 0, image `horea-web:latest` postaven (Next.js build prošel se standalone výstupem, middleware + všechny route zkompilovány).
+
+### Blokováno na uživateli (cutover) — nutné PŘED spuštěním horea.cz
+- Self-hosted DB je prázdná (jen Supabase systémové schéma). horea.cz DNS už míří na VPS → web je do cutoveru fakticky down. Před `docker compose up` + nginx pro `horea.cz` je nutná migrace: schéma 0001–0053 + data + `auth.users` + storage faktury z hostovaného Supabase. Čeká na výslovný pokyn k cutover.
+
 ## 2026-06-22 — deploy: Self-hosted Supabase na OVH VPS (fáze 1)
 
 ### Nové funkce

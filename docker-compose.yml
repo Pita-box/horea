@@ -1,0 +1,18 @@
+# Produkční nasazení Horea na VPS (/opt/apps/horea).
+# Tajemství jsou v sousedním .env (mimo git). NEXT_PUBLIC_* se interpolují
+# do build args ze stejného .env (compose čte .env automaticky).
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL}
+    image: horea-web:latest
+    container_name: horea-web
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:3200:3000"

@@ -43,6 +43,9 @@ const remoteImagePatterns = [
 ].filter((pattern): pattern is NonNullable<typeof pattern> => pattern !== null);
 
 const nextConfig: NextConfig = {
+  // Standalone build pro produkční Docker image (samostatný server.js + jen
+  // potřebné node_modules). Nasazení: VPS Docker (viz docker/ a plans/build-journal.md).
+  output: 'standalone',
   turbopack: {
     root: projectRoot,
   },
