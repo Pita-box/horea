@@ -1,13 +1,16 @@
 import { resolveAppUserGuardState } from '@/lib/auth/app-user-guard';
+import { decideFreeUserGuard } from '@/lib/auth/free-user-guard';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function ErrorPage() {
-  // Přihlášený uživatel se zdravým stavem účtu sem nepatří → na dashboard.
-  // Pokud stav účtu nelze ověřit (guard state = null), zůstává na /error
-  // (právě kvůli tomu sem middleware fail-closed posílá) — žádná redirect smyčka.
+  // Přihlášený uživatel se zdravým stavem účtu sem nepatří → přesměruj ho TAM,
+  // kam ho guard reálně pustí (NE natvrdo na /dashboard). Kdybychom posílali na
+  // /dashboard i uzamčené účty (expired/deleted_data), middleware by je hned
+  // vrátil na /error → ERR_TOO_MANY_REDIRECTS. Proto použijeme stejné rozhodnutí
+  // jako middleware a na /error zůstaneme jen tehdy, když by guard znovu vedl sem.
   const supabase = await createClient();
   const {
     data: { user },
@@ -16,7 +19,21 @@ export default async function ErrorPage() {
   if (user) {
     const guardState = await resolveAppUserGuardState(createAdminClient(), user.id);
     if (guardState) {
-      redirect('/dashboard');
+      const decision = decideFreeUserGuard({
+        pathname: '/dashboard',
+        isAdmin: guardState.isAdmin,
+        hasBusiness: guardState.hasBusiness,
+        subscriptionStatus: guardState.subscriptionStatus,
+        draftCurrentStep: guardState.draftCurrentStep,
+      });
+
+      if (decision.kind === 'continue') {
+        redirect('/dashboard');
+      } else if (decision.pathname !== '/error') {
+        redirect(decision.search ? `${decision.pathname}?${decision.search}` : decision.pathname);
+      }
+      // Pokud by guard znovu vedl na /error (stav nelze bezpečně určit) →
+      // zůstáváme zde a zobrazíme hlášku. Žádná redirect smyčka.
     }
   }
 

@@ -2,6 +2,18 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — auth: ERR_TOO_MANY_REDIRECTS u expired/deleted_data účtů
+
+### Bug & fix
+- **Symptom:** Po nastavení stavu předplatného na `expired` nebo `deleted_data` dostal majitel na dashboardu `ERR_TOO_MANY_REDIRECTS` a dashboard byl zcela nedostupný.
+- **Root cause:** Redirect smyčka mezi middlewarem a `/error`. `decideFreeUserGuard` (`src/lib/auth/free-user-guard.ts`) posílal `expired`/`deleted_data` na `/error`; stránka `/error` (`src/app/error/page.tsx`) ale brala jakýkoliv NENULOVÝ `guardState` jako „zdravý účet" a přesměrovala zpět na `/dashboard` → middleware znovu na `/error` → nekonečná smyčka. (`/error` není v middleware matcheru, takže smyčku tvořil až server-side `redirect` z `/error`.)
+- **Fix (2 části):**
+  1. Guard: zamčené stavy (`expired`/`deleted_data`) nově **pustí na `/dashboard/subscription` a `/dashboard/plans`** (reaktivace, R5.6/R6.6) a ostatní `/dashboard/*` routy přesměruje na `/dashboard/subscription` (NE na `/error`). `/error` zůstává jen pro nezjistitelný stav (`status=null`).
+  2. `/error`: místo natvrdo `redirect('/dashboard')` použije stejné `decideFreeUserGuard` rozhodnutí pro `/dashboard` a přesměruje jen tam, kam guard reálně pustí; pokud by rozhodnutí vedlo zpět na `/error`, zůstane na místě a zobrazí hlášku → žádná smyčka (robustní i pro budoucí stavy).
+
+### Ověřeno
+- `pnpm test:run` guard 36/36 (aktualizované + nové testy: zamčené stavy → subscription, povolené reaktivační cesty). `pnpm lint` 0, `pnpm build` OK.
+
 ## 2026-06-22 — admin: udělení tarifu nechávalo účet ve stavu Free
 
 ### Bug & fix

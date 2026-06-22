@@ -174,7 +174,7 @@ describe('decideFreeUserGuard', () => {
   });
 
   it.each(['expired', 'deleted_data'] as const)(
-    'redirects %s subscription from reservation management to /error',
+    'redirects %s subscription from reservation management to subscription page',
     (subscriptionStatus) => {
       expect(
         decideFreeUserGuard({
@@ -184,9 +184,44 @@ describe('decideFreeUserGuard', () => {
           subscriptionStatus,
           draftCurrentStep: null,
         }),
-      ).toEqual({ kind: 'redirect', pathname: '/error' });
+      ).toEqual({ kind: 'redirect', pathname: '/dashboard/subscription' });
     },
   );
+
+  it.each(['expired', 'deleted_data'] as const)(
+    'redirects %s subscription from dashboard overview to subscription page',
+    (subscriptionStatus) => {
+      expect(
+        decideFreeUserGuard({
+          pathname: '/dashboard',
+          isAdmin: false,
+          hasBusiness: true,
+          subscriptionStatus,
+          draftCurrentStep: null,
+        }),
+      ).toEqual({ kind: 'redirect', pathname: '/dashboard/subscription' });
+    },
+  );
+
+  // Zamčené stavy MUSÍ mít přístup k předplatnému + ceníku kvůli reaktivaci
+  // (R5.6, R6.6) — jinak nemají jak zaplatit a vzniká redirect smyčka.
+  it.each([
+    ['expired', '/dashboard/subscription'],
+    ['expired', '/dashboard/plans'],
+    ['expired', '/dashboard/plans/detail'],
+    ['deleted_data', '/dashboard/subscription'],
+    ['deleted_data', '/dashboard/plans'],
+  ] as const)('allows %s subscription onto reactivation path %s', (subscriptionStatus, pathname) => {
+    expect(
+      decideFreeUserGuard({
+        pathname,
+        isAdmin: false,
+        hasBusiness: true,
+        subscriptionStatus,
+        draftCurrentStep: null,
+      }),
+    ).toEqual({ kind: 'continue' });
+  });
 
   it('keeps free subscription on dashboard overview (free-mode přehled)', () => {
     expect(
@@ -236,16 +271,16 @@ describe('decideFreeUserGuard', () => {
     ).toEqual({ kind: 'redirect', pathname: '/error' });
   });
 
-  it('fails closed on unexpected subscription status', () => {
+  it('routes expired subscription on protected route to subscription page', () => {
     expect(
       decideFreeUserGuard({
-        pathname: '/dashboard',
+        pathname: '/dashboard/settings',
         isAdmin: false,
         hasBusiness: true,
         subscriptionStatus: 'expired',
         draftCurrentStep: null,
       }),
-    ).toEqual({ kind: 'redirect', pathname: '/error' });
+    ).toEqual({ kind: 'redirect', pathname: '/dashboard/subscription' });
   });
 
   it('fails closed on invalid draft step', () => {

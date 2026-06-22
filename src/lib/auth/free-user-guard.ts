@@ -85,6 +85,20 @@ export function decideFreeUserGuard(state: FreeUserGuardState): FreeUserGuardDec
 
     const status = state.subscriptionStatus;
 
+    // Uzamčené stavy (expired / deleted_data): dashboard je zamčený, ale uživatel
+    // MUSÍ mít přístup k předplatnému a ceníku, aby mohl reaktivovat (R5.6, R6.6).
+    // Ostatní routy → přesměrování na předplatné (NE na /error — to ve dvojici se
+    // stránkou /error tvořilo redirect smyčku /dashboard ↔ /error).
+    if (status === 'expired' || status === 'deleted_data') {
+      if (
+        isPathOrSubpath(state.pathname, '/dashboard/subscription') ||
+        isPathOrSubpath(state.pathname, '/dashboard/plans')
+      ) {
+        return { kind: 'continue' };
+      }
+      return { kind: 'redirect', pathname: '/dashboard/subscription' };
+    }
+
     if (isReservationManagementPath(state.pathname)) {
       // Routy správy rezervací — vyžadují aktivní nebo grace_period předplatné (R1.1–1.3).
       if (status === 'active' || status === 'grace_period') {
@@ -97,7 +111,7 @@ export function decideFreeUserGuard(state: FreeUserGuardState): FreeUserGuardDec
         return { kind: 'redirect', pathname: '/dashboard/plans', search: 'locked=reservations' };
       }
 
-      // expired, deleted_data nebo chybějící stav → fail-closed na /error.
+      // chybějící/neznámý stav (null) → fail-closed na /error.
       return { kind: 'redirect', pathname: '/error' };
     }
 
@@ -106,7 +120,7 @@ export function decideFreeUserGuard(state: FreeUserGuardState): FreeUserGuardDec
       return { kind: 'continue' };
     }
 
-    // expired, deleted_data nebo chybějící stav → fail-closed na /error.
+    // chybějící/neznámý stav (null) → fail-closed na /error.
     return { kind: 'redirect', pathname: '/error' };
   }
 
