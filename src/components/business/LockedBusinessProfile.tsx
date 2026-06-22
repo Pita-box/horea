@@ -182,7 +182,7 @@ export function LockedBusinessProfile({
 
       {/* Spodní navigace — logo ukotvené vlevo, ikony na střed */}
       <nav className="sticky bottom-0 border-t border-[var(--color-input-border)] bg-[var(--color-canvas-white)]">
-        <div className="relative mx-auto flex max-w-[440px] items-center justify-center px-6 py-3">
+        <div className="relative flex items-center justify-center px-6 py-3">
           <Link
             href="/"
             aria-label="Horea — domů"
