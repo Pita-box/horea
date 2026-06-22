@@ -228,12 +228,24 @@ export function BusinessActions({
             <select
               className={SELECT_CLASS}
               value={overrideForm.plan}
-              onChange={(event) =>
+              onChange={(event) => {
+                const nextPlan = event.target.value as '' | SubscriptionPlan;
                 setOverrideForm((prev) => ({
                   ...prev,
-                  plan: event.target.value as '' | SubscriptionPlan,
-                }))
-              }
+                  plan: nextPlan,
+                  // Provázání tarif → stav: udělení placeného tarifu na účtu ve
+                  // stavu „free" účet aktivuje (jinak by zůstal Neplacené/Free
+                  // i s tarifem). Zrušení tarifu (bez tarifu) vrací na „free".
+                  // Jiný než „free" stav (grace/expired/…) se nepřepisuje —
+                  // admin ho může nastavit ručně.
+                  status:
+                    nextPlan === ''
+                      ? 'free'
+                      : prev.status === 'free'
+                        ? 'active'
+                        : prev.status,
+                }));
+              }}
             >
               {PLAN_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>

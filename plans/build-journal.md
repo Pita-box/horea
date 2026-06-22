@@ -2,6 +2,17 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — admin: udělení tarifu nechávalo účet ve stavu Free
+
+### Bug & fix
+- **Symptom:** Po udělení tarifu (např. Start) podniku v admin detailu zůstal stav předplatného „Neplacené (Free)" (dashboard, /dashboard/subscription) — vznikl rozpor `plan=start` + `status=free`.
+- **Root cause:** Override formulář (`src/app/admin/businesses/[id]/BusinessActions.tsx`) má oddělené selecty Tarif a Stav; `status` se předvyplní aktuální hodnotou (u nového účtu `free`). Admin změnil jen Tarif, Stav nechal `free`. `admin_override_subscription` zapíše libovolnou kombinaci (vědomě obchází stavový automat), takže uložil `plan=start` + `status=free`.
+- **Fix:** Provázání výběru tarifu se stavem v override formuláři — zvolení placeného tarifu na účtu ve stavu `free` přepne stav na `active`; zrušení tarifu (`''`) nastaví `free`. Jiný než `free` stav (grace/expired) se nepřepisuje (admin může ručně). Server/RPC se nemění (override zůstává plně flexibilní).
+- **Pozn.:** Už uložený nekonzistentní řádek (lokální test salon) se neopraví sám — stačí v override formuláři tarif znovu zvolit a uložit (nově se rovnou nastaví `active`).
+
+### Ověřeno
+- `pnpm lint` 0, `pnpm build` OK, diagnostika čistá.
+
 ## 2026-06-22 — public-business-page: owner náhled — termíny + vrácený Notice
 
 ### Bug & fix
