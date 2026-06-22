@@ -2,6 +2,20 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — auth: responzivní hero obrázek na login/register
+
+### Nové funkce
+- Login a register brandový panel (`src/app/login/page.tsx`, `src/app/register/page.tsx`) nově servíruje hero obrázek responzivně přes `srcSet`/`sizes`. Panel je desktop-only (`hidden lg:block`), renderuje se ~448–536 px, zdroj je přes `object-cover` ořezán na portrét 4/5.
+- Z původního landscape zdroje (1198×800, 73 KB) vyrobeny předem oříznuté portrét 4/5 varianty a nahrány na R2 (`media.horea.cz`, bucket `horea-media`, prefix `de64ab9c-…`): `-640.webp` (640×800, 38,5 KB), `-480.webp` (480×600, 25 KB), `-360.webp` (360×450, 17 KB). Předořez odstranil ~47 % zbytečných šířkových bajtů → i největší varianta je menší než původní.
+- `sizes="(min-width:1024px) min(536px, calc(50vw - 64px)), 1px"` (pod lg → 1px, minimalizuje preload skrytého obrázku). Doplněn `width/height` (aspect ratio, anti-CLS) a `decoding="async"`.
+
+### Ověřeno
+- Varianty živé na `media.horea.cz` (HTTP 200, image/webp). `pnpm lint` exit 0, get_diagnostics bez chyb.
+
+### Pozn. / omezení
+- Zdroj má výšku 800 px → vazebný rozměr po ořezu je výška; stačí na 1× desktop, ale ne na plné 2× retina. Pro ostrost na retina by bylo potřeba vyexportovat vyšší originál (cca 1350 px na výšku) a přegenerovat varianty.
+- Změna se projeví až po deployi (ruční rsync dle `deploy.md`); původní `…-klientu.webp` na R2 ponechán (zpětná kompatibilita do deploye).
+
 ## 2026-06-22 — deploy: horea.cz živé na VPS — cutover dat + app + zálohy (fáze 2/3/5 dokončeno)
 
 ### Nové funkce

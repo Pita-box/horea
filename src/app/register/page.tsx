@@ -22,11 +22,16 @@ export default async function RegisterPage() {
         {/* Levý brandový panel (jen desktop) */}
         <div className="hidden lg:block">
           <div className="relative flex aspect-[4/5] w-full flex-col justify-end overflow-hidden rounded-[40px] bg-[var(--color-air-blue)] p-[var(--card-padding)]">
-            {/* eslint-disable-next-line @next/next/no-img-element -- placeholder, doména mimo next/image remotePatterns */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- asset na vlastní R2 CDN (media.horea.cz) mimo next/image remotePatterns; responzivní přes srcSet */}
             <img
-              src="https://images.pexels.com/photos/8834028/pexels-photo-8834028.jpeg"
+              src="https://media.horea.cz/de64ab9c-842e-46c9-8047-ce40323a32fb/horea-rezervace-klientu-640.webp"
+              srcSet="https://media.horea.cz/de64ab9c-842e-46c9-8047-ce40323a32fb/horea-rezervace-klientu-360.webp 360w, https://media.horea.cz/de64ab9c-842e-46c9-8047-ce40323a32fb/horea-rezervace-klientu-480.webp 480w, https://media.horea.cz/de64ab9c-842e-46c9-8047-ce40323a32fb/horea-rezervace-klientu-640.webp 640w"
+              sizes="(min-width: 1024px) min(536px, calc(50vw - 64px)), 1px"
               alt="Podnikatelka ve své provozovně"
+              width={640}
+              height={800}
               loading="lazy"
+              decoding="async"
               className="absolute inset-0 h-full w-full object-cover"
             />
             {/* Tmavý gradient pro čitelnost textu */}
