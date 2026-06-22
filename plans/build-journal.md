@@ -2,6 +2,15 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — public-business-page: doladění locked teaseru + owner náhledu
+
+### Změny
+- `LockedBusinessProfile`: `IconLock` přesunut úplně dolů (pod telefon), pod ikonou popisek „Podnik zatím neodemknul svůj profil." (už není nad primárním tlačítkem). Do spodní navigace přidáno vlevo Horea `Logo` (proklik → `/`); vpravo zůstávají ikony Domů + Účet.
+- `ReservationFormController`: odstraněn trvalý horní „preview" Notice — majitel může formulář v klidu proklikat; dokončení rezervace je blokované až na konci (krok 5 zobrazí error Notice s hláškou, odeslání se neprovede).
+
+### Ověřeno
+- `pnpm lint` 0, `pnpm build` OK, diagnostika čistá.
+
 ## 2026-06-22 — public-business-page: UI pro nepublikovaný profil (zamčený teaser + owner náhled)
 
 ### Nové funkce

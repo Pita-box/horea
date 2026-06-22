@@ -367,11 +367,6 @@ export function ReservationFormController({
 
   return (
     <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[16px]">
-      {preview ? (
-        <Notice variant="warning">
-          Náhled profilu — rezervace je vypnutá, dokud neaktivujete tarif a nezveřejníte profil.
-        </Notice>
-      ) : null}
       <StepIndicator
         steps={STEP_TITLES}
         current={step}

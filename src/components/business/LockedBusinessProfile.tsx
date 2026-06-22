@@ -2,6 +2,7 @@ import { IconClock, IconHome, IconLock, IconPhone, IconUser } from '@tabler/icon
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Logo } from '@/components/Logo';
 import {
   BUSINESS_TYPE_LABELS,
   isBusinessType,
@@ -124,13 +125,6 @@ export function LockedBusinessProfile({
               </span>
             </div>
 
-            {/* Zámek (vizuální indikátor uzamčeného profilu) */}
-            <div className="flex justify-center pt-2">
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-light-violet)]">
-                <IconLock size={30} stroke={2} aria-hidden="true" className="text-[var(--color-action-violet)]" />
-              </span>
-            </div>
-
             {/* Primární akce */}
             <Link
               href="/login"
@@ -167,32 +161,57 @@ export function LockedBusinessProfile({
                 </div>
               ) : null}
             </div>
+
+            {/* Zámek úplně dole + popisek */}
+            <div className="flex flex-col items-center gap-2 pt-4">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-light-violet)]">
+                <IconLock
+                  size={30}
+                  stroke={2}
+                  aria-hidden="true"
+                  className="text-[var(--color-action-violet)]"
+                />
+              </span>
+              <p className="text-center text-[14px] text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
+                Podnik zatím neodemknul svůj profil.
+              </p>
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Spodní navigace — jen Domů a Účet */}
+      {/* Spodní navigace — vlevo logo (→ domů), vpravo Domů a Účet */}
       <nav className="sticky bottom-0 border-t border-[var(--color-input-border)] bg-[var(--color-canvas-white)]">
-        <ul className="mx-auto flex max-w-[440px] items-center justify-around px-6 py-3">
-          <li>
-            <Link
-              href="/"
-              aria-label="Domů"
-              className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-2xl)] text-[var(--color-action-violet)] transition-colors hover:bg-[var(--color-light-violet)]"
-            >
-              <IconHome size={24} stroke={2} aria-hidden="true" />
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/login"
-              aria-label="Účet"
-              className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-2xl)] text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-light-violet)]"
-            >
-              <IconUser size={24} stroke={2} aria-hidden="true" />
-            </Link>
-          </li>
-        </ul>
+        <div className="mx-auto flex max-w-[440px] items-center justify-between px-6 py-3">
+          <Link
+            href="/"
+            aria-label="Horea — domů"
+            className="flex items-center transition-opacity hover:opacity-80"
+          >
+            <Logo width={92} height={32} className="h-7 w-auto" />
+            <span className="sr-only">Horea</span>
+          </Link>
+          <ul className="flex items-center gap-2">
+            <li>
+              <Link
+                href="/"
+                aria-label="Domů"
+                className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-2xl)] text-[var(--color-action-violet)] transition-colors hover:bg-[var(--color-light-violet)]"
+              >
+                <IconHome size={24} stroke={2} aria-hidden="true" />
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/login"
+                aria-label="Účet"
+                className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-2xl)] text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-light-violet)]"
+              >
+                <IconUser size={24} stroke={2} aria-hidden="true" />
+              </Link>
+            </li>
+          </ul>
+        </div>
       </nav>
     </div>
   );
