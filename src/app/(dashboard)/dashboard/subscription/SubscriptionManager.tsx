@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
@@ -72,13 +73,23 @@ export function SubscriptionManager({
     );
   }
 
-  // expired / deleted_data: tyto stavy middleware na /dashboard/* nepouští
-  // (fail-closed), proto zde stačí informativní hláška.
+  // expired / deleted_data: účet je uzamčený, middleware sem (na /dashboard/subscription
+  // a /dashboard/plans) pouští kvůli reaktivaci. Informativní hláška + CTA na kontakt.
   return (
-    <Notice>
-      Předplatné je neaktivní. Pro obnovení nás prosím kontaktujte nebo dokončete platbu podle
-      e-mailu s pokyny.
-    </Notice>
+    <div className="flex flex-col items-start gap-4">
+      <Notice>
+        Předplatné je neaktivní. Pro obnovení nás prosím kontaktujte nebo dokončete platbu podle
+        e-mailu s pokyny.
+      </Notice>
+      <Link
+        href="/kontakt"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex h-11 items-center justify-center rounded-[var(--radius-buttons)] bg-[var(--color-action-violet)] px-5 text-sm font-semibold text-[var(--color-canvas-white)] transition-opacity hover:opacity-90"
+      >
+        Kontaktujte nás
+      </Link>
+    </div>
   );
 }
 
