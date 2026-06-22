@@ -2,6 +2,24 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — deploy: horea.cz živé na VPS — cutover dat + app + zálohy (fáze 2/3/5 dokončeno)
+
+### Nové funkce
+- **horea.cz živé** na OVH VPS: Cloudflare → nginx (`horea.conf`, Origin cert, `horea.cz`+`www`) → `horea-web` kontejner (`127.0.0.1:3200`) → self-hosted Supabase. Restart `unless-stopped`. nginx mapa `$connection_upgrade` sdílena s maietek.
+- **Cutover dat** z hostovaného Supabase (`ysrnlzlhskifsjnbzmxs`, PG 17.6) do self-hosted (PG 17.6) — přes IPv6 direct connection jako `postgres` superuser, dumpy throwaway `supabase/postgres:17` kontejnerem s `--network host`:
+  - public schéma (DDL vč. GRANTů pro anon/authenticated/service_role + ownership) → restore (20 tabulek).
+  - data load v jedné session s `session_replication_role=replica` (obejde FK pořadí + triggery): `auth.users`+`auth.identities` (column-inserts), `storage.buckets`+`storage.objects`, public data.
+  - Ověřeno: VŠECHNY počty tabulek shodné hosted↔self (5 uživatelů, 2 podniky, 4 rezervace…), sekvence shodné.
+- **Storage migrace**: 2 objekty bucketu `business-media` (logo+cover, jpeg) staženy z hostovaného public URL a nahrány přes self-hosted Storage API (service_role). Bucket `invoices` na hostovaném neexistoval → žádné PDF k přenosu.
+- **Denní zálohy DB**: `/opt/apps/horea/backup-db.sh` (`pg_dump` self-hosted → gzip do `/opt/backups/horea`, rotace 7), ubuntu cron `0 3 * * *` (maietek 02:00 zachován). Test: 71 KB, `gunzip -t` OK.
+
+### Ověřeno (end-to-end přes Cloudflare)
+- `horea.cz` homepage → 200 (0,15 s). Publikovaný profil `/u-lipy` → 200, renderuje reálná data (služby, otevírací doba) ze self-hosted DB. Nepublikovaný `/salon` → korektní „neexistuje" (RLS funguje). Logo `https://supabase.horea.cz/storage/v1/object/public/business-media/.../logo` → 200 (12292 B). `www` redirect 200. Všech 11 Supabase kontejnerů + `horea-web` healthy, RAM 2,6/7,8 GB. `maietek` netknut.
+
+### Pozn. / bezpečnost
+- Manuální cutover dumpy (plaintext PII) po ověření smazány; hostované Supabase ponecháno jako původní záloha, než uživatel vše ověří.
+- ZBÝVÁ po uživatelově ověření: vypnout/archivovat hostovaný Supabase projekt; registrace Telegram webhooku na `https://horea.cz/api/telegram/webhook` (setWebhook + secret token) — viz fáze telegram-operator-notifications.
+
 ## 2026-06-22 — deploy: Horea app container postaven (fáze 3)
 
 ### Nové funkce
