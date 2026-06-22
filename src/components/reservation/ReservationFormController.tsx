@@ -41,9 +41,19 @@ type ReservationFormControllerProps = {
   serviceEmployees?: Record<string, { id: string; name: string; photoUrl: string | null }[]>;
   /** Povolit výběr zaměstnance při rezervaci. */
   allowEmployeeSelection?: boolean;
+  /**
+   * Náhledový režim pro majitele nepublikovaného profilu (free účet): formulář
+   * lze proklikat, ale dokončení rezervace je zakázané (R: „zakázat dokončit
+   * rezervaci"). Skutečné odeslání se neprovede.
+   */
+  preview?: boolean;
 };
 
 const NO_SERVICES_MESSAGE = 'Tento podnik zatím nemá žádné rezervovatelné služby';
+
+/** Hláška v náhledovém režimu, když se majitel pokusí dokončit rezervaci. */
+const PREVIEW_BLOCKED_MESSAGE =
+  'Toto je náhled vašeho profilu. Rezervace bude možná po aktivaci tarifu a publikování profilu.';
 
 /** Krátké popisky pro vodorovný indikátor kroků. */
 const STEP_TITLES = ['Služba', 'Datum', 'Čas', 'Údaje', 'Souhrn'] as const;
@@ -79,6 +89,7 @@ export function ReservationFormController({
   services,
   serviceEmployees = {},
   allowEmployeeSelection = false,
+  preview = false,
 }: ReservationFormControllerProps) {
   const today = useMemo(() => todayInPrague(), []);
 
@@ -282,6 +293,13 @@ export function ReservationFormController({
   }
 
   function handleSubmit() {
+    // Náhledový režim majitele: dokončení rezervace je zakázané (R: free účet).
+    if (preview) {
+      setSubmitError(PREVIEW_BLOCKED_MESSAGE);
+      setSubmitState('error');
+      return;
+    }
+
     // (R8.4) Synchronní guard: i kdyby uživatel klikl dvakrát rychle po sobě,
     // druhý klik se zde zastaví ještě před zahájením requestu.
     if (submittingRef.current) {
@@ -349,6 +367,11 @@ export function ReservationFormController({
 
   return (
     <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[16px]">
+      {preview ? (
+        <Notice variant="warning">
+          Náhled profilu — rezervace je vypnutá, dokud neaktivujete tarif a nezveřejníte profil.
+        </Notice>
+      ) : null}
       <StepIndicator
         steps={STEP_TITLES}
         current={step}

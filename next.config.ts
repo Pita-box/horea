@@ -40,6 +40,8 @@ const remoteImagePatterns = [
   r2ImageHostname
     ? { protocol: 'https' as const, hostname: r2ImageHostname, pathname: '/**' }
     : null,
+  // Vlastní R2 media doména (marketing/teaser assety, např. fallback cover).
+  { protocol: 'https' as const, hostname: 'media.horea.cz', pathname: '/**' },
 ].filter((pattern): pattern is NonNullable<typeof pattern> => pattern !== null);
 
 const nextConfig: NextConfig = {

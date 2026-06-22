@@ -1,8 +1,11 @@
+import { IconArrowUpRight } from '@tabler/icons-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
 import { JsonLdLocalBusiness } from '@/components/JsonLdLocalBusiness';
+import { LockedBusinessProfile } from '@/components/business/LockedBusinessProfile';
 import {
   PublicProfileRenderer,
   type PublicProfileBusiness,
@@ -14,7 +17,9 @@ import { ReservationFormController } from '@/components/reservation/ReservationF
 import type { ReservationService } from '@/components/reservation/types';
 import { isBusinessOpenNow } from '@/lib/business/open-status';
 import { isReservedSlug, normalizeRouteSlug } from '@/lib/slug/route';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/public';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * Veřejná stránka podniku `/{slug}` (úkol 3.2) + SEO metadata (úkol 4.1).
@@ -41,8 +46,6 @@ const SITE_URL = 'https://www.horea.cz';
 
 /** Maximální délka `<meta name="description">` (R12.1). */
 const META_DESCRIPTION_LIMIT = 155;
-
-const UNPUBLISHED_MESSAGE = 'Tento podnik zatím nepublikoval svůj profil.';
 
 type RouteParams = { slug: string };
 
@@ -129,9 +132,10 @@ const getBusinessState = cache(async (slug: string): Promise<BusinessState | nul
  * Obaleno `cache()`: `generateMetadata` potřebuje název/popis/logo a `Page`
  * potřebuje celý profil — díky cache se třízdrojový load provede jen jednou.
  */
-const loadPublishedProfile = cache(async (businessId: string): Promise<PublishedProfile | null> => {
-  const supabase = createPublicClient();
-
+const loadProfileWith = async (
+  supabase: ReturnType<typeof createPublicClient>,
+  businessId: string,
+): Promise<PublishedProfile | null> => {
   const { data: business, error: businessError } = await supabase
     .from('businesses')
     .select(
@@ -252,7 +256,81 @@ const loadPublishedProfile = cache(async (businessId: string): Promise<Published
     serviceEmployees,
     allowEmployeeSelection: Boolean(business.allow_employee_selection),
   };
-});
+};
+
+/**
+ * Profil publikovaného podniku přes anon klienta (RLS pustí jen publikované).
+ * `cache()` sdílí jediné volání mezi `generateMetadata` a `Page`.
+ */
+const loadPublishedProfile = cache(
+  (businessId: string): Promise<PublishedProfile | null> =>
+    loadProfileWith(createPublicClient(), businessId),
+);
+
+/**
+ * Plný profil pro PŘIHLÁŠENÉHO MAJITELE jeho NEPUBLIKOVANÉHO podniku přes admin
+ * klienta (service role, jen server). Bez cache — owner render je dynamický
+ * (čte session) a nikdy se necachuje.
+ */
+const loadOwnerProfile = (businessId: string): Promise<PublishedProfile | null> =>
+  loadProfileWith(createAdminClient() as unknown as ReturnType<typeof createPublicClient>, businessId);
+
+/** Teaser pole nepublikovaného podniku pro „zamčený" veřejný náhled (server-only). */
+type BusinessTeaser = {
+  type: string;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  phone: string | null;
+  openingHours: { dayOfWeek: number; opensAt: string; closesAt: string }[];
+};
+
+async function loadBusinessTeaser(businessId: string): Promise<BusinessTeaser> {
+  const supabase = createAdminClient();
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('type, logo_url, cover_url, phone')
+    .eq('id', businessId)
+    .maybeSingle<{ type: string; logo_url: string | null; cover_url: string | null; phone: string | null }>();
+  const { data: hours } = await supabase
+    .from('opening_hours')
+    .select('day_of_week, opens_at, closes_at')
+    .eq('business_id', businessId)
+    .returns<OpeningHoursRow[]>();
+
+  return {
+    type: business?.type ?? 'ostatni',
+    logoUrl: business?.logo_url ?? null,
+    coverUrl: business?.cover_url ?? null,
+    phone: business?.phone ?? null,
+    openingHours: (hours ?? []).map((row) => ({
+      dayOfWeek: row.day_of_week,
+      opensAt: row.opens_at,
+      closesAt: row.closes_at,
+    })),
+  };
+}
+
+/**
+ * Vrací `true`, pokud je aktuálně přihlášený uživatel majitelem daného podniku.
+ * Čte session přes cookies (zdynamičtí render — ale jen ve větvi „nepublikováno",
+ * která je stejně noindex). Vlastnictví ověří admin klientem proti `owner_user_id`.
+ */
+async function viewerOwnsBusiness(businessId: string): Promise<boolean> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return false;
+  }
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from('businesses')
+    .select('owner_user_id')
+    .eq('id', businessId)
+    .maybeSingle<{ owner_user_id: string }>();
+  return data?.owner_user_id === user.id;
+}
 
 /** Metadata pro nepublikovaný profil i 404: pouze noindex, žádné OG/JSON-LD (R2.3, R3.3, R12.4). */
 const NOINDEX_METADATA: Metadata = {
@@ -320,16 +398,63 @@ export default async function Page({ params }: { params: Promise<RouteParams> })
     notFound();
   }
 
-  // Nepublikovaný profil: HTTP 200, jen název + hláška (R2.1, R2.2). noindex
-  // zajišťuje `generateMetadata`.
+  // Nepublikovaný profil (noindex zajišťuje `generateMetadata`):
+  //  - přihlášený MAJITEL → plný profil v náhledu + výzva k aktivaci tarifu + vypnutá rezervace,
+  //  - ostatní (nepřihlášení / cizí) → „zamčený" teaser.
   if (!state.published) {
+    if (await viewerOwnsBusiness(state.id)) {
+      const ownerProfile = await loadOwnerProfile(state.id);
+      if (ownerProfile) {
+        const {
+          business,
+          services,
+          openingHours,
+          employees,
+          serviceEmployees,
+          allowEmployeeSelection,
+        } = ownerProfile;
+        const reservationServices: ReservationService[] = services.map((service) => ({
+          id: service.id,
+          name: service.name,
+          durationMinutes: service.durationMinutes,
+          priceCzk: service.priceCzk,
+          description: service.description,
+        }));
+        return (
+          <>
+            <PublicProfileRenderer
+              business={business}
+              services={services}
+              openingHours={openingHours}
+              employees={employees}
+              isOpenNow={isBusinessOpenNow(openingHours)}
+              reservationForm={
+                <ReservationFormController
+                  slug={slug}
+                  services={reservationServices}
+                  serviceEmployees={serviceEmployees}
+                  allowEmployeeSelection={allowEmployeeSelection}
+                  preview
+                />
+              }
+            />
+            <OwnerUpgradeBanner />
+          </>
+        );
+      }
+    }
+
+    const teaser = await loadBusinessTeaser(state.id);
     return (
-      <main className="mx-auto flex min-h-[60vh] w-full max-w-[560px] flex-col items-center justify-center gap-[12px] px-[16px] py-[48px] text-center">
-        <h1 className="text-[28px] font-semibold leading-[1.1] text-[var(--color-rich-violet)]">
-          {state.name}
-        </h1>
-        <p className="text-[16px] text-[var(--color-slate-text)]">{UNPUBLISHED_MESSAGE}</p>
-      </main>
+      <LockedBusinessProfile
+        slug={slug}
+        name={state.name}
+        type={teaser.type}
+        logoUrl={teaser.logoUrl}
+        coverUrl={teaser.coverUrl}
+        phone={teaser.phone}
+        openingHours={teaser.openingHours}
+      />
     );
   }
 
@@ -380,5 +505,26 @@ export default async function Page({ params }: { params: Promise<RouteParams> })
         }
       />
     </>
+  );
+}
+
+/**
+ * Plovoucí obdélníkový banner vpravo dole pro majitele v náhledu nepublikovaného
+ * profilu — proklik na výběr tarifu (`/dashboard/plans`).
+ */
+function OwnerUpgradeBanner() {
+  return (
+    <Link
+      href="/dashboard/plans"
+      className="fixed bottom-5 right-5 z-50 flex max-w-[320px] items-start gap-3 rounded-[var(--radius-xl)] border border-[var(--color-action-violet)] bg-[var(--color-action-violet)] px-5 py-4 text-[var(--color-canvas-white)] shadow-lg transition-opacity hover:opacity-90"
+    >
+      <IconArrowUpRight size={22} stroke={2} aria-hidden="true" className="mt-[2px] shrink-0" />
+      <span className="flex flex-col gap-[2px]">
+        <span className="text-[16px] font-semibold leading-[1.2]">Profil je zatím skrytý</span>
+        <span className="text-[14px] leading-[1.3] text-[color-mix(in_srgb,var(--color-canvas-white)_88%,transparent)]">
+          Aktivujte tarif a zveřejněte profil zákazníkům.
+        </span>
+      </span>
+    </Link>
   );
 }

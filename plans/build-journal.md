@@ -2,6 +2,24 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — public-business-page: UI pro nepublikovaný profil (zamčený teaser + owner náhled)
+
+### Nové funkce
+- `src/app/[slug]/page.tsx` — větev „nepublikováno" už není holý text. Nově dva stavy:
+  - **Nepřihlášený / cizí návštěvník** → zamčený teaser `LockedBusinessProfile`.
+  - **Přihlášený MAJITEL nepublikovaného podniku** (free účet) → plný profil v náhledu + plovoucí banner `OwnerUpgradeBanner` (vpravo dole, proklik na `/dashboard/plans`) + rezervační formulář v `preview` režimu (dokončení rezervace zakázáno).
+- `LockedBusinessProfile` (`src/components/business/LockedBusinessProfile.tsx`) — cover (fallback `media.horea.cz/.../reserved.webp`), logo nebo iniciála, název, ztlumený `horea.cz/{slug}`, štítky (typ podniku + Nyní otevřeno/Zavřeno), centrovaná `IconLock` (action-violet na light-violet), primární tlačítko „Odemknout profil" → `/login`, jednořádková dnešní otevírací doba, telefon (tel:), spodní navigace jen Domů + Účet.
+- `ReservationFormController` — nový prop `preview`: formulář lze proklikat, ale dokončení rezervace je blokované (hláška + warning Notice).
+- `open-status.ts` — přidány `getPragueWeekday` a `getTodaysHours` (dnešní otevírací doba v Europe/Prague).
+- `next.config.ts` — `media.horea.cz` přidán do `images.remotePatterns` (fallback cover přes `next/image`).
+
+### Architektura / rozhodnutí
+- Teaser data nepublikovaného podniku (typ, telefon, otevírací doba, cover/logo) se čtou **server-side přes `createAdminClient`** (service role, nikdy ne klient) — žádná DB migrace. Owner se detekuje přes session (`createClient`/cookies) jen ve větvi „nepublikováno" (ta je noindex → dynamický render je v pořádku; publikovaná cesta zůstává ISR). Loader profilu refaktorován na `loadProfileWith(client, id)` (anon pro publikované, admin pro owner náhled).
+- **Produktové rozhodnutí:** teaser nepublikovaného podniku (název, typ, logo, cover, telefon, otevírací doba) je nově veřejně viditelný nepřihlášeným (dle zadání UI).
+
+### Ověřeno
+- `pnpm lint` 0, `pnpm build` OK, `pnpm test:run` (slug metadata + open-status) 10/10, diagnostika čistá.
+
 ## 2026-06-22 — auth: responzivní hero obrázek na login/register
 
 ### Nové funkce

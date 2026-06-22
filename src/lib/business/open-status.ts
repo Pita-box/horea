@@ -56,3 +56,17 @@ export function isBusinessOpenNow(hours: OpenStatusHours[], now: Date = new Date
   const closes = toMinutes(today.closesAt);
   return minutes >= opens && minutes < closes;
 }
+
+/** Dnešní index dne (0=Po … 6=Ne) v pásmu Europe/Prague. */
+export function getPragueWeekday(now: Date = new Date()): number {
+  return pragueNow(now).dayIndex;
+}
+
+/** Otevírací doba pro DNEŠNÍ den (Europe/Prague), nebo `null` když je zavřeno. */
+export function getTodaysHours<T extends OpenStatusHours>(
+  hours: T[],
+  now: Date = new Date(),
+): T | null {
+  const { dayIndex } = pragueNow(now);
+  return hours.find((h) => h.dayOfWeek === dayIndex) ?? null;
+}
