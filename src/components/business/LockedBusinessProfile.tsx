@@ -180,13 +180,13 @@ export function LockedBusinessProfile({
         </div>
       </main>
 
-      {/* Spodní navigace — vlevo logo (→ domů), vpravo Domů a Účet */}
+      {/* Spodní navigace — logo ukotvené vlevo, ikony na střed */}
       <nav className="sticky bottom-0 border-t border-[var(--color-input-border)] bg-[var(--color-canvas-white)]">
-        <div className="mx-auto flex max-w-[440px] items-center justify-between px-6 py-3">
+        <div className="relative mx-auto flex max-w-[440px] items-center justify-center px-6 py-3">
           <Link
             href="/"
             aria-label="Horea — domů"
-            className="flex items-center transition-opacity hover:opacity-80"
+            className="absolute left-6 top-1/2 flex -translate-y-1/2 items-center transition-opacity hover:opacity-80"
           >
             <Logo width={92} height={32} className="h-7 w-auto" />
             <span className="sr-only">Horea</span>
