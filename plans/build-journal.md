@@ -2,6 +2,22 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — deploy: Self-hosted Supabase na OVH VPS (fáze 1)
+
+### Nové funkce
+- Self-hosted Supabase stack běží na OVH VPS (`141.227.135.23`, Ubuntu 24.04) v `/opt/apps/supabase` jako Docker Compose (oficiální self-hosting template, služby: db postgres 17, auth/GoTrue v2.189.0, rest, realtime, storage, imgproxy, meta, kong, pooler/supavisor, studio, edge-functions). Vzor serveru = Docker + Cloudflare (jako sousední `maietek-prod`), NE PM2/certbot ze skillu.
+- Tajemství vygenerována oficiálním `utils/generate-keys.sh --update-env` (JWT_SECRET + legacy symetrické ANON_KEY/SERVICE_ROLE_KEY — přesně to, co Horea používá přes `@supabase/ssr` a `createAdminClient`; dále POSTGRES_PASSWORD, DASHBOARD_PASSWORD, SECRET_KEY_BASE, VAULT_ENC_KEY ad.). Tajemství jen na VPS v `.env`, nikdy ne v repu/chatu.
+- URL nakonfigurovány na cílové domény: `SITE_URL=https://horea.cz`, `API_EXTERNAL_URL`/`SUPABASE_PUBLIC_URL=https://supabase.horea.cz`, `ADDITIONAL_REDIRECT_URLS=https://horea.cz/**`. Signup: email signup zapnut, autoconfirm vypnut (Horea posílá vlastní auth e-maily přes `admin.generateLink` + Resend, GoTrue SMTP se nepoužívá).
+- Bezpečnost: všechny publikované porty (kong 8000/8443, db 5432/pooler 6543) navázány na `127.0.0.1` (úprava port řádků v `docker-compose.yml`, backup `docker-compose.yml.bak`); ověřeno `ss -tlnp` (žádný 0.0.0.0). UFW dál jen 22/80/443. Restart policy `unless-stopped` u všech služeb (přežijí reboot).
+
+### Ověřeno
+- Všechny kontejnery `Healthy` (`docker compose up -d --wait`, exit 0). REST `GET /rest/v1/` s anon klíčem → 200; `GET /auth/v1/health` → GoTrue v2.189.0; `/auth/v1/settings` → 200. RAM 2,4 GB použito / 5,3 GB volných (pohodlně vedle maietek). `maietek-prod` netknut.
+
+### Blokováno na uživateli (fáze 4 + cutover)
+- Cloudflare Origin certifikát pro `horea.cz` + `*.horea.cz` a DNS A záznamy `horea.cz` a `supabase.horea.cz` → `141.227.135.23` (nutné před nginx reverse proxy a TLS).
+- Migrace dat z hostovaného Supabase (schéma 0001–0053 + data + auth.users + storage faktury) — až s výslovným pokynem k cutover.
+
+
 ## 2026-06-21 — admin-system-tools: Informační tooltipy ke kartám stránky `/admin/system`
 
 ### Nové funkce
