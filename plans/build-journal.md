@@ -13,8 +13,16 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 ### Ověřeno
 - Všechny kontejnery `Healthy` (`docker compose up -d --wait`, exit 0). REST `GET /rest/v1/` s anon klíčem → 200; `GET /auth/v1/health` → GoTrue v2.189.0; `/auth/v1/settings` → 200. RAM 2,4 GB použito / 5,3 GB volných (pohodlně vedle maietek). `maietek-prod` netknut.
 
-### Blokováno na uživateli (fáze 4 + cutover)
-- Cloudflare Origin certifikát pro `horea.cz` + `*.horea.cz` a DNS A záznamy `horea.cz` a `supabase.horea.cz` → `141.227.135.23` (nutné před nginx reverse proxy a TLS).
+## 2026-06-22 — deploy: supabase.horea.cz živé přes Cloudflare (fáze 4a)
+
+### Nové funkce
+- Cloudflare Origin cert (`horea.cz` + `*.horea.cz`, platnost do 2041) nasazen na VPS: `/etc/ssl/cloudflare/horea-origin.pem` (644) + `horea-origin.key` (600, root). Ověřena shoda modulů cert↔key.
+- nginx site `supabase-horea.conf` (`/etc/nginx/sites-available`, symlink v sites-enabled): `supabase.horea.cz` → `127.0.0.1:8000` (kong), 80→443 redirect, websocket upgrade pro realtime, `client_max_body_size 50m`. Mapa `$connection_upgrade` se znovu nedefinuje (sdílí se s `maietek.conf`, jinak duplicate map). DNS: A `horea.cz` a `supabase.horea.cz` → `141.227.135.23`, CNAME `www`→`horea.cz`. Cloudflare SSL/TLS = Full (strict).
+
+### Ověřeno
+- `nginx -t` OK, reload OK. Plný řetězec Cloudflare → nginx → kong → Supabase: `GET /auth/v1/settings` a `GET /rest/v1/` s anon klíčem přes veřejnou DNS → 200. Externí `/auth/v1/health` bez klíče → 401 + `cf-ray …-PRG` (Full strict TLS na origin funguje). `maietek` nedotčen.
+
+### Blokováno na uživateli (cutover)
 - Migrace dat z hostovaného Supabase (schéma 0001–0053 + data + auth.users + storage faktury) — až s výslovným pokynem k cutover.
 
 
