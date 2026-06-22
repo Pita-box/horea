@@ -2,6 +2,8 @@
 
 import { serverLog } from '@/lib/log-server';
 import { normalizeRouteSlug } from '@/lib/slug/route';
+import { viewerOwnsBusiness } from '@/lib/business/ownership';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/public';
 
 import { loadAvailableSlotsDetailed } from './slots/loadAvailableSlots';
@@ -57,8 +59,33 @@ export async function getAvailableSlots(
       throw stateError;
     }
 
-    if (!state || !state.published) {
+    // Business neexistuje → žádné termíny.
+    if (!state) {
       return { ok: true, slots: [], durationExceedsDay: false };
+    }
+
+    // Nepublikovaný podnik: termíny dostane jen PŘIHLÁŠENÝ MAJITEL (owner náhled
+    // rezervace u free účtu). Výpočet běží přes admin klienta s `requirePublished:
+    // false` (čte rezervace přímo z tabulky, obchází RLS) — shodně s owner
+    // operacemi Editor/Manual. Cizí/nepřihlášený návštěvník dostane prázdno.
+    if (!state.published) {
+      if (!(await viewerOwnsBusiness(state.id))) {
+        return { ok: true, slots: [], durationExceedsDay: false };
+      }
+
+      const admin = createAdminClient();
+      const ownerResult = await loadAvailableSlotsDetailed(admin, {
+        businessId: state.id,
+        serviceIds: input.serviceIds,
+        dateISO: input.date,
+        requirePublished: false,
+      });
+
+      return {
+        ok: true,
+        slots: ownerResult.slots,
+        durationExceedsDay: ownerResult.durationExceedsDay,
+      };
     }
 
     const { slots, durationExceedsDay } = await loadAvailableSlotsDetailed(supabase, {

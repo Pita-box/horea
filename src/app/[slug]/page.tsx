@@ -16,10 +16,10 @@ import {
 import { ReservationFormController } from '@/components/reservation/ReservationFormController';
 import type { ReservationService } from '@/components/reservation/types';
 import { isBusinessOpenNow } from '@/lib/business/open-status';
+import { viewerOwnsBusiness } from '@/lib/business/ownership';
 import { isReservedSlug, normalizeRouteSlug } from '@/lib/slug/route';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/public';
-import { createClient } from '@/lib/supabase/server';
 
 /**
  * Veřejná stránka podniku `/{slug}` (úkol 3.2) + SEO metadata (úkol 4.1).
@@ -308,28 +308,6 @@ async function loadBusinessTeaser(businessId: string): Promise<BusinessTeaser> {
       closesAt: row.closes_at,
     })),
   };
-}
-
-/**
- * Vrací `true`, pokud je aktuálně přihlášený uživatel majitelem daného podniku.
- * Čte session přes cookies (zdynamičtí render — ale jen ve větvi „nepublikováno",
- * která je stejně noindex). Vlastnictví ověří admin klientem proti `owner_user_id`.
- */
-async function viewerOwnsBusiness(businessId: string): Promise<boolean> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return false;
-  }
-  const admin = createAdminClient();
-  const { data } = await admin
-    .from('businesses')
-    .select('owner_user_id')
-    .eq('id', businessId)
-    .maybeSingle<{ owner_user_id: string }>();
-  return data?.owner_user_id === user.id;
 }
 
 /** Metadata pro nepublikovaný profil i 404: pouze noindex, žádné OG/JSON-LD (R2.3, R3.3, R12.4). */

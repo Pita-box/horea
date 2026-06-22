@@ -2,6 +2,20 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — public-business-page: owner náhled — termíny + vrácený Notice
+
+### Bug & fix
+- **Symptom:** Majitel v náhledu nepublikovaného profilu při výběru data viděl „V tento den nejsou dostupné žádné termíny" i u podniku s vyplněnou otevírací dobou (po–pá 9–17).
+- **Root cause:** `getAvailableSlots` (`src/server/AvailableSlotsService.ts`) vracel prázdné sloty pro každý `!state.published` podnik (běží pod anon klientem, RLS pustí jen publikované).
+- **Fix:** Owner-aware větev — když je `state.published === false` a `viewerOwnsBusiness(state.id)`, počítá termíny přes `createAdminClient` s `loadAvailableSlotsDetailed(..., { requirePublished: false })` (čte rezervace přímo, obchází RLS; shodně s owner operacemi Editor/Manual). Cizí/nepřihlášený dostane dál prázdno.
+
+### Nové funkce / změny
+- `src/lib/business/ownership.ts` — vytažen sdílený `viewerOwnsBusiness(businessId)` (session přes cookies + ověření `owner_user_id` admin klientem). Použit v `[slug]/page.tsx` (owner náhled) i v `AvailableSlotsService` (termíny). Lokální duplikát v page.tsx odstraněn.
+- `ReservationFormController` — vrácen horní `Notice` (variant warning) v `preview` režimu (informace, že rezervaci lze proklikat, ale dokončení je až po aktivaci tarifu). Blok dokončení na kroku 5 zůstává.
+
+### Ověřeno
+- `pnpm lint` 0, `pnpm build` OK, diagnostika čistá.
+
 ## 2026-06-22 — public-business-page: doladění locked teaseru + owner náhledu
 
 ### Změny
