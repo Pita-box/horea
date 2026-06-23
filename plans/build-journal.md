@@ -6,7 +6,7 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 
 ### Nové funkce / změna chování
 - Admin „vynucené smazání podniku" nově **odstraní i účet vlastníka** (`auth.users`), takže se **uvolní e-mail** pro novou registraci. Účetní historie (`subscriptions`, `payments`, faktury) **zůstává zachována, ale anonymizovaná** (odpojená od smazaného uživatele).
-- **Migrace `0054_business_owner_set_null.sql`** (NEAPLIKOVÁNO na DB — viz níže): `businesses.owner_user_id` → nullable + FK `ON DELETE SET NULL` (dříve CASCADE). Smazání uživatele tím podnik (kotvu historie) jen odpojí (`owner_user_id = NULL`) místo aby kaskádově zničil `subscriptions`/`payments`. `businesses_owner_user_id_unique` zůstává (více NULL je v PG navzájem různých).
+- **Migrace `0054_business_owner_set_null.sql`** (aplikováno na hostovaný Supabase přes `db push`; na self-hosted VPS čeká na deploy): `businesses.owner_user_id` → nullable + FK `ON DELETE SET NULL` (dříve CASCADE). Smazání uživatele tím podnik (kotvu historie) jen odpojí (`owner_user_id = NULL`) místo aby kaskádově zničil `subscriptions`/`payments`. `businesses_owner_user_id_unique` zůstává (více NULL je v PG navzájem různých).
 - `src/lib/admin/force-delete.ts`: po smazání tenant dat (existující RPC `admin_force_delete_business`) dohledá `owner_user_id` a zavolá `supabase.auth.admin.deleteUser(ownerUserId)` (best-effort, selhání jen warn). FK SET NULL zajistí zachování historie. R2 úklid médií beze změny; faktury ve Storage se NEmažou (B zachovává).
 - Admin UI (`BusinessActions.tsx`): popis i potvrzovací dialog vynuceného smazání aktualizovány (odstranění účtu + uvolnění e-mailu, zachování anonymizované historie).
 - Rozsah: změněno jen **admin vynucené smazání**; automatické 90denní čištění (cron) beze změny.
@@ -15,7 +15,7 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 - `pnpm lint` 0, `pnpm build` OK, diagnostika čistá. (Chování proti DB ověří uživatel po aplikaci migrace.)
 
 ### ZBÝVÁ
-- **Aplikovat migraci 0054** na DB (lokální dev cíl i produkční self-hosted při deployi) — gated na potvrzení (`supabase db push`).
+- **Aplikovat migraci 0054 na produkční self-hosted DB** (VPS) při deployi. Hostovaný Supabase už aplikováno (`db push`, „Remote database is up to date").
 ## 2026-06-22 — auth: ERR_TOO_MANY_REDIRECTS u expired/deleted_data účtů
 
 ### Bug & fix
