@@ -2,6 +2,15 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — plan-features: gating sekcí na /dashboard/employees (TOP zaměstnanci, Zaměstnanci u služeb)
+
+### Nové funkce
+- Dva nové feature klíče v katalogu (`features.ts`): `employees_top` („Zaměstnanci: TOP zaměstnanci") a `service_employees` („Zaměstnanci: Zaměstnanci u služeb") → automaticky v admin matici `/admin/plans`.
+- `/dashboard/employees`: sekce **TOP zaměstnanci** (`employees_top`) a **Zaměstnanci u služeb** (`service_employees`) se při vypnutí v tarifu nahradí zamčenou kartou. Entitlement čten admin klientem (business přes vlastníka).
+- Nový sdílený komponent `src/components/plans/LockedFeatureCard.tsx` — vystředěná ikona zámku, text „Toto rozšíření není součástí vašeho tarifu. Odemkněte si ho přechodem na vyšší tarif." a primární tlačítko **„Tarify"** → `/dashboard/plans` (`target="_blank"`).
+
+### Ověřeno
+- `pnpm lint` 0, `pnpm test:run src/lib/plans` 8/8, `pnpm build` OK, diagnostika čistá. Bez migrace — na localhostu hned, na produkci při deployi.
 ## 2026-06-22 — plan-features: analytika + jednotlivé widgety do správy tarifů
 
 ### Nové funkce

@@ -1,5 +1,9 @@
 import { Card } from '@/components/ui/card';
 import { Notice } from '@/components/ui/notice';
+import { LockedFeatureCard } from '@/components/plans/LockedFeatureCard';
+import { loadBusinessFeatureChecker } from '@/lib/plans/business-feature';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 import { EmployeesManager } from '../settings/EmployeesManager';
 import { getEmployees, getServiceAssignments, getTopEmployees } from '../settings/employee-actions';
@@ -21,6 +25,25 @@ export default async function EmployeesPage() {
     );
   }
 
+  // Entitlementy (matice plan_features) — TOP zaměstnanci a Zaměstnanci u služeb.
+  // Čteno admin klientem (subscriptions/plan_features nejsou pro běžného uživatele
+  // přes RLS). Businessu se dobereme přes vlastníka.
+  const admin = createAdminClient();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: ownedBusiness } = user
+    ? await admin
+        .from('businesses')
+        .select('id')
+        .eq('owner_user_id', user.id)
+        .maybeSingle<{ id: string }>()
+    : { data: null };
+  const has = ownedBusiness
+    ? await loadBusinessFeatureChecker(admin, ownedBusiness.id)
+    : () => true;
+
   const showServiceAssignment = team.employees.length > 0 && assignments.ok;
 
   return (
@@ -34,7 +57,13 @@ export default async function EmployeesPage() {
           <EmployeesManager initialEmployees={team.employees} initialSettings={team.settings} />
         </Card>
 
-        {topEmployees.ok ? (
+        {!has('employees_top') ? (
+          <div className="relative">
+            <div className="lg:absolute lg:inset-0">
+              <LockedFeatureCard />
+            </div>
+          </div>
+        ) : topEmployees.ok ? (
           <div className="relative">
             <div className="lg:absolute lg:inset-0">
               <TopEmployees employees={topEmployees.employees} />
@@ -43,7 +72,9 @@ export default async function EmployeesPage() {
         ) : null}
       </div>
 
-      {showServiceAssignment ? (
+      {!has('service_employees') ? (
+        <LockedFeatureCard id="zamestnanci-u-sluzeb" />
+      ) : showServiceAssignment ? (
         <Card
           as="section"
           id="zamestnanci-u-sluzeb"

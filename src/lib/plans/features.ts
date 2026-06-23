@@ -22,7 +22,9 @@ export type BusinessFeatureKey =
   | 'analytics_status'
   | 'analytics_employees'
   | 'analytics_top_clients'
-  | 'analytics_new_returning';
+  | 'analytics_new_returning'
+  | 'employees_top'
+  | 'service_employees';
 
 export type BusinessFeature = {
   key: BusinessFeatureKey;
@@ -120,6 +122,16 @@ export const BUSINESS_FEATURES: BusinessFeature[] = [
     key: 'analytics_new_returning',
     label: 'Analýzy: Noví vs. vracející se klienti',
     description: 'Poměr nových a vracejících se klientů.',
+  },
+  {
+    key: 'employees_top',
+    label: 'Zaměstnanci: TOP zaměstnanci',
+    description: 'Žebříček nejvýkonnějších zaměstnanců na stránce Zaměstnanci.',
+  },
+  {
+    key: 'service_employees',
+    label: 'Zaměstnanci: Zaměstnanci u služeb',
+    description: 'Přiřazení zaměstnanců k jednotlivým službám (výběr zaměstnance v rezervaci).',
   },
 ];
 
