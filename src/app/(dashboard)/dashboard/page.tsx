@@ -151,8 +151,7 @@ async function BusinessDashboard({ email, userId }: { email: string; userId: str
     <DashboardShell email={email} profileSlug={business.slug}>
       {status === 'free' ? (
         <Notice>
-          Účet je ve free režimu. Veřejné publikování a placené funkce zapneme po dokončení platební
-          části.
+          Váš účet se aktuálně nachází v bezplatném režimu, který slouží k vyzkoušení aplikace. Jakmile dokončíte nastavení plateb, automaticky vám zpřístupníme veřejné publikování a všechny prémiové funkce.
         </Notice>
       ) : null}
 
@@ -195,7 +194,7 @@ async function BusinessDashboard({ email, userId }: { email: string; userId: str
               Veřejný profil
             </h2>
             <p className="text-sm leading-6 text-[var(--color-slate-text)]">
-              Slug profilu je /{business.slug}. Profil bude veřejný po zapnutí publikování.
+              Adresa vašeho profilu je <b><a className='text-[var(--color-action-violet)] hover:underline' href={`/${business.slug}`} target="_blank" rel="noopener">horea.cz/{business.slug}</a></b>. Váš veřejný profil bude online a dostupný zákazníkům, jakmile si aktivujete odpovídající tarif a zapnete publikování.
             </p>
           </div>
           <div className="text-sm font-semibold text-[var(--color-slate-text)]">
@@ -207,7 +206,7 @@ async function BusinessDashboard({ email, userId }: { email: string; userId: str
                 Otevřít veřejný profil
               </Link>
             ) : (
-              'Profil zatím není publikovaný'
+              'Profil zatím není dostupný.'
             )}
           </div>
         </Card>

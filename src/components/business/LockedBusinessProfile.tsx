@@ -196,7 +196,7 @@ export function LockedBusinessProfile({
               <Link
                 href="/"
                 aria-label="Domů"
-                className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-2xl)] text-[var(--color-action-violet)] transition-colors hover:bg-[var(--color-light-violet)]"
+                className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-2xl)] text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-light-violet)]"
               >
                 <IconHome size={24} stroke={2} aria-hidden="true" />
               </Link>

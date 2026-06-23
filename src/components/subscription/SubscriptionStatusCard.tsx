@@ -7,7 +7,7 @@ export type SubscriptionStatus = 'free' | 'active' | 'grace_period' | 'expired' 
 const STATUS_LABELS: Record<SubscriptionStatus, string> = {
   free: 'Neplacené (Free)',
   active: 'Aktivní',
-  grace_period: 'Odklad platby',
+  grace_period: 'Obnovení selhalo',
   expired: 'Vypršelo',
   deleted_data: 'Data smazána',
 };

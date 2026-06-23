@@ -24,8 +24,8 @@ const WHY_CARDS: { icon: IconName; title: string; body: string }[] = [
   },
   {
     icon: 'grid',
-    title: 'Přehledný dashboard',
-    body: 'Mějte všechny rezervace, klienty a tržby pod kontrolou na jednom místě. Intuitivní rozhraní vám usnadní každodenní správu podniku.',
+    title: 'Vše na jednom méstě',
+    body: 'Získejte dokonalý přehled o celém svém podnikání. Kromě přijímání schůzek získáte např. podrobné statistiky, chytrou správu zaměstnanců, evidenci tržeb a databázi potenciálních klientů...',
   },
 ];
 

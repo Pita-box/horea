@@ -1,5 +1,7 @@
 # Deploy — Horea na OVH VPS (ruční, rsync)
 
+Dvě věci k zapamatování: .env na VPS se rsyncem nikdy nepřepíše (je vyloučený, edituješ ho přímo na serveru), a změna NEXT_PUBLIC_* proměnných vždy vyžaduje rebuild, ne jen restart.
+
 > Ruční nasazení přes rsync + build na VPS. `git push` na GitHub deploy **neprovede** —
 > kód se na VPS dostává rsyncem z lokálního pracovního stromu. Tento dokument je
 > jediný zdroj pravdy pro postup a příkazy.
