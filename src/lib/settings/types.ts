@@ -9,10 +9,17 @@ export type AvailabilitySettings = {
   autoApproveReservations: boolean;
 };
 
+/** Dostupnost dotčených funkcí dle tarifu (matice `plan_features`). */
+export type SettingsEntitlements = {
+  autoApprove: boolean;
+  parallelSlots: boolean;
+};
+
 export type GetSettingsResult =
   | {
       ok: true;
       settings: AvailabilitySettings;
+      entitlements: SettingsEntitlements;
     }
   | {
       ok: false;

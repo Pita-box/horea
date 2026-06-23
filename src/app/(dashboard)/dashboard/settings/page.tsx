@@ -52,7 +52,7 @@ export default async function SettingsPage() {
           id="automaticke-schvalovani-rezervaci"
           className="scroll-mt-20 border border-[var(--color-border-vychozi)] p-[var(--card-padding)]"
         >
-          <SettingsForm initialSettings={result.settings} />
+          <SettingsForm initialSettings={result.settings} entitlements={result.entitlements} />
         </Card>
       ) : (
         <Notice role="alert" variant="error">

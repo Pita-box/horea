@@ -193,6 +193,12 @@ export function ReservationFormController({
         return;
       }
 
+      // Online rezervace nejsou v tarifu podniku → dedikovaná hláška (ne „žádné termíny").
+      if (result.locked) {
+        setSlotsState('locked');
+        return;
+      }
+
       if (result.slots.length === 0) {
         // Prázdno kvůli příliš dlouhému kombinovanému bloku → klient má odebrat
         // služby (R6.2); jinak běžné „v tento den nic" (plno/zavřeno).

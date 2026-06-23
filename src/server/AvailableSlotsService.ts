@@ -30,7 +30,7 @@ export type GetAvailableSlotsInput = {
 };
 
 export type GetAvailableSlotsResult =
-  | { ok: true; slots: string[]; durationExceedsDay: boolean }
+  | { ok: true; slots: string[]; durationExceedsDay: boolean; locked?: boolean }
   | { ok: false; message: string };
 
 const LOAD_ERROR = 'Nepodařilo se načíst termíny, zkuste to prosím znovu.';
@@ -78,7 +78,7 @@ export async function getAvailableSlots(
       const has = await loadBusinessFeatureChecker(admin, state.id);
       // Tarif bez online rezervací → žádné termíny ani v náhledu majitele.
       if (!has('online_reservations')) {
-        return { ok: true, slots: [], durationExceedsDay: false };
+        return { ok: true, slots: [], durationExceedsDay: false, locked: true };
       }
       const ownerResult = await loadAvailableSlotsDetailed(admin, {
         businessId: state.id,
@@ -99,7 +99,7 @@ export async function getAvailableSlots(
     // klientem (anon na subscriptions/plan_features přes RLS nedosáhne).
     const has = await loadBusinessFeatureChecker(createAdminClient(), state.id);
     if (!has('online_reservations')) {
-      return { ok: true, slots: [], durationExceedsDay: false };
+      return { ok: true, slots: [], durationExceedsDay: false, locked: true };
     }
 
     const { slots, durationExceedsDay } = await loadAvailableSlotsDetailed(supabase, {

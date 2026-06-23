@@ -2,6 +2,14 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — plan-features: UI hlášky + deaktivace toggle dle entitlementu
+
+### Nové funkce
+- **Nastavení** (`/dashboard/settings`): toggly „Automatické schvalování" a „Paralelní termíny" se **deaktivují**, když je tarif nemá; pod popiskem hláška „Není dostupné ve vašem tarifu" + odkaz na ceník. Zamčená funkce se zobrazí jako vypnutá (checked = entitlement && hodnota). `getSettings` vrací `entitlements` (admin přes `loadBusinessFeatureChecker`); `updateSetting` serverově blokuje zapnutí funkce mimo tarif (`FEATURE_LOCKED_ERROR`).
+- **Rezervační formulář**: nový slot stav `locked` — když podnik nemá v tarifu online rezervace, krok 2 ukáže „Online rezervace nejsou u tohoto podniku aktuálně k dispozici" místo „žádné termíny". `getAvailableSlots` vrací `locked: true`.
+
+### Ověřeno
+- `pnpm test:run` (settings/reservation/server) 32/32; `pnpm lint` 0; `pnpm build` OK. Bez migrace — na localhostu hned, na produkci při deployi.
 ## 2026-06-22 — plan-features: vynucení behaviorálních entitlementů (online rezervace, auto-schvalování, paralelní sloty, e-maily)
 
 ### Nové funkce

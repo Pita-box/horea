@@ -61,6 +61,12 @@ export function Step2DatePicker({
         </Notice>
       ) : null}
 
+      {slotsState === 'locked' ? (
+        <Notice role="status" aria-live="polite" variant="warning">
+          Online rezervace nejsou u tohoto podniku aktuálně k dispozici.
+        </Notice>
+      ) : null}
+
       {slotsState === 'too_long' ? (
         <Notice role="status" aria-live="polite" variant="warning">
           <span className="block">

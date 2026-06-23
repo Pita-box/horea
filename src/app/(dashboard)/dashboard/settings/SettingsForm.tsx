@@ -2,8 +2,9 @@
 
 import { Button } from '@/components/ui/button';
 import { Notice } from '@/components/ui/notice';
-import type { AvailabilitySettings, SettingKey } from '@/lib/settings/types';
+import type { AvailabilitySettings, SettingKey, SettingsEntitlements } from '@/lib/settings/types';
 import { shouldShowParallelToggle } from '@/lib/settings/visibility';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
@@ -23,7 +24,23 @@ const AUTO_APPROVE_DESCRIPTION =
 
 type SettingsFormProps = {
   initialSettings: AvailabilitySettings;
+  entitlements: SettingsEntitlements;
 };
+
+/** Hláška „funkce není v tarifu" s odkazem na ceník. */
+function LockedHint() {
+  return (
+    <p className="text-sm leading-6 text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
+      Není dostupné ve vašem tarifu.{' '}
+      <Link
+        href="/dashboard/plans"
+        className="font-semibold text-[var(--color-action-violet)] hover:underline"
+      >
+        Zobrazit tarify
+      </Link>
+    </p>
+  );
+}
 
 type ToggleProps = {
   id: string;
@@ -63,7 +80,7 @@ function Toggle({ checked, disabled, id, label, onToggle }: ToggleProps) {
   );
 }
 
-export function SettingsForm({ initialSettings }: SettingsFormProps) {
+export function SettingsForm({ initialSettings, entitlements }: SettingsFormProps) {
   const router = useRouter();
   const [values, setValues] = useState<AvailabilitySettings>(initialSettings);
   const [confirmingParallel, setConfirmingParallel] = useState(false);
@@ -94,6 +111,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   }
 
   function handleParallelToggle() {
+    if (!entitlements.parallelSlots) {
+      return;
+    }
     if (values.allowParallelSlots) {
       // Vypnutí nevyžaduje potvrzení.
       applySetting('allowParallelSlots', false);
@@ -106,6 +126,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   }
 
   function handleAutoApproveToggle() {
+    if (!entitlements.autoApprove) {
+      return;
+    }
     applySetting('autoApproveReservations', !values.autoApproveReservations);
   }
 
@@ -129,12 +152,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             <p className="text-sm leading-6 text-[var(--color-slate-text)]">
               {AUTO_APPROVE_DESCRIPTION}
             </p>
+            {!entitlements.autoApprove ? <LockedHint /> : null}
           </div>
           <Toggle
             id="setting-auto-approve"
             label="Automatické schvalování rezervací"
-            checked={values.autoApproveReservations}
-            disabled={isPending}
+            checked={entitlements.autoApprove && values.autoApproveReservations}
+            disabled={isPending || !entitlements.autoApprove}
             onToggle={handleAutoApproveToggle}
           />
         </div>
@@ -155,12 +179,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   {PARALLEL_SLOTS_EXPLANATION}
                 </p>
               ) : null}
+              {!entitlements.parallelSlots ? <LockedHint /> : null}
             </div>
             <Toggle
               id="setting-parallel-slots"
               label="Paralelní termíny"
-              checked={values.allowParallelSlots}
-              disabled={isPending || confirmingParallel}
+              checked={entitlements.parallelSlots && values.allowParallelSlots}
+              disabled={isPending || confirmingParallel || !entitlements.parallelSlots}
               onToggle={handleParallelToggle}
             />
           </div>
