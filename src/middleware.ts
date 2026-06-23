@@ -2,6 +2,8 @@ import { decideAdminGuard, isAdminPath } from '@/lib/admin/access-guard';
 import { resolveAppUserGuardState } from '@/lib/auth/app-user-guard';
 import { decideFreeUserGuard } from '@/lib/auth/free-user-guard';
 import { needsReacceptance } from '@/lib/dpa/state';
+import { loadPlanFeatureMatrix } from '@/lib/plans/feature-matrix';
+import { decideRouteFeatureGate, routeFeatureFor } from '@/lib/plans/route-feature-gate';
 import { updateSession } from '@/lib/supabase/middleware';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -142,6 +144,29 @@ export async function middleware(request: NextRequest) {
 
   if (decision.kind === 'redirect') {
     return redirectWithSessionState(response, request, decision.pathname, decision.search ?? '');
+  }
+
+  // Entitlement gate dle matice plan_features pro routovatelné funkce (běží až po
+  // základním status-gate, který vrátil `continue`). Jen pro ne-admin podnik s
+  // placeným tarifem; matici načítáme jen na gateované routě (jinak žádný dotaz navíc).
+  if (!guardState.isAdmin && guardState.hasBusiness && guardState.subscriptionPlan) {
+    const feature = routeFeatureFor(request.nextUrl.pathname);
+    if (feature) {
+      const matrix = await loadPlanFeatureMatrix(createMiddlewareAdminClient());
+      const featureDecision = decideRouteFeatureGate(
+        request.nextUrl.pathname,
+        guardState.subscriptionPlan,
+        matrix,
+      );
+      if (featureDecision.kind === 'redirect') {
+        return redirectWithSessionState(
+          response,
+          request,
+          featureDecision.pathname,
+          featureDecision.search,
+        );
+      }
+    }
   }
 
   return nextWithSessionState(response, requestHeaders);

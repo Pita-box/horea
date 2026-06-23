@@ -2,6 +2,18 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — plan-features: vynucení entitlementů pro dashboard routy
+
+### Nové funkce
+- Middleware nově vynucuje matici `plan_features` i pro **routovatelné funkce**: `/dashboard/reservations` → `reservation_management`, `/dashboard/clients` → `clients`, `/dashboard/services` → `services`, `/dashboard/opening-hours` → `opening_hours`. Když má podnik placený tarif, který funkci NEMÁ povolenou, přesměruje se na `/dashboard/plans?locked=<feature>` (stejný vzor jako status-gate pro free).
+- `src/lib/plans/route-feature-gate.ts` (čistá funkce `routeFeatureFor` + `decideRouteFeatureGate`) — mapování rout na feature klíče + rozhodnutí; `plan IS NULL` (free) se neaplikuje. 8 unit testů.
+- `resolveAppUserGuardState` rozšířen o `subscriptionPlan`. Middleware načítá matici jen na gateované routě (žádný dotaz navíc jinde).
+
+### Ověřeno
+- `pnpm test:run` route-feature-gate 8/8; `pnpm lint` 0; `pnpm build` OK.
+
+### Zatím NEvynuceno (behaviorální/systémové funkce — vyžadují vlastní napojení)
+- `online_reservations` (veřejná rezervace), `auto_approve`, `parallel_slots`, `email_notifications`, `invoices`. Vynucené: `public_profile`, `client_search`, + nově 4 dashboard routy.
 ## 2026-06-22 — plan-features: vynucení entitlementu public_profile
 
 ### Bug & fix

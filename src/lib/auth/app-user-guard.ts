@@ -1,4 +1,5 @@
 import type { SubscriptionStatus } from '@/lib/auth/free-user-guard';
+import type { SubscriptionPlan } from '@/lib/checkout/pricing';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export type AppUserGuardState = {
@@ -6,6 +7,7 @@ export type AppUserGuardState = {
   dpaVersionAccepted: string | null;
   hasBusiness: boolean;
   subscriptionStatus: SubscriptionStatus | null;
+  subscriptionPlan: SubscriptionPlan | null;
   draftCurrentStep: number | null;
 };
 
@@ -39,6 +41,7 @@ export async function resolveAppUserGuardState(
       dpaVersionAccepted,
       hasBusiness: false,
       subscriptionStatus: null,
+      subscriptionPlan: null,
       draftCurrentStep: null,
     };
   }
@@ -56,7 +59,7 @@ export async function resolveAppUserGuardState(
   if (business?.id) {
     const { data: subscription, error: subscriptionError } = await supabase
       .from('subscriptions')
-      .select('status')
+      .select('status,plan')
       .eq('business_id', business.id)
       .maybeSingle();
 
@@ -69,6 +72,7 @@ export async function resolveAppUserGuardState(
       dpaVersionAccepted,
       hasBusiness: true,
       subscriptionStatus: (subscription?.status as SubscriptionStatus | undefined) ?? null,
+      subscriptionPlan: (subscription?.plan as SubscriptionPlan | undefined) ?? null,
       draftCurrentStep: null,
     };
   }
@@ -88,6 +92,7 @@ export async function resolveAppUserGuardState(
     dpaVersionAccepted,
     hasBusiness: false,
     subscriptionStatus: null,
+    subscriptionPlan: null,
     draftCurrentStep: typeof draft?.current_step === 'number' ? draft.current_step : null,
   };
 }
