@@ -2,6 +2,17 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — plan-features: vynucení entitlementu public_profile
+
+### Bug & fix
+- **Symptom:** Vypnutí funkce „Veřejný rezervační profil" (`public_profile`) pro tarif v `/admin/plans` nemělo žádný efekt — veřejná stránka podniku zůstala dostupná.
+- **Root cause:** Matice `plan_features` se ukládala, ale vynucoval se jen `client_search` (`search-actions.ts`). Ostatní klíče (vč. `public_profile`) byly jen informativní (katalog `features.ts` to označuje jako „v budoucnu").
+- **Fix (migrace `0055_public_profile_entitlement.sql`, bez změny app kódu):** Rozšířena centrální funkce `is_business_published` (zdroj pravdy pro Published_Business — používá ji `get_public_business_state` i anon RLS) o podmínku, že tarif podniku má `public_profile` povolený (matice `plan_features`; chybějící řádek = povoleno, `plan IS NULL` = neaplikuje se). Gating se tím projeví všude (veřejná stránka, RLS čtení, sloty) a beze ztráty ISR. Stávající „nepublikováno" UI větve (teaser pro veřejnost, owner náhled + upgrade banner) obslouží zbytek.
+- Aplikováno na hostovaný Supabase (`db push`) i self-hosted VPS (`docker exec psql`).
+
+### Pozn. / dopad
+- Na produkci je `start | public_profile | f`, takže podnik na Startu (`u-lipy`) je nově na `horea.cz/u-lipy` skrytý (zamčený teaser) — korektní důsledek. Pokud má být Start veřejný, je třeba `public_profile` pro Start v `/admin/plans` zapnout.
+- Vynucené jsou zatím `client_search` a `public_profile`; ostatní klíče matice jsou stále jen informativní (vyžadují vlastní napojení per funkce).
 ## 2026-06-22 — deploy: nasazení na produkci (VPS) — migrace 0054 + app
 
 ### Provedeno
