@@ -24,7 +24,7 @@ const WHY_CARDS: { icon: IconName; title: string; body: string }[] = [
   },
   {
     icon: 'grid',
-    title: 'Vše na jednom méstě',
+    title: 'Vše na jednom místě',
     body: 'Získejte dokonalý přehled o celém svém podnikání. Kromě přijímání schůzek získáte např. podrobné statistiky, chytrou správu zaměstnanců, evidenci tržeb a databázi potenciálních klientů...',
   },
 ];
