@@ -2,6 +2,15 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — deploy: nasazení na produkci (VPS) — migrace 0054 + app
+
+### Provedeno
+- Migrace `0054` aplikována na **self-hosted DB** (VPS) přes `docker exec supabase-db psql` (ověřeno: `owner_user_id` nullable + FK `SET NULL`).
+- App nasazena dle `deploy.md`: rsync zdrojáku → `/opt/apps/horea/app`, `docker compose build` (tag `horea-web:prev` pro rollback) + `up -d`. Kontejner healthy.
+- Tím šly live všechny změny od minula: responzivní auth hero obrázek, oprava dashboard odkazu, locked/owner profil nepublikovaného podniku, owner náhled termínů, předplatné CTA, oprava ERR_TOO_MANY_REDIRECTS (expired/deleted_data), provázání tarif→stav v admin override, force-delete varianta B.
+
+### Ověřeno (přes Cloudflare)
+- `horea.cz` 200, `/u-lipy` 200, `/login` 200 a servíruje responzivní `srcset` (360/480/640) — potvrzuje nasazený nový kód.
 ## 2026-06-22 — admin: vynucené smazání uvolní e-mail, zachová anonymizovanou historii (varianta B)
 
 ### Nové funkce / změna chování
@@ -15,7 +24,7 @@ Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox sta
 - `pnpm lint` 0, `pnpm build` OK, diagnostika čistá. (Chování proti DB ověří uživatel po aplikaci migrace.)
 
 ### ZBÝVÁ
-- **Aplikovat migraci 0054 na produkční self-hosted DB** (VPS) při deployi. Hostovaný Supabase už aplikováno (`db push`, „Remote database is up to date").
+- Nic — migrace 0054 aplikována i na produkční self-hosted DB (VPS) a kód nasazen (rsync + rebuild + restart, horea.cz ověřeno 200).
 ## 2026-06-22 — auth: ERR_TOO_MANY_REDIRECTS u expired/deleted_data účtů
 
 ### Bug & fix
