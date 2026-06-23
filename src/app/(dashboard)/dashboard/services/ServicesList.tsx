@@ -87,14 +87,14 @@ export function ServicesList({ services }: ServicesListProps) {
                       <div className="flex flex-wrap gap-2">
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="outline"
                           onClick={() => setFormState({ mode: 'edit', service })}
                         >
                           Upravit
                         </Button>
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="outline"
                           onClick={() => setDeletingService(service)}
                         >
                           Smazat

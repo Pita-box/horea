@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { Card } from '@/components/ui/card';
+import { buttonClassName } from '@/components/ui/button';
 import { Notice } from '@/components/ui/notice';
 import { toPragueDisplay } from '@/lib/datetime';
 import { matchClient, type ClientCandidate } from '@/server/ClientUpsertor';
@@ -197,7 +198,7 @@ export default async function ClientsPage() {
                       <td className="py-3">
                         <Link
                           href={`/dashboard/clients/${client.id}`}
-                          className="inline-flex h-10 items-center justify-center rounded-[var(--radius-buttons)] border border-[var(--color-border-vychozi)] px-5 text-sm font-normal leading-none text-[var(--color-slate-text)] transition-colors hover:bg-[var(--color-soft-gray-fill)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-cloud-mist)]"
+                          className={buttonClassName('outline')}
                         >
                           Zobrazit detail
                         </Link>

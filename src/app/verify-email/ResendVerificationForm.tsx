@@ -45,7 +45,7 @@ export function ResendVerificationForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[var(--radius-buttons)] bg-[var(--color-action-violet)] px-6 font-[var(--font-plus-jakarta-sans)] text-base font-semibold text-[var(--color-canvas-white)] transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[var(--radius-buttons)] bg-[var(--color-action-violet)] px-6 font-[var(--font-plus-jakarta-sans)] text-base font-semibold text-[var(--color-canvas-white)] transition-opacity hover:opacity-90 disabled:border disabled:border-[var(--color-action-violet)] disabled:bg-[var(--color-canvas-white)] disabled:text-[var(--color-action-violet)]"
       >
         {isPending ? 'Odesílám…' : 'Znovu odeslat potvrzovací e-mail'}
         {isPending ? null : <IconSend size={20} stroke={2} aria-hidden="true" />}

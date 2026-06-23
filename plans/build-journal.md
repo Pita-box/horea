@@ -2,6 +2,16 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-23 — dashboard: plovoucí indikátor načítání stránky
+
+### Nové funkce
+- Nová komponenta `src/components/dashboard/PageLoader.tsx` — plovoucí indikátor načítání vpravo dole (`fixed bottom-4 right-4`), tmavé pozadí (`--color-dark`), bílý text, rotující `IconLoader2` (`animate-spin`) + „Načítání …". Vždy v DOM, viditelnost řízená opacitou → fade-in/fade-out přes `transition-opacity duration-300`.
+- Detekce navigace bez router eventů (App Router): zobrazí se při kliknutí na interní `<a>` na jinou URL (filtruje externí, `_blank`, modifikátory, stejnou URL/#hash), skryje se při změně `pathname`/`searchParams`. Pojistka 10 s proti uváznutí při zrušené navigaci.
+- Napojeno v `DashboardChrome` přes `<Suspense fallback={null}>` (kvůli `useSearchParams`). Pokrývá owner i admin dashboard.
+
+### Ověřeno
+- `pnpm lint` 0, `pnpm build` OK, `pnpm test:run` 755 passed (snapshoty beze změny po sjednocení s HEAD). Bez migrace.
+
 ## 2026-06-22 — plan-features: gating sekcí na /dashboard/employees (TOP zaměstnanci, Zaměstnanci u služeb)
 
 ### Nové funkce

@@ -34,13 +34,14 @@ export function DashboardHeader({
   showSearch = false,
 }: DashboardHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-3 bg-[var(--color-milky-gray)] px-4 md:px-6">
+    /* <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-3 bg-[var(--color-milky-gray)] px-4 md:px-6"> */
+    <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-3 bg-[var(--color-dark)] px-4 md:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <button
           type="button"
           aria-label="Otevřít navigaci"
           onClick={onMenuClick}
-          className="-ml-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-buttons)] text-[var(--color-rich-violet)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)] lg:hidden"
+          className="ahoj -ml-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-buttons)] text-[white] transition-colors hover:bg-[var(--color-dark-light)] lg:hidden"
         >
           <IconMenu2 size={22} stroke={2} aria-hidden="true" />
         </button>
@@ -53,7 +54,7 @@ export function DashboardHeader({
           <Link
             href={settingsHref}
             aria-label={settingsLabel}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)] hover:text-[var(--color-action-violet)]"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-[var(--color-dark-light)] text-[white] transition-colors"
           >
             <IconSettings size={20} stroke={2} aria-hidden="true" />
           </Link>
@@ -61,7 +62,7 @@ export function DashboardHeader({
         <Link
           href={accountHref}
           aria-label="Nastavení účtu"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)] text-[var(--color-action-violet)] transition-opacity hover:opacity-80"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-[var(--color-dark-light)] text-[white] transition-opacity"
         >
           <IconUser size={20} stroke={2} aria-hidden="true" />
         </Link>

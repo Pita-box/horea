@@ -7,21 +7,26 @@ import Image from 'next/image';
  *
  * Použito `unoptimized`, protože jde o důvěryhodný first-party vektor — Next image
  * optimalizér SVG bez `dangerouslyAllowSVG` neprochází a vektoru optimalizace netřeba.
+ *
+ * `white` přepne na bílou variantu (`public/logo-white.svg`) pro tmavá pozadí
+ * (např. dashboard sidebar). Výchozí je tmavé logo pro světlá pozadí.
  */
 export function Logo({
   className,
   width = 104,
   height = 36,
   priority = false,
+  white = false,
 }: {
   className?: string;
   width?: number;
   height?: number;
   priority?: boolean;
+  white?: boolean;
 }) {
   return (
     <Image
-      src="/logo.svg"
+      src={white ? '/logo-white.svg' : '/logo.svg'}
       alt="Horea"
       width={width}
       height={height}

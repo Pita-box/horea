@@ -16,13 +16,14 @@ import {
   IconUsersGroup,
 } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
+import { Suspense, useEffect, useState, type ReactNode } from 'react';
 
 import { ToastProvider } from '@/components/ui/toast';
 
 import { DashboardFooter } from './DashboardFooter';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardSidebar, type DashboardNavItem } from './DashboardSidebar';
+import { PageLoader } from './PageLoader';
 import { ScrollToHashOnLoad } from './ScrollToHashOnLoad';
 
 export type DashboardVariant = 'owner' | 'admin';
@@ -123,10 +124,14 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
     <ToastProvider>
       {/* Owner shell: po načtení odscrolluje na #hash kotvu z fulltextu (R12.1/R12.2). */}
       {variant === 'owner' ? <ScrollToHashOnLoad /> : null}
+      <Suspense fallback={null}>
+        <PageLoader />
+      </Suspense>
       <div className="flex h-screen overflow-hidden bg-[var(--color-milky-gray)] text-[var(--color-slate-text)]">
         {/* Desktop sidebar */}
         <aside
-          className={`fixed left-0 top-0 z-20 hidden h-full border-[var(--color-input-border)] bg-[var(--color-milky-gray)] lg:block ${
+          /* className={`fixed left-0 top-0 z-20 hidden h-full border-[var(--color-input-border)] bg-[var(--color-milky-gray)] lg:block ${ */
+          className={`fixed left-0 top-0 z-20 hidden h-full border-[var(--color-input-border)] bg-[var(--color-dark)] lg:block ${
             collapsed ? 'w-16' : 'w-64'
           }`}
         >
@@ -147,7 +152,7 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
               aria-hidden="true"
               onClick={() => setMobileOpen(false)}
             />
-            <aside className="absolute left-0 top-0 h-full w-64 border-r border-[var(--color-input-border)] bg-[var(--color-milky-gray)] shadow-xl">
+            <aside className="absolute left-0 top-0 h-full w-64 border-[var(--color-input-border)] bg-[var(--color-dark)] shadow-2xl">
               <DashboardSidebar
                 items={items}
                 showUpgrade={variant === 'owner'}
@@ -170,8 +175,8 @@ export function DashboardChrome({ variant = 'owner', children }: DashboardChrome
             showSettings
             showSearch={variant === 'owner'}
           />
-          <main className="min-h-0 flex-1 p-4 pt-0">
-            <div className="flex h-full flex-col overflow-y-auto rounded-[var(--radius-cards)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-action-violet)_18%,white)] via-[var(--color-action-violet)_18%] to-[color-mix(in_srgb,var(--color-sunset-pink)_22%,white)]">
+          <main className="min-h-0 flex-1 p-4 pt-0 bg-[var(--color-dark)]">
+            <div className="flex h-full flex-col overflow-y-auto rounded-[var(--radius-cards)] bg-[image:var(--color-gradient-main)]">
               <div className="flex-1 p-[var(--section-gap)]">
                 <h1 className="mb-6 font-[var(--font-polysans)] text-[28px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--color-rich-violet)] md:text-[32px]">
                   {title}

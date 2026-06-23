@@ -120,7 +120,7 @@ export function PlanCards({ currentPlan, status, periodEnd, matrix, id }: PlanCa
                   'inline-flex h-11 w-full items-center justify-center rounded-[var(--radius-buttons)] px-5 text-sm font-semibold transition-colors',
                   cta === 'upgrade'
                     ? 'bg-[var(--color-action-violet)] text-[var(--color-canvas-white)] hover:brightness-95'
-                    : 'border border-[var(--color-border-vychozi)] text-[var(--color-slate-text)] hover:border-[var(--color-action-violet)]',
+                    : 'border border-[var(--color-border-vychozi)] text-[var(--color-slate-text)] hover:border-[var(--color-action-violet)] bg-[var(--color-electric-green)] hover:bg-[var(--color-action-violet)] hover:text-[white]',
                 ].join(' ')}
               >
                 {cta === 'upgrade' ? 'Upgradovat tarif' : 'Zvolit tento tarif'}

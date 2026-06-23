@@ -185,7 +185,7 @@ export function DashboardSearch() {
           aria-label="Otevřít vyhledávání"
           aria-expanded={expanded}
           onClick={openSearch}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[var(--color-slate-text)] transition-colors hover:text-[var(--color-action-violet)]"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[white] hover:bg-[var(--color-dark-light)] transition-colors "
         >
           <IconSearch size={20} stroke={2} aria-hidden="true" />
         </button>

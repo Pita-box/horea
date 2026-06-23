@@ -64,7 +64,7 @@ export function DashboardSidebar({
             onClick={onNavigate}
             className="flex items-center transition-opacity hover:opacity-80"
           >
-            <Logo width={104} height={36} className="h-8 w-auto" />
+            <Logo width={104} height={36} white className="h-8 w-auto" />
             <span className="sr-only">Horea</span>
           </Link>
         )}
@@ -75,7 +75,7 @@ export function DashboardSidebar({
             aria-label={collapsed ? 'Rozbalit postranní panel' : 'Sbalit postranní panel'}
             aria-pressed={collapsed}
             title={collapsed ? 'Rozbalit' : 'Sbalit'}
-            className="hidden rounded-[var(--radius-buttons)] p-2 text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)] lg:flex"
+            className="hidden rounded-[var(--radius-buttons)] p-2 text-[white] transition-colors hover:bg-[var(--color-dark-light)] hover:text-[var(--color-light-violet)] lg:flex"
           >
             {collapsed ? (
               <IconLayoutSidebarLeftExpand size={20} stroke={2} aria-hidden="true" />
@@ -102,7 +102,7 @@ export function DashboardSidebar({
                 collapsed ? 'justify-center px-0 py-3' : 'px-4 py-3',
                 active
                   ? 'bg-[var(--color-canvas-white)] font-semibold text-[var(--color-action-violet)] shadow-sm'
-                  : 'font-medium text-[var(--color-slate-text)] hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
+                  : 'font-medium text-[white] hover:bg-[var(--color-dark-light)]',
               ].join(' ')}
             >
               <Icon size={20} stroke={2} aria-hidden="true" />
@@ -112,14 +112,14 @@ export function DashboardSidebar({
         })}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-2 border-t border-[color-mix(in_srgb,var(--color-input-border)_50%,transparent)] pt-4">
+      <div className="mt-auto flex flex-col gap-2 border-t border-[color-mix(in_srgb,var(--color-input-border)_10%,transparent)] pt-4">
         {showUpgrade ? (
           <Link
             href="/dashboard/plans"
             onClick={onNavigate}
             title={collapsed ? 'Tarify' : undefined}
             className={[
-              'mb-2 flex items-center justify-center gap-3 rounded-[var(--radius-buttons)] bg-[var(--color-canvas-white)] py-3 text-center text-sm font-semibold text-[var(--color-action-violet)] shadow-sm transition-colors hover:bg-[var(--color-action-violet)] hover:text-[white]',
+              'mb-2 flex items-center justify-center gap-3 rounded-[var(--radius-buttons)] bg-[var(--color-electric-green)] py-3 text-center text-sm font-semibold text-[var(--color-dark)] shadow-sm transition-colors hover:bg-[var(--color-action-violet)] hover:text-[white]',
               collapsed ? 'px-0' : '',
             ].join(' ')}
           >
@@ -133,7 +133,7 @@ export function DashboardSidebar({
             onClick={onNavigate}
             title={collapsed ? 'Nápověda' : undefined}
             className={[
-              'flex items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
+              'flex items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-sm font-medium text-[var(--color-gay)] transition-colors hover:bg-[var(--color-dark-light)] hover:text-[white]',
               collapsed ? 'justify-center px-0' : 'px-4',
             ].join(' ')}
           >
@@ -146,7 +146,7 @@ export function DashboardSidebar({
             type="submit"
             title={collapsed ? 'Odhlásit se' : undefined}
             className={[
-              'flex w-full items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-left text-sm font-medium text-[var(--color-slate-text)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-action-violet)_14%,white)]',
+              'flex w-full items-center gap-3 rounded-[var(--radius-buttons)] py-2 text-left text-sm font-medium text-[var(--color-gay)] transition-colors hover:bg-[var(--color-red)] hover:text-[white]',
               collapsed ? 'justify-center px-0' : 'px-4',
             ].join(' ')}
           >

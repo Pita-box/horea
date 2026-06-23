@@ -120,7 +120,7 @@ export function AssignEmployee({
           type="button"
           onClick={() => persist(employees.map((e) => e.id))}
           disabled={isPending || selected.length === employees.length}
-          className="rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] px-3 py-2 text-sm text-[var(--color-slate-text)] transition-colors hover:border-[var(--color-action-violet)] disabled:opacity-50"
+          className="rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] px-3 py-2 text-sm text-[var(--color-slate-text)] transition-colors hover:border-[var(--color-action-violet)] disabled:border-[var(--color-action-violet)] disabled:bg-[var(--color-canvas-white)] disabled:text-[var(--color-action-violet)]"
         >
           Vybrat vše
         </button>
@@ -128,7 +128,7 @@ export function AssignEmployee({
           type="button"
           onClick={() => persist([])}
           disabled={isPending || selected.length === 0}
-          className="rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] px-3 py-2 text-sm text-[var(--color-slate-text)] transition-colors hover:border-[var(--color-action-violet)] disabled:opacity-50"
+          className="rounded-[var(--radius-buttons)] border border-[var(--color-input-border)] px-3 py-2 text-sm text-[var(--color-slate-text)] transition-colors hover:border-[var(--color-action-violet)] disabled:border-[var(--color-action-violet)] disabled:bg-[var(--color-canvas-white)] disabled:text-[var(--color-action-violet)]"
         >
           Zrušit výběr
         </button>

@@ -25,7 +25,7 @@ export function PeriodTabs({ period }: { period: ResolvedPeriod }) {
               'inline-flex h-9 items-center rounded-[var(--radius-buttons)] px-4 text-sm font-medium transition-colors',
               active
                 ? 'bg-[var(--color-action-violet)] text-white'
-                : 'text-[var(--color-slate-text)] hover:bg-[var(--color-soft-gray-fill)]',
+                : 'text-[var(--color-slate-text)] hover:bg-[var(--color-light-violet)]',
             ].join(' ')}
           >
             {option.label}
