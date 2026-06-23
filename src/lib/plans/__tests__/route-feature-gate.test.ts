@@ -18,6 +18,7 @@ describe('routeFeatureFor', () => {
     expect(routeFeatureFor('/dashboard/clients')).toBe('clients');
     expect(routeFeatureFor('/dashboard/services')).toBe('services');
     expect(routeFeatureFor('/dashboard/opening-hours')).toBe('opening_hours');
+    expect(routeFeatureFor('/dashboard/analytics')).toBe('analytics');
   });
 
   it('negateované routy → null', () => {

@@ -17,6 +17,7 @@ const ROUTE_FEATURES: ReadonlyArray<{ base: string; feature: BusinessFeatureKey 
   { base: '/dashboard/clients', feature: 'clients' },
   { base: '/dashboard/services', feature: 'services' },
   { base: '/dashboard/opening-hours', feature: 'opening_hours' },
+  { base: '/dashboard/analytics', feature: 'analytics' },
 ];
 
 function isPathOrSubpath(pathname: string, base: string): boolean {

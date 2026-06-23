@@ -2,6 +2,17 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — plan-features: analytika + jednotlivé widgety do správy tarifů
+
+### Nové funkce
+- Do katalogu `plan_features` (`src/lib/plans/features.ts`) přidáno 7 klíčů — admin je v `/admin/plans` zapíná/vypíná per tarif (matice se staví z katalogu, takže se objeví automaticky):
+  - `analytics` — celá stránka `/dashboard/analytics` (route-gate v middlewaru → při vypnutí redirect na ceník).
+  - `analytics_revenue` (Vývoj tržeb v čase), `analytics_peaks` (Špičky vytížení), `analytics_status` (Stav rezervací), `analytics_employees` (Výkonnost zaměstnanců), `analytics_top_clients` (TOP klienti), `analytics_new_returning` (Noví vs. vracející se klienti).
+- Analytics page (`/dashboard/analytics`) gateuje každý z 6 widgetů: při vypnutí v tarifu se místo widgetu zobrazí `LockedAnalyticsCard` (zámek + „není dostupné ve vašem tarifu" + odkaz na ceník). KPI karty a „Nejvýdělečnější služby" zůstávají vždy (mimo zadání). `load.ts` vrací `businessId` pro entitlement.
+- `route-feature-gate.ts`: `/dashboard/analytics` → `analytics`.
+
+### Ověřeno
+- `pnpm test:run` (plans/analytics) 17/17; `pnpm lint` 0; `pnpm build` čistý. Bez migrace — na localhostu hned, na produkci při deployi.
 ## 2026-06-22 — plan-features: UI hlášky + deaktivace toggle dle entitlementu
 
 ### Nové funkce

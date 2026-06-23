@@ -8,6 +8,9 @@ import {
   type RankingRow,
 } from '@/components/analytics/AnalyticsCharts';
 import { KpiCard, PeriodTabs } from '@/components/analytics/AnalyticsKpis';
+import { LockedAnalyticsCard } from '@/components/analytics/LockedAnalyticsCard';
+import { loadBusinessFeatureChecker } from '@/lib/plans/business-feature';
+import { createAdminClient } from '@/lib/supabase/admin';
 import {
   computeClientMix,
   computeHeatmap,
@@ -48,6 +51,10 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
   }
 
   const { period, current, previous, historyBefore, employeeNames } = result.data;
+
+  // Entitlementy widgetů dle tarifu (matice plan_features). Celá stránka je
+  // gateovaná routou `analytics` v middlewaru; tady gateujeme jednotlivé widgety.
+  const has = await loadBusinessFeatureChecker(createAdminClient(), result.data.businessId);
 
   const kpis = computeKpis(current);
   const prevKpis = computeKpis(previous);
@@ -126,24 +133,36 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
       </div>
 
       {/* Široký graf vývoje tržeb */}
-      <RevenueTrendChart
-        points={revenueSeries}
-        id="vyvoj-trzeb"
-        info="Jak se den po dni vyvíjely tržby z uskutečněných rezervací. Pomáhá poznat silné a slabé dny."
-      />
+      {has('analytics_revenue') ? (
+        <RevenueTrendChart
+          points={revenueSeries}
+          id="vyvoj-trzeb"
+          info="Jak se den po dni vyvíjely tržby z uskutečněných rezervací. Pomáhá poznat silné a slabé dny."
+        />
+      ) : (
+        <LockedAnalyticsCard title="Vývoj tržeb v čase" id="vyvoj-trzeb" />
+      )}
 
       {/* Vytížení + stav rezervací */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-        <UtilizationHeatmap
-          grid={heatmap}
-          id="spicky-vytizeni"
-          info="Kdy se nejvíc rezervuje. Čím tmavší políčko, tím víc rezervací v daný den a hodinu — tmavá místa praskají ve švech, světlá jsou volná."
-        />
-        <StatusDonut
-          breakdown={breakdown}
-          id="stav-rezervaci"
-          info="Rozložení rezervací podle výsledku: uskutečněné, propadlé (nedorazil), zrušené a teprve naplánované. Ukazuje spolehlivost kalendáře."
-        />
+        {has('analytics_peaks') ? (
+          <UtilizationHeatmap
+            grid={heatmap}
+            id="spicky-vytizeni"
+            info="Kdy se nejvíc rezervuje. Čím tmavší políčko, tím víc rezervací v daný den a hodinu — tmavá místa praskají ve švech, světlá jsou volná."
+          />
+        ) : (
+          <LockedAnalyticsCard title="Špičky vytížení" id="spicky-vytizeni" />
+        )}
+        {has('analytics_status') ? (
+          <StatusDonut
+            breakdown={breakdown}
+            id="stav-rezervaci"
+            info="Rozložení rezervací podle výsledku: uskutečněné, propadlé (nedorazil), zrušené a teprve naplánované. Ukazuje spolehlivost kalendáře."
+          />
+        ) : (
+          <LockedAnalyticsCard title="Stav rezervací" id="stav-rezervaci" />
+        )}
       </div>
 
       {/* Spodní mřížka: služby / zaměstnanci / klienti */}
@@ -155,26 +174,38 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
           emptyText="Zatím žádné uskutečněné služby."
           info="Služby seřazené podle toho, kolik peněz celkem vydělaly (ne podle počtu). Jedna dražší služba může být cennější než pět levných."
         />
-        <RankingList
-          title="Výkonnost zaměstnanců"
-          rows={employeeRows}
-          id="vykonnost-zamestnancu"
-          emptyText="Zatím žádné přiřazené rezervace."
-          info="Kolik tržeb vygeneroval každý zaměstnanec a kolik odbavil rezervací. U rezervace s více lidmi se tržba počítá každému z nich."
-        />
-        <div className="flex flex-col gap-6">
-          <ClientMixCard
-            mix={clientMix}
-            id="novi-vs-vracejici-klienti"
-            info="Poměr nových klientů (první návštěva) k vracejícím se (byli tu i dřív). Ukazuje, jestli podnik roste náborem, nebo si drží stálou klientelu."
-          />
+        {has('analytics_employees') ? (
           <RankingList
-            title="TOP klienti"
-            rows={clientRows}
-            id="top-klienti"
-            emptyText="Zatím žádní klienti s útratou."
-            info="Klienti s nejvyšší celkovou útratou za období. Hodí se třeba pro poděkování nebo věrnostní slevu."
+            title="Výkonnost zaměstnanců"
+            rows={employeeRows}
+            id="vykonnost-zamestnancu"
+            emptyText="Zatím žádné přiřazené rezervace."
+            info="Kolik tržeb vygeneroval každý zaměstnanec a kolik odbavil rezervací. U rezervace s více lidmi se tržba počítá každému z nich."
           />
+        ) : (
+          <LockedAnalyticsCard title="Výkonnost zaměstnanců" id="vykonnost-zamestnancu" />
+        )}
+        <div className="flex flex-col gap-6">
+          {has('analytics_new_returning') ? (
+            <ClientMixCard
+              mix={clientMix}
+              id="novi-vs-vracejici-klienti"
+              info="Poměr nových klientů (první návštěva) k vracejícím se (byli tu i dřív). Ukazuje, jestli podnik roste náborem, nebo si drží stálou klientelu."
+            />
+          ) : (
+            <LockedAnalyticsCard title="Noví vs. vracející se klienti" id="novi-vs-vracejici-klienti" />
+          )}
+          {has('analytics_top_clients') ? (
+            <RankingList
+              title="TOP klienti"
+              rows={clientRows}
+              id="top-klienti"
+              emptyText="Zatím žádní klienti s útratou."
+              info="Klienti s nejvyšší celkovou útratou za období. Hodí se třeba pro poděkování nebo věrnostní slevu."
+            />
+          ) : (
+            <LockedAnalyticsCard title="TOP klienti" id="top-klienti" />
+          )}
         </div>
       </div>
     </div>

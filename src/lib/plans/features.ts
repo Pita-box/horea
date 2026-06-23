@@ -15,7 +15,14 @@ export type BusinessFeatureKey =
   | 'clients'
   | 'client_search'
   | 'email_notifications'
-  | 'invoices';
+  | 'invoices'
+  | 'analytics'
+  | 'analytics_revenue'
+  | 'analytics_peaks'
+  | 'analytics_status'
+  | 'analytics_employees'
+  | 'analytics_top_clients'
+  | 'analytics_new_returning';
 
 export type BusinessFeature = {
   key: BusinessFeatureKey;
@@ -78,6 +85,41 @@ export const BUSINESS_FEATURES: BusinessFeature[] = [
     key: 'invoices',
     label: 'Faktury k předplatnému',
     description: 'Automatické generování faktur za předplatné.',
+  },
+  {
+    key: 'analytics',
+    label: 'Analýzy a přehledy',
+    description: 'Stránka Analýzy (/dashboard/analytics) s přehledy a statistikami podniku.',
+  },
+  {
+    key: 'analytics_revenue',
+    label: 'Analýzy: Vývoj tržeb v čase',
+    description: 'Graf vývoje tržeb z uskutečněných rezervací den po dni.',
+  },
+  {
+    key: 'analytics_peaks',
+    label: 'Analýzy: Špičky vytížení',
+    description: 'Heatmapa nejvytíženějších dnů a hodin.',
+  },
+  {
+    key: 'analytics_status',
+    label: 'Analýzy: Stav rezervací',
+    description: 'Rozložení rezervací podle výsledku (uskutečněné, propadlé, zrušené, naplánované).',
+  },
+  {
+    key: 'analytics_employees',
+    label: 'Analýzy: Výkonnost zaměstnanců',
+    description: 'Tržby a počet rezervací podle jednotlivých zaměstnanců.',
+  },
+  {
+    key: 'analytics_top_clients',
+    label: 'Analýzy: TOP klienti',
+    description: 'Žebříček klientů s nejvyšší celkovou útratou za období.',
+  },
+  {
+    key: 'analytics_new_returning',
+    label: 'Analýzy: Noví vs. vracející se klienti',
+    description: 'Poměr nových a vracejících se klientů.',
   },
 ];
 

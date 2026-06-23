@@ -40,6 +40,8 @@ type ReservationRow = {
 export type AnalyticsData = {
   period: ResolvedPeriod;
   today: string;
+  /** ID podniku majitele — pro entitlement gating widgetů. */
+  businessId: string;
   /** Rezervace v aktuálním období. */
   current: AnalyticsReservation[];
   /** Rezervace v předchozím (srovnávacím) období. */
@@ -198,6 +200,6 @@ export async function loadAnalytics(periodKeyRaw: string | undefined): Promise<A
 
   return {
     ok: true,
-    data: { period, today, current, previous, historyBefore, employeeNames },
+    data: { period, today, businessId: business.id, current, previous, historyBefore, employeeNames },
   };
 }
