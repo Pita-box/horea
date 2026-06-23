@@ -388,7 +388,9 @@ export function BusinessActions({
         </h3>
         <p className="text-sm leading-6 text-[color-mix(in_srgb,var(--color-slate-text)_70%,white)]">
           Nevratně smaže tenant data podniku (profil, služby, otevírací doby,
-          rezervace, klienty). Historie plateb a předplatného zůstává zachována.
+          rezervace, klienty) a odstraní účet vlastníka — jeho e-mail se uvolní pro
+          novou registraci. Anonymizovaná historie plateb a faktur zůstává zachována
+          pro účetní účely.
         </p>
         <Button
           type="button"
@@ -412,8 +414,9 @@ export function BusinessActions({
           onClose={() => setConfirmDelete(false)}
         >
           <p className="text-sm leading-6">
-            Tato akce je <strong>nevratná</strong>. Veškerá tenant data podniku budou
-            trvale odstraněna. Historie plateb a předplatného zůstane zachována pro
+            Tato akce je <strong>nevratná</strong>. Tenant data podniku a účet vlastníka
+            (včetně přihlašovacího e-mailu) budou trvale odstraněny — e-mail se uvolní pro
+            novou registraci. Anonymizovaná historie plateb a faktur zůstane zachována pro
             účetní účely.
           </p>
           {error ? (

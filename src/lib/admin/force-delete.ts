@@ -20,6 +20,11 @@ import { r2DeleteByPrefix } from '@/lib/storage/r2';
  * podniku vyprázdněn (R6.2); historie `subscriptions`/`payments` zůstává zachována
  * (R6.3). Akce je auditně zaznamenána ve stejné transakci (R6.4, Property 2).
  *
+ * NAVÍC (varianta „uvolnit e-mail, zachovat anonymizovanou historii"): po smazání
+ * tenant dat se smaže i účet vlastníka v `auth.users`. Díky FK `ON DELETE SET NULL`
+ * (migrace 0054) se tím podnik jen odpojí (`owner_user_id = NULL`) a účetní
+ * historie zůstane zachována (anonymizovaná). Uvolní se e-mail pro novou registraci.
+ *
  * Funkci volá výhradně server-side service role (admin server action); klient i
  * actor (admin user id z auth kontextu) se předávají jako parametry.
  */
@@ -69,6 +74,14 @@ export async function forceDeleteBusiness(
     return { ok: false, error: 'not_confirmed' };
   }
 
+  // Vlastníka si dohledáme PŘED smazáním (RPC `owner_user_id` nemění). Po smazání
+  // tenant dat ho použijeme ke smazání auth účtu (uvolnění e-mailu).
+  const { data: ownerRow } = await supabase
+    .from('businesses')
+    .select('owner_user_id')
+    .eq('id', input.businessId)
+    .maybeSingle<{ owner_user_id: string | null }>();
+
   const { data, error } = await supabase.rpc('admin_force_delete_business', {
     p_actor_user_id: input.actorUserId,
     p_business_id: input.businessId,
@@ -82,6 +95,19 @@ export async function forceDeleteBusiness(
 
   if (!row) {
     return { ok: false, error: 'not_found' };
+  }
+
+  // Smazání účtu vlastníka v auth.users → uvolní e-mail pro novou registraci.
+  // Díky FK ON DELETE SET NULL (migrace 0054) se podnik jen odpojí
+  // (owner_user_id = NULL) a anonymizovaná historie subscriptions/payments
+  // zůstane zachována. Best-effort: selhání nesmí shodit už provedené (a
+  // auditované) smazání tenant dat — admin může akci zopakovat.
+  const ownerUserId = ownerRow?.owner_user_id ?? null;
+  if (ownerUserId) {
+    const { error: authDeleteError } = await supabase.auth.admin.deleteUser(ownerUserId);
+    if (authDeleteError) {
+      await serverLog.warn('force_delete_auth_delete_failed', { businessId: row.business_id });
+    }
   }
 
   // Médiá podniku (logo, cover, fotky zaměstnanců) žijí pod jedním R2 prefixem
