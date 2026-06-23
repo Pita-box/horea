@@ -3,6 +3,7 @@
 import { serverLog } from '@/lib/log-server';
 import { normalizeRouteSlug } from '@/lib/slug/route';
 import { viewerOwnsBusiness } from '@/lib/business/ownership';
+import { loadBusinessFeatureChecker } from '@/lib/plans/business-feature';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/public';
 
@@ -74,11 +75,17 @@ export async function getAvailableSlots(
       }
 
       const admin = createAdminClient();
+      const has = await loadBusinessFeatureChecker(admin, state.id);
+      // Tarif bez online rezervací → žádné termíny ani v náhledu majitele.
+      if (!has('online_reservations')) {
+        return { ok: true, slots: [], durationExceedsDay: false };
+      }
       const ownerResult = await loadAvailableSlotsDetailed(admin, {
         businessId: state.id,
         serviceIds: input.serviceIds,
         dateISO: input.date,
         requirePublished: false,
+        forceNoParallel: !has('parallel_slots'),
       });
 
       return {
@@ -88,10 +95,18 @@ export async function getAvailableSlots(
       };
     }
 
+    // Entitlementy tarifu (online rezervace / paralelní sloty) — čteme admin
+    // klientem (anon na subscriptions/plan_features přes RLS nedosáhne).
+    const has = await loadBusinessFeatureChecker(createAdminClient(), state.id);
+    if (!has('online_reservations')) {
+      return { ok: true, slots: [], durationExceedsDay: false };
+    }
+
     const { slots, durationExceedsDay } = await loadAvailableSlotsDetailed(supabase, {
       businessId: state.id,
       serviceIds: input.serviceIds,
       dateISO: input.date,
+      forceNoParallel: !has('parallel_slots'),
     });
 
     return { ok: true, slots, durationExceedsDay };

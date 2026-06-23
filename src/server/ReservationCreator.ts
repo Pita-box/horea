@@ -13,6 +13,7 @@ import { validateServiceCount } from '@/lib/reservation/limits';
 import { reservationContactSchema } from '@/lib/reservation/schema';
 import type { ReservationContactValues } from '@/lib/reservation/schema';
 import { normalizeRouteSlug } from '@/lib/slug/route';
+import { loadBusinessFeatureChecker } from '@/lib/plans/business-feature';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 import { upsertClientFromReservation } from './ClientUpsertor';
@@ -274,6 +275,22 @@ export async function createReservation(
     return { ok: false, code: 404, message: MESSAGES.notPublished };
   }
 
+  // Entitlementy tarifu (`plan_features`) — načteno jednou (admin klient čte
+  // subscriptions + plan_features). Vynucuje online rezervace, paralelní sloty,
+  // auto-schvalování a e-mailové notifikace.
+  const has = await loadBusinessFeatureChecker(admin, business.id);
+
+  // Online rezervace musí být v tarifu povolené — jinak podnik veřejně nepřijímá
+  // rezervace (formulář může existovat, ale zápis se zablokuje serverově).
+  if (!has('online_reservations')) {
+    await safeLog('reservation_rejected', {
+      businessId: business.id,
+      reason: 'online_reservations_locked',
+    });
+    return { ok: false, code: 404, message: MESSAGES.notPublished };
+  }
+  const forceNoParallel = !has('parallel_slots');
+
   // (3b) Načtení VŠECH vybraných služeb jedním dotazem; každá musí existovat a
   //      patřit podniku (R7.1). Provizorní data pro e-mail; autoritativní
   //      Combined_Duration/ends_at počítá SQL pod zámkem v `create_reservation_multi`.
@@ -334,6 +351,7 @@ export async function createReservation(
       serviceIds: input.serviceIds,
       dateISO: input.date,
       time: input.time,
+      forceNoParallel,
       write: () =>
         admin.rpc('create_reservation_multi', {
           p_business_id: business.id,
@@ -402,6 +420,7 @@ export async function createReservation(
         businessId: business.id,
         serviceIds: input.serviceIds,
         dateISO: input.date,
+        forceNoParallel,
       });
     } catch {
       // Recompute je best-effort; při selhání vrátíme prázdný list.
@@ -411,7 +430,19 @@ export async function createReservation(
   }
 
   const reservationId = row.reservation_id;
-  const status: ReservationStatus = row.status === 'approved' ? 'approved' : 'pending';
+  let status: ReservationStatus = row.status === 'approved' ? 'approved' : 'pending';
+
+  // Auto-schvalování musí být v tarifu povolené; jinak rezervace vždy čeká na
+  // schválení (i kdyby měl podnik `auto_approve_reservations = true`). Flip běží
+  // hned po vytvoření (před e-maily), takže klient i e-mail dostanou správný stav.
+  if (status === 'approved' && !has('auto_approve')) {
+    try {
+      await admin.from('reservations').update({ status: 'pending' }).eq('id', reservationId);
+      status = 'pending';
+    } catch {
+      // best-effort: při selhání flipu ponecháme stav z RPC
+    }
+  }
 
   // (6b) Volitelné přiřazení zaměstnance (post-commit, best-effort). Není součástí
   //      atomického slot-write — zaměstnanec je jen atribut, ne kapacitní zámek.
@@ -446,17 +477,20 @@ export async function createReservation(
 
   // (7) Post-commit best-effort e-maily — selhání nezpůsobí rollback.
   //     Multi-service payload: seznam služeb v pořadí + Combined_Duration +
-  //     Combined_Price (R16.1, R16.2).
-  await dispatchEmails({
-    admin,
-    business,
-    services: orderedServiceRows,
-    reservationId,
-    status,
-    startsAt,
-    contact: parsed.data,
-    employeeName: assignedEmployeeName,
-  });
+  //     Combined_Price (R16.1, R16.2). E-mailové notifikace musí být v tarifu
+  //     povolené (`email_notifications`); jinak se přeskočí.
+  if (has('email_notifications')) {
+    await dispatchEmails({
+      admin,
+      business,
+      services: orderedServiceRows,
+      reservationId,
+      status,
+      startsAt,
+      contact: parsed.data,
+      employeeName: assignedEmployeeName,
+    });
+  }
 
   // (7b) Post-commit upsert klienta do evidence `clients` (R15.1). Best-effort —
   //      `upsertClientFromReservation` nikdy nevyhazuje, takže selhání nemůže

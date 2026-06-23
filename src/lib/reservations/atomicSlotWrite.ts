@@ -54,6 +54,11 @@ export type AtomicSlotWriteParams<T> = {
    * přímo přes service-role klienta.
    */
   requirePublished?: boolean;
+  /**
+   * Vynutit NEparalelní pre-lock přepočet (entitlement `parallel_slots` vypnutý).
+   * Předává se dál do `loadAvailableSlots`.
+   */
+  forceNoParallel?: boolean;
   /** Konkrétní DB zápis pod zámkem (RPC). Volá se jen při dostupném slotu. */
   write: () => PromiseLike<T>;
 };
@@ -65,7 +70,7 @@ export type AtomicSlotWriteResult<T> =
 export async function atomicSlotWrite<T>(
   params: AtomicSlotWriteParams<T>,
 ): Promise<AtomicSlotWriteResult<T>> {
-  const { supabase, businessId, serviceIds, dateISO, time, excludeReservationId, requirePublished, write } =
+  const { supabase, businessId, serviceIds, dateISO, time, excludeReservationId, requirePublished, forceNoParallel, write } =
     params;
 
   // (1) Pre-lock grid re-check přes sdílený Slot_Calculator (R9.3).
@@ -75,6 +80,7 @@ export async function atomicSlotWrite<T>(
     dateISO,
     excludeReservationId,
     requirePublished,
+    forceNoParallel,
   });
 
   if (!slots.includes(time)) {

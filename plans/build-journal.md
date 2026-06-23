@@ -2,6 +2,25 @@
 
 Chronologický žurnál stavění (nejnovější nahoře). Per-task checkbox stav je kanonicky v `.kiro/specs/<spec>/tasks.md`; zde jsou jen nové funkce a bug/fix znalost. Bez PII a tajemství.
 
+## 2026-06-22 — plan-features: vynucení behaviorálních entitlementů (online rezervace, auto-schvalování, paralelní sloty, e-maily)
+
+### Nové funkce
+- `src/lib/plans/business-feature.ts` — `loadBusinessFeatureChecker(supabase, businessId)` → `has(key)` (načte tarif podniku + matici jednou; `plan IS NULL` = vše povoleno). Vyžaduje admin/service klienta.
+- **online_reservations**: `createReservation` zápis zablokuje (404 „nepřijímá rezervace"), `getAvailableSlots` vrací prázdné termíny (veřejnost i owner náhled), když tarif funkci nemá.
+- **auto_approve**: `createReservation` po vytvoření překlopí rezervaci na `pending`, pokud tarif auto-schvalování nemá (i kdyby měl podnik `auto_approve_reservations = true`). Flip běží před e-maily.
+- **parallel_slots**: nový param `forceNoParallel` v `loadAvailableSlotsDetailed` + `atomicSlotWrite`; `getAvailableSlots` i `createReservation` ho nastaví podle entitlementu → paralelní termíny se nenabízejí ani nezapíšou.
+- **email_notifications**: `createReservation` přeskočí odeslání potvrzovacích/upozorňovacích e-mailů, pokud tarif funkci nemá.
+
+### Stav vynucení (10/11)
+- Vynuceno: `public_profile`, `client_search`, `reservation_management`, `clients`, `services`, `opening_hours` (routy) + nově `online_reservations`, `auto_approve`, `parallel_slots`, `email_notifications`.
+- **Záměrně NEvynuceno:** `invoices` (negenerovat fakturu placenému zákazníkovi je účetně rizikové — doporučeno spíš odebrat z matice).
+
+### Pozn. (UI polish jako follow-up)
+- Vynucení je serverové (zdroj pravdy). UI ještě neukazuje dedikované hlášky: při vypnutých online rezervacích formulář zobrazí „žádné termíny" (ne dedikovaný text); toggly auto-schvalování/paralelní sloty v nastavení jsou stále vidět, ale runtime je přebije. E-maily se gateují při vytvoření rezervace (ne ostatní e-mailové touchpointy).
+- Bez migrace — projeví se na localhostu hned, na produkci při deployi.
+
+### Ověřeno
+- `pnpm test:run` (server/reservations/plans) 40/40; `pnpm lint` 0; `pnpm build` OK.
 ## 2026-06-22 — plan-features: vynucení entitlementů pro dashboard routy
 
 ### Nové funkce

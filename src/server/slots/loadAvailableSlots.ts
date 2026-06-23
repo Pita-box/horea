@@ -52,6 +52,12 @@ export type LoadAvailableSlotsParams = {
    *   obchází RLS), takže výpočet funguje i pro nepublikovaný podnik.
    */
   requirePublished?: boolean;
+  /**
+   * Vynutit NEparalelní výpočet bez ohledu na `businesses.allow_parallel_slots`
+   * — používá se k vynucení entitlementu `parallel_slots` (tarif funkci nemá).
+   * Volající (server action) entitlement zjistí a předá sem `true`.
+   */
+  forceNoParallel?: boolean;
 };
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -117,7 +123,7 @@ export async function loadAvailableSlotsDetailed(
   params: LoadAvailableSlotsParams,
 ): Promise<LoadAvailableSlotsResult> {
   const empty: LoadAvailableSlotsResult = { slots: [], durationExceedsDay: false };
-  const { businessId, serviceIds, dateISO, excludeReservationId, requirePublished = true } = params;
+  const { businessId, serviceIds, dateISO, excludeReservationId, requirePublished = true, forceNoParallel = false } = params;
 
   if (!DATE_PATTERN.test(dateISO)) {
     return empty;
@@ -270,7 +276,7 @@ export async function loadAvailableSlotsDetailed(
   const buildSlots = (durationMinutes: number): string[] => {
     const input: SlotCalculatorInput = {
       config: {
-        allowParallelSlots: business.allow_parallel_slots,
+        allowParallelSlots: business.allow_parallel_slots && !forceNoParallel,
         timezone: 'Europe/Prague',
       },
       openingHours: {
