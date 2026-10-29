@@ -122,16 +122,17 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Hero vizuál — stylový placeholder blok v rámci tokenů (žádný externí obrázek) */}
-          <div
-            className="relative mt-[48px] flex aspect-video w-full max-w-5xl items-center justify-center overflow-hidden rounded-[40px] border border-[var(--color-border-vychozi)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-action-violet)_18%,white)] via-[var(--color-canvas-white)] to-[color-mix(in_srgb,var(--color-sunset-pink)_22%,white)] shadow-sm"
-            aria-hidden="true"
+          <video
+            className="mt-[48px] aspect-video w-full max-w-5xl rounded-[40px] border border-[var(--color-border-vychozi)] bg-[var(--color-rich-violet)] object-cover shadow-sm"
+            src="/media/horea-motion/horea-main-motion.mp4"
+            poster="/media/horea-motion/horea-main-poster.jpg"
+            aria-label="Horea – hlavní produktové video"
+            controls
+            playsInline
+            preload="metadata"
           >
-            <Icon
-              name="calendar-check"
-              className="h-[96px] w-[96px] text-[var(--color-action-violet)] opacity-80"
-            />
-          </div>
+            Váš prohlížeč nepodporuje přehrávání videa.
+          </video>
         </section>
 
         {/* 2. Proč si vybrat Horea? */}
